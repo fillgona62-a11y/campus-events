@@ -46,6 +46,27 @@ function runMigrations() {
     CREATE INDEX IF NOT EXISTS idx_captchas_expires ON captchas(expires_at);
   `);
 
+  // 历史库兼容：早期版本的 email_codes 使用 code_hash / used 字段，
+  // 而 v2 使用 code / consumed。结构不符时先把旧表改名归档（数据不丢），
+  // 再按新结构建表，避免启动阶段建索引时因缺少 consumed 列崩溃。
+  try {
+    const cols = db.prepare('PRAGMA table_info(email_codes)').all();
+    if (cols.length) {
+      const names = cols.map((c) => c.name);
+      const isLegacy =
+        names.includes('code_hash') ||
+        !names.includes('consumed') ||
+        !names.includes('code');
+      if (isLegacy) {
+        const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        db.exec(`ALTER TABLE email_codes RENAME TO email_codes_legacy_${stamp}`);
+        console.log(`[migrate] 旧版 email_codes 已归档为 email_codes_legacy_${stamp}`);
+      }
+    }
+  } catch (err) {
+    console.warn('[migrate] email_codes 结构检查跳过：', err.message);
+  }
+
   // 新表：验证码（F3/F2）与审计日志（F6）
   db.exec(`
     CREATE TABLE IF NOT EXISTS email_codes (

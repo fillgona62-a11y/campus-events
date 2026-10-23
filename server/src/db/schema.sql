@@ -94,7 +94,9 @@ CREATE TABLE IF NOT EXISTS email_codes (
   attempts   INTEGER NOT NULL DEFAULT 0,          -- 校验失败次数（满 5 作废）
   created_at TEXT    NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_email_codes_lookup ON email_codes(email, purpose, consumed);
+-- 注意：idx_email_codes_lookup 不在此处创建。历史库里 email_codes 可能是旧结构
+-- （code_hash / used），此时建索引会因缺少 consumed 列而启动崩溃。
+-- 该索引统一由 db/migrate.js 在"旧表改名归档 + 建新表"之后创建。
 
 -- 管理员操作日志表（F6，只读）
 CREATE TABLE IF NOT EXISTS audit_logs (
