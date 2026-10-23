@@ -42,17 +42,24 @@ app.use('/api', apiNotFound);
 if (fs.existsSync(config.clientDist)) {
   app.use(
     express.static(config.clientDist, {
-      maxAge: '1d',
+      // 默认不给 HTML 长缓存：入口文件必须每次回源校验，否则发版后
+      // 用户浏览器会继续用旧的 index.html（它引用的还是旧 hash 资源名），
+      // 表现为"网站没更新"。带 hash 的资源文件另设长缓存。
+      maxAge: 0,
       setHeaders: (res, filePath) => {
-        // 带 hash 的静态资源长缓存
-        if (/\.(js|css|png|jpg|jpeg|webp|svg|woff2?)$/.test(filePath)) {
-          res.setHeader('Cache-Control', 'public, max-age=604800');
+        if (/\.(html)$/.test(filePath)) {
+          res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        } else if (/\.(js|css|png|jpg|jpeg|webp|svg|woff2?)$/.test(filePath)) {
+          // 带 hash 的静态资源长缓存（内容变则文件名变）
+          res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
         }
       },
     })
   );
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    // SPA fallback 同样不能缓存，理由同上
+    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
     res.sendFile(path.join(config.clientDist, 'index.html'));
   });
 }
