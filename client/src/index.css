@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局基础样式：移动优先 */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f5f7fa;
+  color: #1f2933;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 富文本内容排版（活动简介，服务端已白名单过滤） */
+.rich-text img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.rich-text p {
+  margin: 0.5em 0;
+  line-height: 1.7;
+}
+.rich-text h1,
+.rich-text h2,
+.rich-text h3,
+.rich-text h4 {
+  margin: 0.8em 0 0.4em;
+  font-weight: 600;
+}
+.rich-text ul,
+.rich-text ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+/* 横向滚动分类条隐藏滚动条 */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

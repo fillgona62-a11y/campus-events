@@ -1,0 +1,54 @@
+# ---------- 依赖 ----------
+node_modules/
+.pnp
+.pnp.js
+
+# ---------- 构建产物 ----------
+client/dist/
+dist/
+build/
+
+# ---------- 环境变量与密钥（绝对不能提交） ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+
+# ---------- 数据库 ----------
+server/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# ---------- 用户上传文件（线上真实数据，不进仓库） ----------
+server/uploads/*
+!server/uploads/.gitkeep
+
+# ---------- 日志与缓存 ----------
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+.pm2/
+.cache/
+.eslintcache
+
+# ---------- 编辑器 / 系统 ----------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 临时与备份包 ----------
+*.zip
+*.tar
+*.tar.gz
+*.tmp
+temp/

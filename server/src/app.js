@@ -1,0 +1,63 @@
+/**
+ * Express 应用装配：安全中间件、API 路由、上传与前端静态托管、SPA fallback。
+ */
+const path = require('path');
+const fs = require('fs');
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const compression = require('compression');
+const config = require('./config');
+const apiRoutes = require('./routes');
+const { apiNotFound, errorHandler } = require('./middleware/errorHandler');
+
+const app = express();
+
+// 信任 Nginx 一层反向代理：使 express-rate-limit 按真实访客 IP 计数
+// （不设置时所有请求的 req.ip 都是 127.0.0.1，限流会退化为全站共享额度）
+app.set('trust proxy', 1);
+
+// 安全响应头（crossOriginResourcePolicy 放开以允许前端跨端口引用 /uploads 图片）
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: false, // SPA 单域部署，CSP 交由前置 Nginx 配置
+  })
+);
+app.use(cors());
+app.use(compression());
+app.use(express.json({ limit: '1mb' }));
+
+// 上传文件静态托管（带缓存）
+app.use(
+  '/uploads',
+  express.static(config.uploadDir, { maxAge: '7d', immutable: false })
+);
+
+// API 路由
+app.use('/api/v1', apiRoutes);
+app.use('/api', apiNotFound);
+
+// 生产模式：托管前端构建产物 + SPA fallback
+if (fs.existsSync(config.clientDist)) {
+  app.use(
+    express.static(config.clientDist, {
+      maxAge: '1d',
+      setHeaders: (res, filePath) => {
+        // 带 hash 的静态资源长缓存
+        if (/\.(js|css|png|jpg|jpeg|webp|svg|woff2?)$/.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=604800');
+        }
+      },
+    })
+  );
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(config.clientDist, 'index.html'));
+  });
+}
+
+// 统一错误处理
+app.use(errorHandler);
+
+module.exports = app;

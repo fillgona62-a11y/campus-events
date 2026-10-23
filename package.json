@@ -1,0 +1,14 @@
+{
+  "name": "campus-events",
+  "version": "1.0.0",
+  "private": true,
+  "description": "校园活动报名系统（前后端一体：Express + SQLite 后端，Vite + React 前端）",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "seed": "npm --prefix server run seed",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start"
+  }
+}
