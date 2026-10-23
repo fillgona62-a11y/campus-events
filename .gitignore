@@ -46,6 +46,10 @@ yarn-error.log*
 Thumbs.db
 desktop.ini
 
+# ---------- 部署临时产物 ----------
+deploy-package.json
+deploy-stage/
+
 # ---------- 临时与备份包 ----------
 *.zip
 *.tar

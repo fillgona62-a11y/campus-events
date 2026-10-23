@@ -3,12 +3,29 @@
  * 所有可配置项在此收敛，其他模块只允许从这里取配置。
  */
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 /** 将可能为相对路径的配置解析为基于 server 目录的绝对路径 */
 function resolveDir(p, fallback) {
   const value = p || fallback;
   return path.isAbsolute(value) ? value : path.resolve(__dirname, '..', '..', value);
+}
+
+/**
+ * 解析前端构建产物目录。
+ * 依次尝试：环境变量 CLIENT_DIST、client/dist（本地开发）、webroot（线上部署包形态）。
+ * 都找不到时回落到 client/dist，由调用方用 fs.existsSync 判断存在性。
+ */
+function resolveClientDist() {
+  const base = path.resolve(__dirname, '..', '..', '..');
+  const candidates = [process.env.CLIENT_DIST, 'client/dist', 'webroot'];
+  for (const c of candidates) {
+    if (!c) continue;
+    const dir = path.isAbsolute(c) ? c : path.resolve(base, c);
+    if (fs.existsSync(path.join(dir, 'index.html'))) return dir;
+  }
+  return path.resolve(base, 'client', 'dist');
 }
 
 const DEFAULT_JWT_SECRET = 'campus-events-dev-secret-do-not-use-in-prod';
@@ -23,8 +40,8 @@ const config = {
   dbPath: resolveDir(process.env.DB_PATH, './data/data.db'),
   /** 封面图上传目录绝对路径 */
   uploadDir: resolveDir(process.env.UPLOAD_DIR, './uploads'),
-  /** 前端构建产物目录（存在时由 Express 托管） */
-  clientDist: path.resolve(__dirname, '..', '..', '..', 'client', 'dist'),
+  /** 前端构建产物目录（存在时由 Express 托管；线上部署包形态为 webroot） */
+  clientDist: resolveClientDist(),
   /** 图形验证码配置（有效期秒数，一次性使用） */
   captcha: {
     ttlSeconds: parseInt(process.env.CAPTCHA_TTL, 10) || 300,
