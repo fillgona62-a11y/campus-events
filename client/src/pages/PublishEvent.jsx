@@ -181,16 +181,18 @@ export default function PublishEvent() {
             label="开始时间 *"
             value={form.start_time}
             onChange={(v) => update('start_time', v)}
-            format="YYYY-MM-DD HH:mm"
+            format="YYYY-MM-DD HH:mm:ss"
             ampm={false}
+            views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
             slotProps={{ textField: { fullWidth: true } }}
           />
           <DateTimePicker
             label="结束时间 *"
             value={form.end_time}
             onChange={(v) => update('end_time', v)}
-            format="YYYY-MM-DD HH:mm"
+            format="YYYY-MM-DD HH:mm:ss"
             ampm={false}
+            views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
             slotProps={{ textField: { fullWidth: true } }}
           />
         </div>
@@ -199,8 +201,9 @@ export default function PublishEvent() {
           label="报名截止时间 *"
           value={form.signup_deadline}
           onChange={(v) => update('signup_deadline', v)}
-          format="YYYY-MM-DD HH:mm"
+          format="YYYY-MM-DD HH:mm:ss"
           ampm={false}
+          views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
           slotProps={{ textField: { fullWidth: true } }}
         />
 
