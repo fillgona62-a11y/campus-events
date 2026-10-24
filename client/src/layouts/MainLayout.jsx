@@ -81,6 +81,10 @@ export default function MainLayout() {
             <Button color="inherit" component={Link} to="/" sx={navSx}>
               首页
             </Button>
+            {/* 论坛入口：公开可见（放在登录态条件块之外） */}
+            <Button color="inherit" component={Link} to="/forum" sx={navSx}>
+              论坛
+            </Button>
             {token && (
               <>
                 <Button color="inherit" component={Link} to="/publish" sx={navSx}>

@@ -7,6 +7,7 @@ const userModel = require('../models/userModel');
 const eventModel = require('../models/eventModel');
 const registrationModel = require('../models/registrationModel');
 const eventService = require('../services/eventService');
+const forumService = require('../services/forumService');
 const notificationService = require('../services/notificationService');
 const auditService = require('../services/auditService');
 const { generateTempPassword } = require('../utils/password');
@@ -172,6 +173,32 @@ function listAuditLogs(req, res, next) {
   }
 }
 
+/** DELETE /admin/posts/:id 管理员删帖（软删除 + 审计） */
+function deletePost(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) throw ApiError.badRequest('帖子 ID 不合法');
+    forumService.deletePost(req.user, id); // 服务层已允许管理员
+    auditService.log(req.user.id, AUDIT_ACTION.FORUM_POST_DELETE, 'post', id, {});
+    ok(res, null, '已删除');
+  } catch (err) {
+    next(err);
+  }
+}
+
+/** DELETE /admin/comments/:id 管理员删评论（软删除 + 审计） */
+function deleteComment(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) throw ApiError.badRequest('评论 ID 不合法');
+    forumService.deleteComment(req.user, id);
+    auditService.log(req.user.id, AUDIT_ACTION.FORUM_COMMENT_DELETE, 'comment', id, {});
+    ok(res, null, '已删除');
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   overview,
   overviewTrend,
@@ -182,4 +209,6 @@ module.exports = {
   setUserStatus,
   resetUserPassword,
   listAuditLogs,
+  deletePost,
+  deleteComment,
 };

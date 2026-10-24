@@ -113,6 +113,60 @@ function runMigrations() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_calendar_notes_user_date ON calendar_notes(user_id, date);
   `);
 
+  // 新表：校园论坛（posts/comments/post_likes/post_favorites/user_follows）
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS posts (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      author_id     INTEGER NOT NULL REFERENCES users(id),
+      title         TEXT    NOT NULL,
+      content       TEXT    NOT NULL,
+      media         TEXT,
+      topics        TEXT,
+      view_count    INTEGER NOT NULL DEFAULT 0,
+      comment_count INTEGER NOT NULL DEFAULT 0,
+      like_count    INTEGER NOT NULL DEFAULT 0,
+      favorite_count INTEGER NOT NULL DEFAULT 0,
+      status        TEXT    NOT NULL DEFAULT 'active',
+      created_at    TEXT    NOT NULL,
+      updated_at    TEXT    NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_posts_created ON posts(status, created_at);
+
+    CREATE TABLE IF NOT EXISTS comments (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_id    INTEGER NOT NULL REFERENCES posts(id),
+      user_id    INTEGER NOT NULL REFERENCES users(id),
+      parent_id  INTEGER NOT NULL DEFAULT 0,
+      content    TEXT    NOT NULL,
+      status     TEXT    NOT NULL DEFAULT 'active',
+      created_at TEXT    NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id, parent_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS post_likes (
+      post_id    INTEGER NOT NULL REFERENCES posts(id),
+      user_id    INTEGER NOT NULL REFERENCES users(id),
+      created_at TEXT    NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_post_likes_unique ON post_likes(post_id, user_id);
+
+    CREATE TABLE IF NOT EXISTS post_favorites (
+      post_id    INTEGER NOT NULL REFERENCES posts(id),
+      user_id    INTEGER NOT NULL REFERENCES users(id),
+      created_at TEXT    NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_post_favorites_unique ON post_favorites(post_id, user_id);
+
+    CREATE TABLE IF NOT EXISTS user_follows (
+      follower_id INTEGER NOT NULL REFERENCES users(id),
+      followee_id INTEGER NOT NULL REFERENCES users(id),
+      created_at  TEXT    NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_user_follows_unique ON user_follows(follower_id, followee_id);
+    CREATE INDEX IF NOT EXISTS idx_user_follows_followee ON user_follows(followee_id);
+  `);
+
   console.log('[migrate] 增量迁移完成');
 }
 

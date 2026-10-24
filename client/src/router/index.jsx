@@ -21,6 +21,11 @@ import Profile from '../pages/Profile';
 import Calendar from '../pages/Calendar';
 import Privacy from '../pages/Privacy';
 import Terms from '../pages/Terms';
+import ForumLayout from '../layouts/ForumLayout';
+import ForumHome from '../pages/forum/ForumHome';
+import ForumPostDetail from '../pages/forum/ForumPostDetail';
+import ForumPublish from '../pages/forum/ForumPublish';
+import MyForum from '../pages/forum/MyForum';
 import Dashboard from '../pages/admin/Dashboard';
 import EventReview from '../pages/admin/EventReview';
 import EventManage from '../pages/admin/EventManage';
@@ -40,6 +45,23 @@ const router = createBrowserRouter([
       { path: 'calendar', element: <Calendar /> },
       { path: 'privacy', element: <Privacy /> },
       { path: 'terms', element: <Terms /> },
+      {
+        // 校园论坛：分区布局（读公开）；发帖/编辑/我的需登录
+        path: 'forum',
+        element: <ForumLayout />,
+        children: [
+          { index: true, element: <ForumHome /> },
+          { path: 'post/:id', element: <ForumPostDetail /> },
+          {
+            element: <ProtectedRoute />,
+            children: [
+              { path: 'new', element: <ForumPublish /> },
+              { path: 'post/:id/edit', element: <ForumPublish /> },
+              { path: 'me', element: <MyForum /> },
+            ],
+          },
+        ],
+      },
       {
         // 需登录的页面
         element: <ProtectedRoute />,

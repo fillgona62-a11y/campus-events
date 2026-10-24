@@ -39,5 +39,7 @@ router.get('/users', adminController.listUsers);
 router.put('/users/:id/status', validate(userStatusSchema), adminController.setUserStatus);
 router.put('/users/:id/password/reset', adminController.resetUserPassword);
 router.get('/audit-logs', adminController.listAuditLogs);
+router.delete('/posts/:id', adminController.deletePost);
+router.delete('/comments/:id', adminController.deleteComment);
 
 module.exports = router;

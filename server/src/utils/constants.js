@@ -53,6 +53,8 @@ const AUDIT_ACTION = {
   USER_DISABLE: 'user_disable',
   USER_ENABLE: 'user_enable',
   USER_PASSWORD_RESET: 'user_password_reset',
+  FORUM_POST_DELETE: 'forum_post_delete',
+  FORUM_COMMENT_DELETE: 'forum_comment_delete',
 };
 
 /** 业务错误码（响应体 code 字段） */

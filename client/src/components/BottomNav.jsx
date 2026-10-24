@@ -11,6 +11,7 @@
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import HomeIcon from '@mui/icons-material/Home';
+import ForumIcon from '@mui/icons-material/Forum';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import PersonIcon from '@mui/icons-material/Person';
 import Paper from '@mui/material/Paper';
@@ -19,6 +20,7 @@ import { CLASH } from '../theme';
 
 const TABS = [
   { label: '首页', value: '/', icon: <HomeIcon /> },
+  { label: '论坛', value: '/forum', icon: <ForumIcon /> },
   { label: '我的报名', value: '/my/registrations', icon: <AssignmentIcon /> },
   { label: '我的', value: '/profile', icon: <PersonIcon /> },
 ];

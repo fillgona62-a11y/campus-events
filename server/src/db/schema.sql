@@ -73,6 +73,63 @@ CREATE TABLE IF NOT EXISTS calendar_notes (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_calendar_notes_user_date ON calendar_notes(user_id, date);
 
+-- ===== 校园论坛（/forum 分区）=====
+-- 帖子表
+CREATE TABLE IF NOT EXISTS posts (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  author_id     INTEGER NOT NULL REFERENCES users(id),
+  title         TEXT    NOT NULL,
+  content       TEXT    NOT NULL,                  -- 富文本（服务端白名单净化）
+  media         TEXT,                              -- JSON：{images:[/uploads/..], videos:[{type:'upload'|'embed', url, poster?}]}
+  topics        TEXT,                              -- 话题标签，逗号分隔
+  view_count    INTEGER NOT NULL DEFAULT 0,
+  comment_count INTEGER NOT NULL DEFAULT 0,
+  like_count    INTEGER NOT NULL DEFAULT 0,
+  favorite_count INTEGER NOT NULL DEFAULT 0,
+  status        TEXT    NOT NULL DEFAULT 'active', -- active / deleted
+  created_at    TEXT    NOT NULL,
+  updated_at    TEXT    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_posts_created ON posts(status, created_at);
+
+-- 评论/回复表（parent_id=0 为主评论，否则为对某条评论的回复）
+CREATE TABLE IF NOT EXISTS comments (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id    INTEGER NOT NULL REFERENCES posts(id),
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  parent_id  INTEGER NOT NULL DEFAULT 0,
+  content    TEXT    NOT NULL,
+  status     TEXT    NOT NULL DEFAULT 'active',    -- active / deleted
+  created_at TEXT    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id, parent_id, created_at);
+
+-- 帖子点赞（一人一赞，UNIQUE 约束）
+CREATE TABLE IF NOT EXISTS post_likes (
+  post_id    INTEGER NOT NULL REFERENCES posts(id),
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  created_at TEXT    NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_post_likes_unique ON post_likes(post_id, user_id);
+
+-- 帖子收藏
+CREATE TABLE IF NOT EXISTS post_favorites (
+  post_id    INTEGER NOT NULL REFERENCES posts(id),
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  created_at TEXT    NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_post_favorites_unique ON post_favorites(post_id, user_id);
+
+-- 关注（follower_id 关注 followee_id）
+CREATE TABLE IF NOT EXISTS user_follows (
+  follower_id INTEGER NOT NULL REFERENCES users(id),
+  followee_id INTEGER NOT NULL REFERENCES users(id),
+  created_at  TEXT    NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_follows_unique ON user_follows(follower_id, followee_id);
+CREATE INDEX IF NOT EXISTS idx_user_follows_followee ON user_follows(followee_id);
+
 -- 站内信表
 CREATE TABLE IF NOT EXISTS notifications (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
