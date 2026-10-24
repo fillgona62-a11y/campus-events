@@ -188,9 +188,29 @@ function bumpApprovedCount(id, delta, withCheck) {
     .run(delta, now, id).changes;
 }
 
-/** 数据概览统计 */
+/** 数据概览统计（时间均为 ISO UTC 字符串，字典序即时间序，可直接比较） */
+// 现存活动：已上架且未结束（排除 待审/拒绝/下架/取消/已结束）——下架不再计入总数
 function countTotal() {
-  return db.prepare('SELECT COUNT(*) AS c FROM events').get().c;
+  const now = new Date().toISOString();
+  return db
+    .prepare("SELECT COUNT(*) AS c FROM events WHERE status = 'approved' AND end_time > ?")
+    .get(now).c;
+}
+// 正在报名：已上架且报名未截止（signup_deadline >= now）
+function countOpen() {
+  const now = new Date().toISOString();
+  return db
+    .prepare("SELECT COUNT(*) AS c FROM events WHERE status = 'approved' AND signup_deadline >= ?")
+    .get(now).c;
+}
+// 正在进行：已上架且当前落在 [start_time, end_time] 区间
+function countOngoing() {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      "SELECT COUNT(*) AS c FROM events WHERE status = 'approved' AND start_time <= ? AND end_time >= ?"
+    )
+    .get(now, now).c;
 }
 function countPending() {
   return db.prepare("SELECT COUNT(*) AS c FROM events WHERE status = 'pending'").get().c;
@@ -218,6 +238,8 @@ module.exports = {
   updateStatus,
   bumpApprovedCount,
   countTotal,
+  countOpen,
+  countOngoing,
   countPending,
   getCheckinCode,
   setCheckinCode,

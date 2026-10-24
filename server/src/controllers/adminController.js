@@ -19,7 +19,9 @@ function overview(req, res, next) {
   try {
     ok(res, {
       total_users: userModel.count(),
-      total_events: eventModel.countTotal(),
+      total_events: eventModel.countTotal(), // 现存活动（已上架且未结束，不含下架）
+      open_events: eventModel.countOpen(), // 正在报名（报名未截止）
+      ongoing_events: eventModel.countOngoing(), // 正在进行（进行中区间）
       pending_events: eventModel.countPending(),
       total_registrations: registrationModel.count(),
     });
