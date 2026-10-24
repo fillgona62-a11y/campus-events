@@ -24,7 +24,7 @@ export function SkeletonCard({ count = 6 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="overflow-hidden rounded-2xl border-2 border-ink bg-white">
+        <div key={i} className="overflow-hidden rounded-2xl border-2 border-ink bg-paper-card">
           <div className="skeleton h-40 w-full" />
           <div className="space-y-2.5 p-4">
             <div className="skeleton h-5 w-3/4 rounded" />
@@ -46,7 +46,7 @@ export function SkeletonList({ count = 4 }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex gap-3 rounded-2xl border-2 border-ink bg-white p-3">
+        <div key={i} className="flex gap-3 rounded-2xl border-2 border-ink bg-paper-card p-3">
           <div className="skeleton h-20 w-28 flex-shrink-0 rounded-xl" />
           <div className="flex-1 space-y-2 py-1">
             <div className="skeleton h-4 w-2/3 rounded" />
@@ -99,7 +99,7 @@ export function AuthShell({
         <ClashStar size={26} className="absolute right-10 top-16 animate-float" style={{ color: CLASH.ink }} />
         <ClashStar size={16} className="absolute bottom-24 right-24" style={{ color: CLASH.ink }} />
         <div className="relative">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink bg-white shadow-block-ink-sm">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink bg-paper-card shadow-block-ink-sm">
             <ClashStar size={24} style={{ color: CLASH.royal }} />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-ink md:text-4xl">{brandTitle}</h1>
@@ -131,7 +131,7 @@ export const PAGINATION_SX = {
     backgroundColor: CLASH.lime,
     color: CLASH.ink,
     fontWeight: 800,
-    boxShadow: '3px 3px 0 0 #12121A',
+    boxShadow: '3px 3px 0 0 var(--ink-line)',
     '&:hover': { backgroundColor: CLASH.lime },
   },
 };

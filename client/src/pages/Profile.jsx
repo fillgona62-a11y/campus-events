@@ -188,10 +188,10 @@ export default function Profile() {
           </h1>
           <p className="mt-0.5 text-xs font-bold text-ink-mute">学号 {user?.student_id || '-'}</p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-[11px] font-extrabold text-ink">
+            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
               {user?.role === 'admin' ? '管理员' : '普通用户'}
             </span>
-            <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink">
+            <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
               {user?.email ? '已绑定邮箱' : '未绑定邮箱'}
             </span>
           </div>
@@ -307,10 +307,10 @@ export default function Profile() {
           onChange={(e) => setEmailForm((f) => ({ ...f, email: e.target.value }))}
         />
         {/* 图形验证码：撞色小卡 */}
-        <div className="rounded-2xl border-2 border-ink bg-clash-lemon p-3 shadow-block-ink-sm">
+        <div className="rounded-2xl border-2 border-ink bg-clash-lemon p-3 shadow-block-ink-sm on-clash">
           <div className="flex items-start gap-2">
             <div
-              className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-white"
+              className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-paper-card"
               onClick={loadCaptcha}
               title="点击图片刷新验证码"
               dangerouslySetInnerHTML={{ __html: captcha.svg }}

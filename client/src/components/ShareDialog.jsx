@@ -34,23 +34,23 @@ function clashSolidButton(bg) {
     minHeight: 44,
     fontWeight: 800,
     borderRadius: '14px',
-    border: '2px solid #12121A',
+    border: '2px solid var(--ink-line)',
     backgroundColor: bg,
     color: fg,
-    boxShadow: '4px 4px 0 0 #12121A',
+    boxShadow: '4px 4px 0 0 var(--ink-line)',
     transition:
       'transform .16s cubic-bezier(.22,1,.36,1), box-shadow .16s cubic-bezier(.22,1,.36,1)',
     '&:hover': {
       backgroundColor: bg,
-      boxShadow: '6px 6px 0 0 #12121A',
+      boxShadow: '6px 6px 0 0 var(--ink-line)',
       transform: 'translate(-2px, -2px)',
     },
-    '&:active': { boxShadow: '1px 1px 0 0 #12121A', transform: 'translate(2px, 2px)' },
+    '&:active': { boxShadow: '1px 1px 0 0 var(--ink-line)', transform: 'translate(2px, 2px)' },
     '&.Mui-disabled': {
       backgroundColor: '#D7D7E2',
       color: '#6B6B7B',
       boxShadow: 'none',
-      border: '2px solid #12121A',
+      border: '2px solid var(--ink-line)',
     },
   };
 }
@@ -120,7 +120,7 @@ export default function ShareDialog({ open, onClose, event }) {
             size="small"
             aria-label="关闭分享弹窗"
             sx={{
-              border: '2px solid #12121A',
+              border: '2px solid var(--ink-line)',
               borderRadius: '10px',
               transition: 'transform .16s cubic-bezier(.22,1,.36,1)',
               '&:hover': { backgroundColor: '#F0F0F5', transform: 'translate(-1px, -1px)' },
@@ -139,7 +139,7 @@ export default function ShareDialog({ open, onClose, event }) {
               <p className="mt-4 text-sm font-semibold text-ink-mute">正在生成海报…</p>
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-white p-4 shadow-block-ink">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-card p-4 shadow-block-ink">
               {/* 纯色光斑装饰（不使用渐变） */}
               <span
                 aria-hidden="true"
@@ -167,7 +167,7 @@ export default function ShareDialog({ open, onClose, event }) {
 
                 {/* 二维码预览 */}
                 {qr && (
-                  <div className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-ink bg-white px-3 py-2 shadow-block-ink-sm">
+                  <div className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-ink bg-paper-card px-3 py-2 shadow-block-ink-sm">
                     <img src={qr} alt="活动二维码预览" className="h-28 w-28" />
                     <span className="text-[11px] font-bold text-ink-mute">扫码报名</span>
                   </div>

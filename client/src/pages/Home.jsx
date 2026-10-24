@@ -82,7 +82,7 @@ export default function Home() {
         <ClashStar size={18} className="absolute bottom-16 right-32" style={{ color: CLASH.ink }} />
 
         <div className="relative max-w-2xl">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-white px-3 py-1 text-xs font-extrabold">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-paper-card px-3 py-1 text-xs font-extrabold">
             <ClashStar size={12} style={{ color: CLASH.magenta }} />
             校园活动 · 报名中心
           </p>
@@ -108,7 +108,7 @@ export default function Home() {
               size="large"
               startIcon={<AddCircleOutlineIcon />}
               onClick={handlePublish}
-              sx={{ backgroundColor: '#FFFFFF' }}
+              sx={{ backgroundColor: 'var(--paper-card)' }}
             >
               发布活动
             </Button>

@@ -26,7 +26,7 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
 # ---------- config ----------
-$ServerIp  = "43.202.251.174"
+$ServerIp  = "52.78.4.248"
 $User      = "ec2-user"
 $Key       = "$env:USERPROFILE\.ssh\seoul.pem"
 $RemoteDir = "~/campus-events-online"

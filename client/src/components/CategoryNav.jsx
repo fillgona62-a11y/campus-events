@@ -41,7 +41,7 @@ export default function CategoryNav({ categories = [], value = 0, onChange }) {
               'text-sm font-bold transition-all duration-200 ease-clash',
               active
                 ? 'shadow-block-ink hover:-translate-y-0.5 hover:shadow-block-ink-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-block-ink-sm'
-                : 'bg-white text-ink hover:-translate-y-0.5 hover:bg-paper hover:shadow-block-ink-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                : 'bg-paper-card text-ink hover:-translate-y-0.5 hover:bg-paper hover:shadow-block-ink-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
             ].join(' ')}
             style={active ? { backgroundColor: color, color: fg } : undefined}
           >

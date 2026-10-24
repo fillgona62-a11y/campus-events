@@ -331,7 +331,7 @@ export default function PublishEvent() {
         </FormSection>
 
         {/* 提交区：整行大按钮 + 硬投影 */}
-        <div className="rounded-2xl border-2 border-ink bg-white p-4">
+        <div className="rounded-2xl border-2 border-ink bg-paper-card p-4">
           <Button
             fullWidth
             variant="contained"

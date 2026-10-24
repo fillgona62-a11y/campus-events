@@ -97,12 +97,12 @@ export default function Calendar() {
           sx={{
             minWidth: 44,
             minHeight: 44,
-            border: '2px solid #12121A',
+            border: '2px solid var(--ink-line)',
             borderRadius: 12,
-            boxShadow: '3px 3px 0 0 #12121A',
+            boxShadow: '3px 3px 0 0 var(--ink-line)',
             backgroundColor: CLASH.lime,
-            '&:hover': { backgroundColor: CLASH.lime, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 #12121A' },
-            '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 #12121A' },
+            '&:hover': { backgroundColor: CLASH.lime, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 var(--ink-line)' },
+            '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 var(--ink-line)' },
           }}
         >
           <ChevronLeftIcon />
@@ -119,12 +119,12 @@ export default function Calendar() {
           sx={{
             minWidth: 44,
             minHeight: 44,
-            border: '2px solid #12121A',
+            border: '2px solid var(--ink-line)',
             borderRadius: 12,
-            boxShadow: '3px 3px 0 0 #12121A',
+            boxShadow: '3px 3px 0 0 var(--ink-line)',
             backgroundColor: CLASH.cyan,
-            '&:hover': { backgroundColor: CLASH.cyan, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 #12121A' },
-            '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 #12121A' },
+            '&:hover': { backgroundColor: CLASH.cyan, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 var(--ink-line)' },
+            '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 var(--ink-line)' },
           }}
         >
           <ChevronRightIcon />
@@ -159,7 +159,7 @@ export default function Calendar() {
                   aria-pressed={isSelected}
                   className={`flex min-h-[52px] flex-col items-center rounded-xl border-2 py-1 text-xs transition-transform active:translate-y-[2px] ${
                     isSelected
-                      ? 'border-ink bg-clash-lime font-extrabold shadow-block-ink-sm'
+                      ? 'border-ink bg-clash-lime font-extrabold shadow-block-ink-sm on-clash'
                       : 'border-transparent hover:border-ink/30'
                   } ${inMonth ? 'text-ink' : 'text-ink-faint'}`}
                 >
@@ -184,7 +184,7 @@ export default function Calendar() {
           <h2 className="mb-2 mt-4 flex items-center gap-2 text-base font-extrabold text-ink">
             <ClashStar size={16} style={{ color: CLASH.violet }} />
             {selected} 的活动
-            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-xs font-extrabold text-ink">
+            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-xs font-extrabold text-ink on-clash">
               {selectedEvents.length}
             </span>
           </h2>

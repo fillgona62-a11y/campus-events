@@ -132,7 +132,7 @@ export default function EventCard({ event }) {
               minHeight: 44,
               fontWeight: 800,
               borderRadius: '14px',
-              border: '2px solid #12121A',
+              border: '2px solid var(--ink-line)',
               ...(disabled
                 ? {
                     backgroundColor: '#D7D7E2',
@@ -149,13 +149,13 @@ export default function EventCard({ event }) {
                 : {
                     backgroundColor: CLASH.royal,
                     color: '#FFFFFF',
-                    boxShadow: '4px 4px 0 0 #12121A',
+                    boxShadow: '4px 4px 0 0 var(--ink-line)',
                     '&:hover': {
                       backgroundColor: CLASH.royal,
-                      boxShadow: '6px 6px 0 0 #12121A',
+                      boxShadow: '6px 6px 0 0 var(--ink-line)',
                       transform: 'translate(-2px, -2px)',
                     },
-                    '&:active': { boxShadow: '1px 1px 0 0 #12121A', transform: 'translate(2px, 2px)' },
+                    '&:active': { boxShadow: '1px 1px 0 0 var(--ink-line)', transform: 'translate(2px, 2px)' },
                   }),
             }}
           >

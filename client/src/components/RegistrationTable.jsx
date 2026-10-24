@@ -31,14 +31,14 @@ import { readableText } from '../utils/clash';
 import { ClashStar } from './ClashDecor';
 
 /** 通用撞色实心按钮样式 */
-function clashButton(bg, { textColor, shadow = '3px 3px 0 0 #12121A' } = {}) {
+function clashButton(bg, { textColor, shadow = '3px 3px 0 0 var(--ink-line)' } = {}) {
   const fg = textColor || readableText(bg);
   return {
     minHeight: 36,
     fontWeight: 800,
     fontSize: '0.8rem',
     borderRadius: '12px',
-    border: '2px solid #12121A',
+    border: '2px solid var(--ink-line)',
     backgroundColor: bg,
     color: fg,
     boxShadow: shadow,
@@ -46,15 +46,15 @@ function clashButton(bg, { textColor, shadow = '3px 3px 0 0 #12121A' } = {}) {
       'transform .16s cubic-bezier(.22,1,.36,1), box-shadow .16s cubic-bezier(.22,1,.36,1)',
     '&:hover': {
       backgroundColor: bg,
-      boxShadow: '4px 4px 0 0 #12121A',
+      boxShadow: '4px 4px 0 0 var(--ink-line)',
       transform: 'translate(-1px, -1px)',
     },
-    '&:active': { boxShadow: '1px 1px 0 0 #12121A', transform: 'translate(2px, 2px)' },
+    '&:active': { boxShadow: '1px 1px 0 0 var(--ink-line)', transform: 'translate(2px, 2px)' },
     '&.Mui-disabled': {
       backgroundColor: '#D7D7E2',
       color: '#6B6B7B',
       boxShadow: 'none',
-      border: '2px solid #12121A',
+      border: '2px solid var(--ink-line)',
     },
   };
 }
@@ -85,23 +85,23 @@ export default function RegistrationTable({
             minHeight: 40,
             fontWeight: 800,
             borderRadius: '12px',
-            border: '2px solid #12121A',
-            boxShadow: '3px 3px 0 0 #12121A',
+            border: '2px solid var(--ink-line)',
+            boxShadow: '3px 3px 0 0 var(--ink-line)',
             transition:
               'transform .16s cubic-bezier(.22,1,.36,1), box-shadow .16s cubic-bezier(.22,1,.36,1)',
             '&:hover': {
               backgroundColor: '#F5F5FA',
-              boxShadow: '4px 4px 0 0 #12121A',
+              boxShadow: '4px 4px 0 0 var(--ink-line)',
               transform: 'translate(-1px, -1px)',
             },
-            '&:active': { boxShadow: '1px 1px 0 0 #12121A', transform: 'translate(2px, 2px)' },
+            '&:active': { boxShadow: '1px 1px 0 0 var(--ink-line)', transform: 'translate(2px, 2px)' },
           }}
         >
           {exporting ? '导出中…' : '导出 CSV'}
         </Button>
       </div>
 
-      <TableContainer className="overflow-x-auto rounded-2xl border-2 border-ink bg-white shadow-block-ink">
+      <TableContainer className="overflow-x-auto rounded-2xl border-2 border-ink bg-paper-card shadow-block-ink">
         <Table size="small" sx={{ minWidth: 860 }}>
           <TableHead>
             <TableRow>
@@ -120,7 +120,7 @@ export default function RegistrationTable({
               <TableRow>
                 <TableCell colSpan={hasActions ? 8 : 7} sx={{ border: 0, py: 6 }}>
                   <div className="flex flex-col items-center justify-center gap-3 text-center">
-                    <span className="flex h-14 w-14 -rotate-6 items-center justify-center rounded-2xl border-2 border-ink bg-clash-cyan shadow-block-ink-sm">
+                    <span className="flex h-14 w-14 -rotate-6 items-center justify-center rounded-2xl border-2 border-ink bg-clash-cyan shadow-block-ink-sm on-clash">
                       <ClashStar size={26} style={{ color: CLASH.ink }} />
                     </span>
                     <p className="text-sm font-bold text-ink">还没有报名记录</p>

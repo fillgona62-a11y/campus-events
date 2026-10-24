@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   主题变量（暗色模式核心）
+   :root        = 亮色（默认）
+   html.dark    = 暗色（由 ThemeModeProvider 切换 <html> 类）
+   中性色（墨/纸）翻转；撞色八色板明度不变，两种模式通用。
+   ============================================================ */
+:root {
+  --paper: #fbfaf7;          /* 页面底色 */
+  --paper-card: #ffffff;     /* 卡片/表面底色 */
+  --ink-line: #12121a;       /* 文字 + 2px 墨线描边 + 硬投影色（亮色=墨） */
+  --ink-soft: #3a3a46;
+  --ink-mute: #6b6b7b;
+  --ink-faint: #9a9aab;
+  --ink-rgb: 18, 18, 26;     /* 用于 rgba() 半透明（如网格线/滚动条） */
+  --appbar-bg: rgba(251, 250, 247, 0.88); /* 顶栏毛玻璃底色 */
+}
+
+html.dark {
+  --paper: #0e0e15;
+  --paper-card: #181822;
+  --ink-line: #ececf3;       /* 暗色下墨线/文字翻为奶白，硬投影呈反相贴纸感 */
+  --ink-soft: #c9c9d4;
+  --ink-mute: #9a9aab;
+  --ink-faint: #6b6b7b;
+  --ink-rgb: 236, 236, 243;
+  --appbar-bg: rgba(14, 14, 21, 0.85);
+}
+
 /* 全局基础样式：移动优先 · 撞色（Clash）风格 */
 html,
 body,
@@ -11,11 +39,11 @@ body,
 
 body {
   margin: 0;
-  background-color: #fbfaf7;
-  color: #12121a;
+  background-color: var(--paper);
+  color: var(--ink-line);
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  /* 极淡的撞色晕染背景，避免大面积纯白显得平淡 */
+  /* 极淡的撞色晕染背景，避免大面积纯色显得平淡 */
   background-image:
     radial-gradient(circle at 12% -4%, rgba(178, 252, 6, 0.16), transparent 42%),
     radial-gradient(circle at 92% 2%, rgba(237, 53, 249, 0.13), transparent 40%),
@@ -23,27 +51,35 @@ body {
   background-attachment: fixed;
 }
 
+/* 暗色下降低晕染强度，避免亮斑刺眼 */
+html.dark body {
+  background-image:
+    radial-gradient(circle at 12% -4%, rgba(178, 252, 6, 0.08), transparent 42%),
+    radial-gradient(circle at 92% 2%, rgba(237, 53, 249, 0.07), transparent 40%),
+    radial-gradient(circle at 50% 108%, rgba(129, 252, 255, 0.08), transparent 46%);
+}
+
 /* 文本选中：撞色荧光绿 */
 ::selection {
   background: #b2fc06;
-  color: #12121a;
+  color: var(--ink-line);
 }
 
 /* 滚动条：细、低调 */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(18, 18, 26, 0.22) transparent;
+  scrollbar-color: rgba(var(--ink-rgb), 0.22) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgba(18, 18, 26, 0.2);
+  background: rgba(var(--ink-rgb), 0.2);
   border-radius: 999px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(18, 18, 26, 0.34);
+  background: rgba(var(--ink-rgb), 0.34);
 }
 *::-webkit-scrollbar-track {
   background: transparent;
@@ -74,6 +110,9 @@ body {
 .rich-text a {
   color: #012696;
   text-decoration: underline;
+}
+html.dark .rich-text a {
+  color: #8da6d2; /* 雾霭蓝，暗底可读 */
 }
 .rich-text blockquote {
   margin: 0.8em 0;
@@ -130,23 +169,29 @@ body {
   color: transparent;
 }
 
-/* 卡片：撞色描边 + 硬边投影 */
+/* 卡片：撞色描边 + 硬边投影（底色/描边/投影均随主题翻转） */
 .clash-card {
-  background: #fff;
-  border: 2px solid #12121a;
+  background: var(--paper-card);
+  border: 2px solid var(--ink-line);
   border-radius: 20px;
-  box-shadow: 4px 4px 0 0 #12121a;
+  box-shadow: 4px 4px 0 0 var(--ink-line);
   transition:
     transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .clash-card:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 0 #12121a;
+  box-shadow: 8px 8px 0 0 var(--ink-line);
 }
 .clash-card:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 0 #12121a;
+  box-shadow: 1px 1px 0 0 var(--ink-line);
+}
+
+/* 撞色块上的文字：无论亮/暗模式都强制为墨色（撞色块本身明度不变，需深字保证对比度） */
+.on-clash,
+.on-clash * {
+  color: #12121a !important;
 }
 
 /* 键盘可达性：统一的焦点环 */
@@ -167,9 +212,9 @@ a,
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(18, 18, 26, 0.06) 25%,
-    rgba(18, 18, 26, 0.12) 37%,
-    rgba(18, 18, 26, 0.06) 63%
+    rgba(var(--ink-rgb), 0.06) 25%,
+    rgba(var(--ink-rgb), 0.12) 37%,
+    rgba(var(--ink-rgb), 0.06) 63%
   );
   background-size: 500px 100%;
   animation: shimmer 1.6s linear infinite;

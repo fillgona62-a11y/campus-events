@@ -151,7 +151,7 @@ export default function MyRegistrations() {
                   <p className="text-xs font-semibold text-ink-mute">{item.location}</p>
                   {/* 核销凭证提示（F4）：已报名成功的活动，到场报学号核销 */}
                   {item.status === 'approved' && (
-                    <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink">
+                    <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink on-clash">
                       {item.checked_in === 1
                         ? '已核销入场'
                         : `到场凭证：${item.title} · 本人学号 ${currentUser?.student_id || ''}（请报学号核销）`}

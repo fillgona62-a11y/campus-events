@@ -22,6 +22,7 @@ import { useAuthStore } from '../store/authStore';
 import { me } from '../api/authApi';
 import BottomNav from '../components/BottomNav';
 import { ClashStar, ClashStripe } from '../components/ClashDecor';
+import ThemeToggle from '../components/ThemeToggle';
 import { CLASH } from '../theme';
 
 /** 桌面导航项：撞色 hover 反馈 */
@@ -92,6 +93,7 @@ export default function MainLayout() {
             )}
           </div>
           <div className="flex-1" />
+          <ThemeToggle />
 
           {token ? (
             <>
@@ -118,7 +120,7 @@ export default function MainLayout() {
                     color: CLASH.ink,
                     fontSize: 14,
                     fontWeight: 800,
-                    border: '2px solid #12121A',
+                    border: '2px solid var(--ink-line)',
                   }}
                 >
                   {user?.name?.slice(0, 1) || '我'}
@@ -165,9 +167,9 @@ export default function MainLayout() {
                   backgroundColor: CLASH.lime,
                   color: CLASH.ink,
                   fontWeight: 800,
-                  boxShadow: '3px 3px 0 0 #12121A',
-                  '&:hover': { backgroundColor: CLASH.lime, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 #12121A' },
-                  '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 #12121A' },
+                  boxShadow: '3px 3px 0 0 var(--ink-line)',
+                  '&:hover': { backgroundColor: CLASH.lime, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 var(--ink-line)' },
+                  '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 var(--ink-line)' },
                 }}
               >
                 注册
@@ -182,7 +184,7 @@ export default function MainLayout() {
       </main>
 
       {/* 页脚：撞色细条 + 法务入口（F9） */}
-      <footer className="bg-white pb-28 pt-0 md:pb-4">
+      <footer className="bg-paper-card pb-28 pt-0 md:pb-4">
         <ClashStripe />
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-x-4 gap-y-1 px-3 py-4 text-xs text-ink-mute">
           <span className="font-bold text-ink-soft">校园活动报名系统</span>

@@ -37,9 +37,9 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
       elevation={0}
       sx={{
-        borderTop: '2px solid #12121A',
+        borderTop: '2px solid var(--ink-line)',
         borderRadius: 0,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--paper-card)',
         // 全面屏安全区：底部 Home 条之上再留 4px 呼吸位
         paddingBottom: 'max(env(safe-area-inset-bottom), 4px)',
       }}
@@ -81,13 +81,13 @@ export default function BottomNav() {
                 '&.Mui-selected': {
                   backgroundColor: CLASH.lime,
                   color: CLASH.ink,
-                  border: '2px solid #12121A',
-                  boxShadow: '3px 3px 0 0 #12121A',
+                  border: '2px solid var(--ink-line)',
+                  boxShadow: '3px 3px 0 0 var(--ink-line)',
                   opacity: 1,
                 },
                 '&.Mui-selected:hover': {
                   backgroundColor: CLASH.lime,
-                  boxShadow: '4px 4px 0 0 #12121A',
+                  boxShadow: '4px 4px 0 0 var(--ink-line)',
                 },
               }}
             />

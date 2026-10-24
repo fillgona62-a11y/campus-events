@@ -126,13 +126,13 @@ export default function MyEvents() {
                   <p className="mt-1 text-xs font-semibold text-ink-mute">
                     报名：{event.approved_count}/{event.capacity === 0 ? '不限' : event.capacity}
                     {event.pending_registrations > 0 && (
-                      <span className="ml-2 rounded-md border-2 border-ink bg-clash-lemon px-1.5 py-0.5 font-bold text-ink">
+                      <span className="ml-2 rounded-md border-2 border-ink bg-clash-lemon px-1.5 py-0.5 font-bold text-ink on-clash">
                         {event.pending_registrations} 条待审核报名
                       </span>
                     )}
                   </p>
                   {event.status === 'rejected' && event.reject_reason && (
-                    <p className="mt-2 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-xs font-bold text-ink">
+                    <p className="mt-2 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-xs font-bold text-ink on-clash">
                       拒绝理由：{event.reject_reason}
                     </p>
                   )}

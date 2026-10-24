@@ -186,10 +186,10 @@ export default function ForgotPassword() {
             />
 
             {/* 图形验证码：撞色小卡 */}
-            <div className="rounded-2xl border-2 border-ink bg-clash-mint p-3 shadow-block-ink-sm">
+            <div className="rounded-2xl border-2 border-ink bg-clash-mint p-3 shadow-block-ink-sm on-clash">
               <div className="flex items-start gap-2">
                 <div
-                  className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-white"
+                  className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-paper-card"
                   onClick={loadCaptcha}
                   title="点击图片刷新验证码"
                   dangerouslySetInnerHTML={{ __html: captcha.svg }}

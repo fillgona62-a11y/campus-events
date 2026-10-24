@@ -1,22 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/zh-cn';
 import App from './App';
-import theme from './theme';
+import { ThemeModeProvider } from './theme/ThemeModeProvider';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeModeProvider>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-cn">
-        <CssBaseline />
         <App />
       </LocalizationProvider>
-    </ThemeProvider>
+    </ThemeModeProvider>
   </React.StrictMode>
 );
 

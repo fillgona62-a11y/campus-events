@@ -59,9 +59,9 @@ export default function SearchBar({ defaultValue = '', placeholder = '搜索活�
                   aria-label="清除搜索内容"
                   sx={{
                     color: CLASH.ink,
-                    border: '2px solid #12121A',
+                    border: '2px solid var(--ink-line)',
                     borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'var(--paper-card)',
                     transition: 'transform .16s cubic-bezier(.22,1,.36,1), background-color .16s ease',
                     '&:hover': { backgroundColor: '#F0F0F5', transform: 'translate(-1px, -1px)' },
                     '&:active': { transform: 'translate(1px, 1px) scale(0.94)' },
@@ -77,12 +77,12 @@ export default function SearchBar({ defaultValue = '', placeholder = '搜索活�
                 sx={{
                   color: '#FFFFFF',
                   backgroundColor: CLASH.violet,
-                  border: '2px solid #12121A',
+                  border: '2px solid var(--ink-line)',
                   borderRadius: '10px',
-                  boxShadow: '2px 2px 0 0 #12121A',
+                  boxShadow: '2px 2px 0 0 var(--ink-line)',
                   transition:
                     'transform .16s cubic-bezier(.22,1,.36,1), box-shadow .16s cubic-bezier(.22,1,.36,1)',
-                  '&:hover': { backgroundColor: CLASH.violet, boxShadow: '4px 4px 0 0 #12121A', transform: 'translate(-1px, -1px)' },
+                  '&:hover': { backgroundColor: CLASH.violet, boxShadow: '4px 4px 0 0 var(--ink-line)', transform: 'translate(-1px, -1px)' },
                   '&:active': { boxShadow: 'none', transform: 'translate(2px, 2px)' },
                 }}
               >
@@ -93,7 +93,7 @@ export default function SearchBar({ defaultValue = '', placeholder = '搜索活�
         ),
       }}
       sx={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--paper-card)',
         borderRadius: '14px',
         '& .MuiOutlinedInput-root': { minHeight: 48 },
       }}

@@ -4,7 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="校园活动报名系统——发现、报名、管理校园活动" />
-    <meta name="theme-color" content="#1976d2" />
+    <meta name="theme-color" content="#012696" />
+    <!-- 防暗色闪烁：在首帧绘制前同步 <html class="dark">（与 ThemeModeProvider 逻辑一致） -->
+    <script>
+      (function () {
+        try {
+          var k = 'campus-theme-mode';
+          var s = localStorage.getItem(k);
+          var dark = s === 'dark' || ((s !== 'light') &&
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
     <!-- 分享卡片（Open Graph / Twitter）：转发到微信、QQ、微博等带富卡片 -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="校园活动报名系统" />

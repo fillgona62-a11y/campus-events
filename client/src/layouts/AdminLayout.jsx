@@ -21,6 +21,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import HistoryIcon from '@mui/icons-material/History';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ClashStar, ClashStripe } from '../components/ClashDecor';
+import ThemeToggle from '../components/ThemeToggle';
 import { CLASH } from '../theme';
 
 const NAV_ITEMS = [
@@ -62,7 +63,7 @@ function NavList({ onNavigate }) {
               '&.Mui-selected': {
                 backgroundColor: CLASH.lime,
                 color: CLASH.ink,
-                boxShadow: '3px 3px 0 0 #12121A',
+                boxShadow: '3px 3px 0 0 var(--ink-line)',
                 '&:hover': { backgroundColor: CLASH.lime },
               },
               '&.Mui-selected .MuiListItemIcon-root': { color: CLASH.ink },
@@ -125,7 +126,7 @@ export default function AdminLayout() {
 
       <div className="min-w-0 flex-1">
         {/* 标题栏：撞色点缀（色块 + 四角星） */}
-        <AppBar position="sticky" color="default" elevation={0} sx={{ borderBottom: '2px solid #12121A' }}>
+        <AppBar position="sticky" color="default" elevation={0} sx={{ borderBottom: '2px solid var(--ink-line)' }}>
           <Toolbar className="gap-2">
             <IconButton
               className="md:hidden"
@@ -144,6 +145,7 @@ export default function AdminLayout() {
             </span>
             <span className="font-extrabold text-ink">校园活动 · 管理后台</span>
             <div className="flex-1" />
+            <ThemeToggle />
             <IconButton component={Link} to="/" aria-label="返回前台" sx={{ minWidth: 44, minHeight: 44 }}>
               <ArrowBackIcon />
             </IconButton>

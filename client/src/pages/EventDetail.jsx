@@ -41,7 +41,7 @@ function DetailSkeleton() {
   return (
     <div className="space-y-4">
       <div className="skeleton h-52 w-full rounded-2xl md:h-72" />
-      <div className="space-y-3 rounded-2xl border-2 border-ink bg-white p-4">
+      <div className="space-y-3 rounded-2xl border-2 border-ink bg-paper-card p-4">
         <div className="skeleton h-6 w-3/4 rounded" />
         <div className="skeleton h-4 w-1/2 rounded" />
         <div className="skeleton h-4 w-2/3 rounded" />
@@ -272,7 +272,7 @@ export default function EventDetail() {
 
         {/* 关键信息：色块标签 + 图标 */}
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-lemon px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-lemon px-3 py-2 on-clash">
             <ScheduleIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">活动时间</p>
@@ -281,21 +281,21 @@ export default function EventDetail() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-mint px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-mint px-3 py-2 on-clash">
             <PlaceIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">活动地点</p>
               <p className="truncate text-sm font-bold text-ink">{event.location}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-haze px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-haze px-3 py-2 on-clash">
             <EventBusyIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">报名截止</p>
               <p className="truncate text-sm font-bold text-ink">{formatDateTime(event.signup_deadline)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-cyan px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-cyan px-3 py-2 on-clash">
             <PersonIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">发布者</p>
@@ -323,7 +323,7 @@ export default function EventDetail() {
         </div>
 
         {event.status === 'rejected' && event.reject_reason && isOwnerOrAdmin && (
-          <p className="mt-3 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-sm font-bold text-ink">
+          <p className="mt-3 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-sm font-bold text-ink on-clash">
             审核拒绝理由：{event.reject_reason}
           </p>
         )}
@@ -345,7 +345,7 @@ export default function EventDetail() {
 
       {/* 底部固定操作栏（适配全面屏安全区） */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-ink bg-white p-3 shadow-[0_-4px_0_0_#12121A] md:bottom-auto md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-ink bg-paper-card p-3 shadow-[0_-4px_0_0_var(--ink-line)] md:bottom-auto md:hidden"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
       >
         <div className="mx-auto max-w-[1200px]">{mainButton}</div>

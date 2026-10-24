@@ -36,7 +36,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
   // ── 空数据态：撞色空态卡 + 引导文案 ─────────────────────────────
   if (!dates.length || total === 0) {
     return (
-      <div className="rounded-2xl border-2 border-ink bg-white p-5 shadow-block-ink">
+      <div className="rounded-2xl border-2 border-ink bg-paper-card p-5 shadow-block-ink">
         <h2 className="mb-4 text-base font-extrabold text-ink">{title}</h2>
         <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
           <span className="flex h-16 w-16 -rotate-6 items-center justify-center rounded-2xl border-2 border-ink bg-clash-lime shadow-block-ink">
@@ -83,7 +83,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
   };
 
   return (
-    <div className="rounded-2xl border-2 border-ink bg-white p-5 shadow-block-ink">
+    <div className="rounded-2xl border-2 border-ink bg-paper-card p-5 shadow-block-ink">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-extrabold text-ink">{title}</h2>
         {/* 多序列图例 */}
@@ -135,7 +135,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
                 x2={W - PAD.right}
                 y1={y(yMax * r)}
                 y2={y(yMax * r)}
-                stroke="rgba(18,18,26,0.12)"
+                stroke="rgba(var(--ink-rgb),0.18)"
                 strokeWidth="1"
                 strokeDasharray="4 4"
               />
@@ -187,7 +187,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
             x2={W - PAD.right}
             y1={H - PAD.bottom}
             y2={H - PAD.bottom}
-            stroke="#12121A"
+            stroke="var(--ink-line)"
             strokeWidth="1.5"
           />
           {xLabels.map(({ i, label }) => (
@@ -224,7 +224,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
         {/* Tooltip：跟随当前悬停 / 键盘选中的日期 */}
         {hoverDate && (
           <div
-            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-xl border-2 border-ink bg-white px-3 py-2 shadow-block-ink"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-xl border-2 border-ink bg-paper-card px-3 py-2 shadow-block-ink"
             style={{
               // 左右夹紧，避免首尾数据点的 tooltip 溢出图表容器
               left: `${Math.min(88, Math.max(12, (x(activeIndex) / W) * 100))}%`,

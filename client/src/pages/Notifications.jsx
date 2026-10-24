@@ -73,7 +73,7 @@ export default function Notifications() {
           <ClashStar size={20} style={{ color: CLASH.magenta }} />
           <h1 className="text-xl font-extrabold tracking-tight text-ink">站内通知</h1>
           {data.unread_count > 0 && (
-            <span className="rounded-md border-2 border-ink bg-clash-magenta px-2 py-0.5 text-xs font-extrabold text-ink">
+            <span className="rounded-md border-2 border-ink bg-clash-magenta px-2 py-0.5 text-xs font-extrabold text-ink on-clash">
               {data.unread_count} 条未读
             </span>
           )}
@@ -105,7 +105,7 @@ export default function Notifications() {
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && handleRead(item)}
               className={`clash-card cursor-pointer p-4 ${
-                item.is_read ? 'bg-white' : 'bg-clash-lemon'
+                item.is_read ? 'bg-paper-card' : 'bg-clash-lemon on-clash'
               }`}
             >
               <div className="flex items-center gap-2">

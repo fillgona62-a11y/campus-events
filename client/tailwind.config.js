@@ -1,12 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 // 移动优先断点：sm 640 / md 768 / lg 1024 / xl 1280（Tailwind 默认）
 // 视觉基调：撞色（Clash）——高饱和大色块 + 硬边投影 + 四角星装饰
+// 暗色模式：darkMode:'class' + 中性色（ink/paper）改为 CSS 变量，随 .dark 翻转
 export default {
+  // 暗色模式以 html.dark 类驱动（由 ThemeModeProvider 控制，默认跟随系统）
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        // ── 撞色八色板（取自参考图）──────────────────────────────
+        // ── 撞色八色板（取自参考图，明度不变，两种模式通用）────────────
         clash: {
           lime: '#B2FC06', // 荧光绿
           magenta: '#ED35F9', // 樱珞紫
@@ -17,16 +20,17 @@ export default {
           lemon: '#F9D77C', // 柔柠黄
           royal: '#012696', // 宝蓝色
         },
-        // ── 中性色 ────────────────────────────────────────────
+        // ── 中性色（主题化：亮色=#12121A 墨 / 暗色=奶白，靠 CSS 变量翻转）──
+        // ink.DEFAULT 既作文字色也作描边/硬投影色：两种模式下二者取值相同
         ink: {
-          DEFAULT: '#12121A',
-          soft: '#3A3A46',
-          mute: '#6B6B7B',
-          faint: '#9A9AAB',
+          DEFAULT: 'var(--ink-line)',
+          soft: 'var(--ink-soft)',
+          mute: 'var(--ink-mute)',
+          faint: 'var(--ink-faint)',
         },
         paper: {
-          DEFAULT: '#FBFAF7',
-          card: '#FFFFFF',
+          DEFAULT: 'var(--paper)',
+          card: 'var(--paper-card)',
         },
         // 兼容旧代码里的 primary 用法
         primary: {
@@ -52,10 +56,11 @@ export default {
         // 柔和悬浮（卡片静置）
         pop: '0 12px 30px -14px rgba(18,18,26,.28)',
         'pop-lg': '0 28px 60px -22px rgba(18,18,26,.40)',
-        // 硬边投影（撞色风格：按钮 / 卡片悬浮）
-        'block-ink': '4px 4px 0 0 #12121A',
-        'block-ink-lg': '6px 6px 0 0 #12121A',
-        'block-ink-sm': '2px 2px 0 0 #12121A',
+        // 硬边投影（撞色风格）：墨线色随模式翻转（亮色=墨 / 暗色=奶白，形成反相贴纸感）
+        'block-ink': '4px 4px 0 0 var(--ink-line)',
+        'block-ink-lg': '6px 6px 0 0 var(--ink-line)',
+        'block-ink-sm': '2px 2px 0 0 var(--ink-line)',
+        // 彩色硬投影（撞色块本身，明度不变，两种模式通用）
         'block-lime': '4px 4px 0 0 #B2FC06',
         'block-magenta': '4px 4px 0 0 #ED35F9',
         'block-violet': '4px 4px 0 0 #8A3BEC',
