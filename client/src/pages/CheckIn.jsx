@@ -1,13 +1,14 @@
 /**
  * 组织者核销台（F4）：核销口令生成/展示 + 学号+口令核销 + 已核销/未核销统计。
  * 路由：/my/events/:id/checkin（仅活动发布者或管理员可达，服务端二次校验权限）。
+ *
+ * 视觉：撞色卡片化，口令用撞色块突出，统计用三色块卡片。
  */
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
@@ -17,6 +18,8 @@ import {
   checkin,
   checkinStats,
 } from '../api/eventApi';
+import { ClashStar, ClashStripe } from '../components/ClashDecor';
+import { CLASH } from '../theme';
 import { formatTimeRange } from '../utils/format';
 
 export default function CheckIn() {
@@ -91,8 +94,9 @@ export default function CheckIn() {
 
   if (!event) {
     return (
-      <div className="flex justify-center py-16">
-        <CircularProgress />
+      <div className="mx-auto max-w-md space-y-3">
+        <div className="skeleton h-10 w-full rounded-2xl" />
+        <div className="skeleton h-48 w-full rounded-2xl" />
       </div>
     );
   }
@@ -107,7 +111,7 @@ export default function CheckIn() {
         >
           <ArrowBackIcon />
         </IconButton>
-        <span className="text-sm text-gray-500">核销台 · {event.title}</span>
+        <span className="text-sm font-bold text-ink-mute">核销台 · {event.title}</span>
       </div>
 
       {message.text && (
@@ -116,17 +120,26 @@ export default function CheckIn() {
         </Alert>
       )}
 
-      <p className="mb-3 text-xs text-gray-500">
+      <p className="mb-3 text-xs font-semibold text-ink-mute">
         活动时间：{formatTimeRange(event.start_time, event.end_time)}（活动开始后可生成口令与核销）
       </p>
 
       {/* 口令卡片 */}
-      <div className="mb-4 rounded-xl bg-white p-4 shadow-sm">
-        <h2 className="mb-2 font-semibold">核销口令</h2>
+      <section className="clash-card mb-4 p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <ClashStar size={16} style={{ color: CLASH.lime }} />
+          <h2 className="text-base font-extrabold text-ink">核销口令</h2>
+        </div>
+        <ClashStripe className="mb-3" />
         {checkinCode ? (
-          <p className="text-center text-4xl font-bold tracking-[0.5em] text-primary">{checkinCode}</p>
+          <p
+            className="rounded-2xl border-2 border-ink py-4 text-center text-4xl font-extrabold tracking-[0.5em] text-ink"
+            style={{ backgroundColor: CLASH.lime }}
+          >
+            {checkinCode}
+          </p>
         ) : (
-          <p className="text-sm text-gray-500">尚未生成核销口令。活动开始后生成，一活动一口令。</p>
+          <p className="text-sm text-ink-soft">尚未生成核销口令。活动开始后生成，一活动一口令。</p>
         )}
         <Button
           fullWidth
@@ -138,29 +151,33 @@ export default function CheckIn() {
         >
           {generating ? '生成中…' : checkinCode ? '重新生成口令' : '生成核销口令'}
         </Button>
-      </div>
+      </section>
 
       {/* 统计卡片 */}
       {stats && (
         <div className="mb-4 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-white p-3 shadow-sm">
-            <p className="text-2xl font-bold text-green-600">{stats.approved_count}</p>
-            <p className="mt-1 text-xs text-gray-500">报名成功</p>
+          <div className="clash-card p-3">
+            <p className="text-2xl font-extrabold text-ink">{stats.approved_count}</p>
+            <p className="mt-1 text-xs font-bold text-ink-mute">报名成功</p>
           </div>
-          <div className="rounded-xl bg-white p-3 shadow-sm">
-            <p className="text-2xl font-bold text-primary">{stats.checked_in_count}</p>
-            <p className="mt-1 text-xs text-gray-500">已核销</p>
+          <div className="clash-card p-3">
+            <p className="text-2xl font-extrabold text-ink">{stats.checked_in_count}</p>
+            <p className="mt-1 text-xs font-bold text-ink-mute">已核销</p>
           </div>
-          <div className="rounded-xl bg-white p-3 shadow-sm">
-            <p className="text-2xl font-bold text-orange-500">{stats.unchecked_count}</p>
-            <p className="mt-1 text-xs text-gray-500">未核销</p>
+          <div className="clash-card p-3">
+            <p className="text-2xl font-extrabold text-ink">{stats.unchecked_count}</p>
+            <p className="mt-1 text-xs font-bold text-ink-mute">未核销</p>
           </div>
         </div>
       )}
 
       {/* 核销表单 */}
-      <form onSubmit={handleCheckin} className="space-y-4 rounded-xl bg-white p-4 shadow-sm">
-        <h2 className="font-semibold">现场核销</h2>
+      <form onSubmit={handleCheckin} className="clash-card space-y-4 p-4">
+        <div className="flex items-center gap-2">
+          <ClashStar size={16} style={{ color: CLASH.cyan }} />
+          <h2 className="text-base font-extrabold text-ink">现场核销</h2>
+        </div>
+        <ClashStripe />
         <TextField
           fullWidth
           required

@@ -1,9 +1,13 @@
 /**
  * 用户协议（F9）：模板内容，需用户过目定稿。
  * 未登录可从 MainLayout footer 进入。
+ *
+ * 视觉：撞色卡片 + 撞色标题，小节标题前带四角星。
  */
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import { ClashStar, ClashStripe } from '../components/ClashDecor';
+import { CLASH } from '../theme';
 
 const SECTIONS = [
   {
@@ -69,13 +73,22 @@ export default function Terms() {
   const navigate = useNavigate();
   return (
     <div className="mx-auto max-w-2xl pb-8">
-      <div className="rounded-xl bg-white p-5 shadow-sm md:p-8">
-        <h1 className="mb-1 text-2xl font-bold">用户协议</h1>
-        <p className="mb-6 text-sm text-gray-400">生效日期：2025-01-01（模板稿，待定稿后更新）</p>
-        <div className="space-y-5 text-sm leading-relaxed text-gray-700">
+      <div className="clash-card p-5 md:p-8">
+        <div className="mb-1 flex items-center gap-2">
+          <ClashStar size={20} style={{ color: CLASH.violet }} />
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink">
+            <span className="clash-text-gradient">用户协议</span>
+          </h1>
+        </div>
+        <p className="mb-6 mt-2 text-xs font-bold text-ink-faint">生效日期：2025-01-01（模板稿，待定稿后更新）</p>
+        <ClashStripe className="mb-6" />
+        <div className="space-y-5 text-sm leading-relaxed text-ink-soft">
           {SECTIONS.map((s) => (
             <section key={s.title}>
-              <h2 className="mb-1 font-semibold text-gray-900">{s.title}</h2>
+              <h2 className="mb-1.5 flex items-center gap-1.5 font-extrabold text-ink">
+                <ClashStar size={12} style={{ color: CLASH.magenta }} />
+                {s.title}
+              </h2>
               {s.body.map((line, i) => (
                 <p key={i} className="mb-1">
                   {line}
@@ -86,7 +99,7 @@ export default function Terms() {
         </div>
       </div>
       <div className="mt-4 text-center">
-        <Button variant="text" onClick={() => navigate('/')}>
+        <Button variant="outlined" onClick={() => navigate('/')}>
           回首页
         </Button>
       </div>

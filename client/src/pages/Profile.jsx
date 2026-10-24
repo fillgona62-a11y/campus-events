@@ -1,5 +1,7 @@
 /**
  * 个人资料：学号（只读）+ 完善姓名/手机号 + 修改密码卡片（F1）+ 邮箱卡片（F3 联动绑定/换绑）。
+ *
+ * 视觉：撞色圆形头像（首字）+ 资料项卡片列表。
  */
 import { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
@@ -10,6 +12,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { updateMe, changePassword, sendEmailCode, bindEmail, getCaptcha } from '../api/authApi';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
+import { ClashStar, ClashStripe } from '../components/ClashDecor';
+import { CLASH } from '../theme';
 
 export default function Profile() {
   const { user, setUser, logout } = useAuthStore();
@@ -169,8 +173,39 @@ export default function Profile() {
 
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <h1 className="text-xl font-bold">个人资料</h1>
-      <div className="space-y-4 rounded-xl bg-white p-4 shadow-sm md:p-6">
+      {/* ── 撞色头像区 ─────────────────────────────────────────── */}
+      <section className="clash-card flex items-center gap-4 p-4">
+        <div
+          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-ink text-2xl font-extrabold text-ink shadow-block-ink-sm"
+          style={{ backgroundColor: CLASH.lime }}
+          aria-hidden="true"
+        >
+          {user?.name?.slice(0, 1) || '我'}
+        </div>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-lg font-extrabold tracking-tight text-ink">
+            {user?.name || '未设置姓名'}
+          </h1>
+          <p className="mt-0.5 text-xs font-bold text-ink-mute">学号 {user?.student_id || '-'}</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-[11px] font-extrabold text-ink">
+              {user?.role === 'admin' ? '管理员' : '普通用户'}
+            </span>
+            <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink">
+              {user?.email ? '已绑定邮箱' : '未绑定邮箱'}
+            </span>
+          </div>
+        </div>
+        <ClashStar size={22} className="animate-float" style={{ color: CLASH.magenta }} />
+      </section>
+
+      {/* ── 基本资料 ───────────────────────────────────────────── */}
+      <section className="clash-card space-y-4 p-4 md:p-6">
+        <div className="flex items-center gap-2">
+          <ClashStar size={16} style={{ color: CLASH.violet }} />
+          <h2 className="text-base font-extrabold text-ink">基本资料</h2>
+        </div>
+        <ClashStripe />
         <TextField fullWidth label="学号" value={user?.student_id || ''} disabled helperText="学号为登录账号，不可修改" />
         <TextField
           fullWidth
@@ -200,7 +235,7 @@ export default function Profile() {
         <Button
           fullWidth
           color="error"
-          variant="text"
+          variant="outlined"
           onClick={() => {
             logout();
             window.location.href = '/login';
@@ -208,11 +243,15 @@ export default function Profile() {
         >
           退出登录
         </Button>
-      </div>
+      </section>
 
       {/* 修改密码卡片（F1） */}
-      <div className="space-y-4 rounded-xl bg-white p-4 shadow-sm md:p-6">
-        <h2 className="font-semibold">修改密码</h2>
+      <section className="clash-card space-y-4 p-4 md:p-6">
+        <div className="flex items-center gap-2">
+          <ClashStar size={16} style={{ color: CLASH.lemon }} />
+          <h2 className="text-base font-extrabold text-ink">修改密码</h2>
+        </div>
+        <ClashStripe />
         <TextField
           fullWidth
           type="password"
@@ -247,12 +286,16 @@ export default function Profile() {
         >
           {pwdSubmitting ? '提交中…' : '修改密码'}
         </Button>
-      </div>
+      </section>
 
       {/* 邮箱卡片（F3 联动：绑定后可用于找回密码） */}
-      <div className="space-y-4 rounded-xl bg-white p-4 shadow-sm md:p-6">
-        <h2 className="font-semibold">绑定邮箱</h2>
-        <p className="text-sm text-gray-500">
+      <section className="clash-card space-y-4 p-4 md:p-6">
+        <div className="flex items-center gap-2">
+          <ClashStar size={16} style={{ color: CLASH.cyan }} />
+          <h2 className="text-base font-extrabold text-ink">绑定邮箱</h2>
+        </div>
+        <ClashStripe />
+        <p className="text-sm text-ink-soft">
           绑定邮箱后可通过“忘记密码”自助找回密码。当前状态：
           {user?.email ? `已绑定（${user.email}）` : '未绑定'}
         </p>
@@ -263,16 +306,17 @@ export default function Profile() {
           value={emailForm.email}
           onChange={(e) => setEmailForm((f) => ({ ...f, email: e.target.value }))}
         />
-        <div>
+        {/* 图形验证码：撞色小卡 */}
+        <div className="rounded-2xl border-2 border-ink bg-clash-lemon p-3 shadow-block-ink-sm">
           <div className="flex items-start gap-2">
             <div
-              className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center rounded border border-gray-200 bg-gray-50"
+              className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-white"
               onClick={loadCaptcha}
               title="点击图片刷新验证码"
               dangerouslySetInnerHTML={{ __html: captcha.svg }}
             />
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={loadCaptcha}
               disabled={captchaLoading}
               startIcon={<RefreshIcon />}
@@ -287,8 +331,8 @@ export default function Profile() {
             value={captchaCode}
             onChange={(e) => setCaptchaCode(e.target.value)}
             inputProps={{ maxLength: 8 }}
-            sx={{ mt: 1 }}
-            helperText={captchaAnswer ? `开发模式：验证码为 ${captchaAnswer}` : '点击图片可刷新'}
+            sx={{ mt: 1.5 }}
+            helperText={captchaAnswer ? `开发模式：验证码为 ${captchaAnswer}` : '看不清？点击图片或右侧按钮可刷新'}
           />
         </div>
         <div className="flex items-start gap-2">
@@ -317,7 +361,7 @@ export default function Profile() {
         >
           {emailSubmitting ? '提交中…' : '绑定邮箱'}
         </Button>
-      </div>
+      </section>
 
       <Snackbar
         open={toast.open}

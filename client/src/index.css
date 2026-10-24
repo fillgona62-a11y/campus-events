@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 全局基础样式：移动优先 */
+/* 全局基础样式：移动优先 · 撞色（Clash）风格 */
 html,
 body,
 #root {
@@ -11,33 +11,76 @@ body,
 
 body {
   margin: 0;
-  background-color: #f5f7fa;
-  color: #1f2933;
+  background-color: #fbfaf7;
+  color: #12121a;
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 极淡的撞色晕染背景，避免大面积纯白显得平淡 */
+  background-image:
+    radial-gradient(circle at 12% -4%, rgba(178, 252, 6, 0.16), transparent 42%),
+    radial-gradient(circle at 92% 2%, rgba(237, 53, 249, 0.13), transparent 40%),
+    radial-gradient(circle at 50% 108%, rgba(129, 252, 255, 0.14), transparent 46%);
+  background-attachment: fixed;
+}
+
+/* 文本选中：撞色荧光绿 */
+::selection {
+  background: #b2fc06;
+  color: #12121a;
+}
+
+/* 滚动条：细、低调 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(18, 18, 26, 0.22) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(18, 18, 26, 0.2);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(18, 18, 26, 0.34);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* 富文本内容排版（活动简介，服务端已白名单过滤） */
 .rich-text img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 .rich-text p {
   margin: 0.5em 0;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 .rich-text h1,
 .rich-text h2,
 .rich-text h3,
 .rich-text h4 {
   margin: 0.8em 0 0.4em;
-  font-weight: 600;
+  font-weight: 700;
 }
 .rich-text ul,
 .rich-text ol {
   padding-left: 1.5em;
   margin: 0.5em 0;
+}
+.rich-text a {
+  color: #012696;
+  text-decoration: underline;
+}
+.rich-text blockquote {
+  margin: 0.8em 0;
+  padding: 0.6em 0.9em;
+  border-left: 4px solid #b2fc06;
+  background: rgba(178, 252, 6, 0.12);
+  border-radius: 0 12px 12px 0;
 }
 
 /* 横向滚动分类条隐藏滚动条 */
@@ -46,4 +89,100 @@ body {
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* ── 撞色装饰：四角星 ───────────────────────────────── */
+.clash-star {
+  display: inline-block;
+  background: currentColor;
+  clip-path: polygon(
+    50% 0%,
+    60% 38%,
+    100% 50%,
+    60% 62%,
+    50% 100%,
+    40% 62%,
+    0% 50%,
+    40% 38%
+  );
+}
+
+/* 撞色条纹：分类色条 / 装饰分隔 */
+.clash-stripe {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #b2fc06 0%,
+    #ed35f9 22%,
+    #8a3bec 44%,
+    #81fcff 66%,
+    #f9d77c 84%,
+    #012696 100%
+  );
+}
+
+/* 撞色渐变文字（用于大标题强调） */
+.clash-text-gradient {
+  background: linear-gradient(96deg, #012696 0%, #8a3bec 38%, #ed35f9 68%, #b2fc06 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 卡片：撞色描边 + 硬边投影 */
+.clash-card {
+  background: #fff;
+  border: 2px solid #12121a;
+  border-radius: 20px;
+  box-shadow: 4px 4px 0 0 #12121a;
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.clash-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 0 #12121a;
+}
+.clash-card:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 #12121a;
+}
+
+/* 键盘可达性：统一的焦点环 */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #8a3bec;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 移动端点击不出现灰色高亮块 */
+button,
+a,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 骨架屏微光 */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(18, 18, 26, 0.06) 25%,
+    rgba(18, 18, 26, 0.12) 37%,
+    rgba(18, 18, 26, 0.06) 63%
+  );
+  background-size: 500px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* 尊重系统「减少动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

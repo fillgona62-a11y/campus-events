@@ -1,14 +1,15 @@
 /**
  * 我的报名：即将开始 / 已结束 Tab，可查看详情或取消报名（截止前）。
  * v2：候补中展示顺位；已报名成功活动展示核销凭证提示（F4/F5）。
+ *
+ * 视觉：列表项撞色卡片化（左色块封面 + 状态徽标），三态齐全。
  */
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
-import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -20,8 +21,12 @@ import dayjs from 'dayjs';
 import { myRegistrations, cancelRegistration } from '../api/registrationApi';
 import StatusBadge from '../components/StatusBadge';
 import EmptyState from '../components/EmptyState';
+import { ClashStar, clashColorAt } from '../components/ClashDecor';
+import { CLASH, CATEGORY_COLORS } from '../theme';
+import { readableText } from '../utils/clash';
 import { formatTimeRange } from '../utils/format';
 import { useAuthStore } from '../store/authStore';
+import { PAGINATION_SX, SkeletonList, ErrorState } from './clashUi';
 
 const PAGE_SIZE = 10;
 
@@ -32,6 +37,7 @@ export default function MyRegistrations() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState({ list: [], total: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [cancelTarget, setCancelTarget] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
@@ -40,9 +46,13 @@ export default function MyRegistrations() {
 
   const load = useCallback(() => {
     setLoading(true);
+    setError('');
     myRegistrations({ tab, page, page_size: PAGE_SIZE })
       .then((d) => setData(d))
-      .catch((err) => showToast(err.message, 'error'))
+      .catch((err) => {
+        setError(err.message || '报名记录加载失败');
+        showToast(err.message, 'error');
+      })
       .finally(() => setLoading(false));
   }, [tab, page]);
 
@@ -66,7 +76,10 @@ export default function MyRegistrations() {
 
   return (
     <div>
-      <h1 className="mb-3 text-xl font-bold">我的报名</h1>
+      <div className="mb-3 flex items-center gap-2">
+        <ClashStar size={20} style={{ color: CLASH.magenta }} />
+        <h1 className="text-xl font-extrabold tracking-tight text-ink">我的报名</h1>
+      </div>
 
       <Tabs
         value={tab}
@@ -78,58 +91,78 @@ export default function MyRegistrations() {
       </Tabs>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <CircularProgress />
-        </div>
+        <SkeletonList count={4} />
+      ) : error && data.list.length === 0 ? (
+        <ErrorState text={error} onRetry={load} />
       ) : data.list.length === 0 ? (
-        <EmptyState text={tab === 'upcoming' ? '暂无即将开始的活动报名' : '暂无已结束的报名记录'} />
+        <EmptyState text={tab === 'upcoming' ? '暂无即将开始的活动报名' : '暂无已结束的报名记录'}>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button variant="contained" component={Link} to="/">
+              去逛活动
+            </Button>
+            <Button variant="outlined" component={Link} to="/calendar">
+              查看日历
+            </Button>
+          </div>
+        </EmptyState>
       ) : (
         <div className="space-y-3">
           {data.list.map((item) => {
             const cancellable =
               ['pending', 'approved', 'waitlisted'].includes(item.status) &&
               dayjs().isBefore(dayjs(item.signup_deadline));
+            // 无封面占位：与 EventCard 封面同色规则，纯撞色块 + 大字
+            const coverColor = clashColorAt(item.category_id, CATEGORY_COLORS);
+            const coverText = readableText(coverColor);
             return (
-              <div key={item.id} className="flex gap-3 rounded-xl bg-white p-3 shadow-sm">
+              <div key={item.id} className="clash-card flex gap-3 p-3">
                 {item.cover_url ? (
                   <img
                     src={item.cover_url}
                     alt={item.title}
                     loading="lazy"
-                    className="h-20 w-28 flex-shrink-0 rounded-lg object-cover"
+                    className="h-20 w-28 flex-shrink-0 rounded-xl border-2 border-ink object-cover"
                   />
                 ) : (
-                  <div className="flex h-20 w-28 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-xl font-bold text-blue-400">
+                  <div
+                    className="flex h-20 w-28 flex-shrink-0 items-center justify-center rounded-xl border-2 border-ink text-2xl font-extrabold"
+                    style={{ backgroundColor: coverColor, color: coverText }}
+                  >
                     {item.title?.slice(0, 1)}
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate font-semibold">{item.title}</h3>
+                    <h3 className="truncate font-bold text-ink">{item.title}</h3>
                     <StatusBadge type="reg" status={item.status} />
                     {item.status === 'waitlisted' && item.waitlist_position && (
-                      <Chip size="small" color="info" variant="outlined" label={`第 ${item.waitlist_position} 位`} />
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        label={`候补第 ${item.waitlist_position} 位`}
+                        sx={{ borderColor: CLASH.ink, backgroundColor: CLASH.lemon, color: CLASH.ink, fontWeight: 800, borderWidth: 2 }}
+                      />
                     )}
                     {item.event_status === 'cancelled' && <StatusBadge type="event" status="cancelled" />}
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs font-semibold text-ink-mute">
                     {formatTimeRange(item.start_time, item.end_time)}
                   </p>
-                  <p className="text-xs text-gray-500">{item.location}</p>
+                  <p className="text-xs font-semibold text-ink-mute">{item.location}</p>
                   {/* 核销凭证提示（F4）：已报名成功的活动，到场报学号核销 */}
                   {item.status === 'approved' && (
-                    <p className="mt-1 text-xs text-blue-600">
+                    <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink">
                       {item.checked_in === 1
                         ? '已核销入场'
                         : `到场凭证：${item.title} · 本人学号 ${currentUser?.student_id || ''}（请报学号核销）`}
                     </p>
                   )}
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <Button size="small" variant="outlined" onClick={() => navigate(`/events/${item.event_id}`)}>
                       查看详情
                     </Button>
                     {cancellable && (
-                      <Button size="small" color="error" variant="text" onClick={() => setCancelTarget(item)}>
+                      <Button size="small" color="error" variant="contained" onClick={() => setCancelTarget(item)}>
                         {item.status === 'waitlisted' ? '取消候补' : '取消报名'}
                       </Button>
                     )}
@@ -148,17 +181,19 @@ export default function MyRegistrations() {
             page={page}
             onChange={(e, p) => setPage(p)}
             color="primary"
+            sx={PAGINATION_SX}
           />
         </div>
       )}
 
+      {/* 取消报名：退路为中性描边，危险操作为警示色实心 */}
       <Dialog open={Boolean(cancelTarget)} onClose={() => !submitting && setCancelTarget(null)} maxWidth="xs" fullWidth>
         <DialogTitle>取消报名</DialogTitle>
         <DialogContent>
-          <p className="text-sm text-gray-600">确定要取消报名「{cancelTarget?.title}」吗？</p>
+          <p className="text-sm text-ink-soft">确定要取消报名「{cancelTarget?.title}」吗？</p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCancelTarget(null)} disabled={submitting}>
+          <Button variant="outlined" onClick={() => setCancelTarget(null)} disabled={submitting}>
             再想想
           </Button>
           <Button color="error" variant="contained" onClick={handleCancel} disabled={submitting}>

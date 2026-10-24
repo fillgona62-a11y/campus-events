@@ -1,7 +1,9 @@
 /**
- * 忘记密码页（F2）：两步流程。
+ * 找回密码页（F2）：两步流程。
  * 第一步：学号 + 绑定邮箱 → 发送验证码（防枚举中性提示）；
  * 第二步：验证码 + 新密码 → 重置成功跳转登录页。
+ *
+ * 视觉：复用登录页同款左右分栏撞色布局（品牌区 + 白色表单卡）。
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +16,8 @@ import StepLabel from '@mui/material/StepLabel';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { sendEmailCode, resetPassword, getCaptcha } from '../api/authApi';
 import client from '../api/client';
+import { AuthShell } from './clashUi';
+import { CLASH } from '../theme';
 
 const STEPS = ['验证身份', '设置新密码'];
 
@@ -136,10 +140,12 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-md">
-        <h1 className="mb-1 text-center text-2xl font-bold text-primary">找回密码</h1>
-        <p className="mb-4 text-center text-sm text-gray-500">通过绑定邮箱重置账号密码</p>
+    <AuthShell accent={CLASH.cyan} slogan="通过绑定邮箱自助找回密码，两步即可重置">
+      <div className="clash-card p-6 md:p-8">
+        <h2 className="text-center text-2xl font-extrabold tracking-tight text-ink">
+          找回<span className="clash-text-gradient">密码</span>
+        </h2>
+        <p className="mb-4 mt-1 text-center text-sm text-ink-mute">通过绑定邮箱重置账号密码</p>
 
         <Stepper activeStep={step} className="mb-6">
           {STEPS.map((label) => (
@@ -178,16 +184,18 @@ export default function ForgotPassword() {
               onChange={update('email')}
               helperText="未绑定邮箱的老用户请先在个人资料页绑定邮箱"
             />
-            <div>
+
+            {/* 图形验证码：撞色小卡 */}
+            <div className="rounded-2xl border-2 border-ink bg-clash-mint p-3 shadow-block-ink-sm">
               <div className="flex items-start gap-2">
                 <div
-                  className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center rounded border border-gray-200 bg-gray-50"
+                  className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-white"
                   onClick={loadCaptcha}
                   title="点击图片刷新验证码"
                   dangerouslySetInnerHTML={{ __html: captcha.svg }}
                 />
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   onClick={loadCaptcha}
                   disabled={captchaLoading}
                   startIcon={<RefreshIcon />}
@@ -203,10 +211,11 @@ export default function ForgotPassword() {
                 value={captchaCode}
                 onChange={(e) => setCaptchaCode(e.target.value)}
                 inputProps={{ maxLength: 8 }}
-                sx={{ mt: 1 }}
-                helperText={captchaAnswer ? `开发模式：验证码为 ${captchaAnswer}` : '点击图片可刷新'}
+                sx={{ mt: 1.5 }}
+                helperText={captchaAnswer ? `开发模式：验证码为 ${captchaAnswer}` : '看不清？点击图片或右侧按钮可刷新'}
               />
             </div>
+
             <Button
               fullWidth
               type="submit"
@@ -261,12 +270,20 @@ export default function ForgotPassword() {
           </form>
         )}
 
-        <p className="mt-4 text-center text-sm text-gray-500">
-          <Link to="/login" className="text-primary">
-            返回登录
-          </Link>
-        </p>
+        <div className="mt-6 space-y-1.5 text-center text-sm">
+          <p className="text-ink-mute">
+            想起来了？
+            <Link to="/login" className="ml-1 font-extrabold text-clash-royal no-underline hover:underline">
+              返回登录
+            </Link>
+          </p>
+          <p>
+            <Link to="/register" className="font-bold text-ink-soft no-underline hover:text-clash-violet">
+              还没有账号？去注册
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </AuthShell>
   );
 }

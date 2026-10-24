@@ -1,25 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/zh-cn';
 import App from './App';
+import theme from './theme';
 import './index.css';
-
-// MUI 中文主题：主色与圆角约定
-const theme = createTheme({
-  palette: {
-    primary: { main: '#1976d2' },
-    background: { default: '#f5f7fa' },
-  },
-  shape: { borderRadius: 10 },
-  typography: {
-    fontFamily:
-      '"PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif',
-  },
-});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

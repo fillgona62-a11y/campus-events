@@ -1,5 +1,11 @@
 /**
- * 活动详情页：大图 + 信息 + 报名进度 + 富文本简介 + 底部固定报名栏。
+ * 活动详情页：撞色封面 + 撞色信息卡 + 报名进度 + 富文本简介 + 底部固定报名栏。
+ *
+ * 视觉要点：
+ *   1. 无封面时用「纯撞色块 + 大字」占位，不用渐变
+ *   2. 关键信息（时间 / 地点）用小图标 + 色块标签，信息层级一眼可辨
+ *   3. 报名进度百分比加粗放大
+ *   4. 底部 CTA 文案按状态区分，危险操作（取消报名）用警示色
  */
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -13,16 +19,37 @@ import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShareIcon from '@mui/icons-material/Share';
+import PlaceIcon from '@mui/icons-material/Place';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import PersonIcon from '@mui/icons-material/Person';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import IconButton from '@mui/material/IconButton';
 import { getEvent, registerEvent } from '../api/eventApi';
 import { cancelRegistration } from '../api/registrationApi';
 import { useAuthStore } from '../store/authStore';
 import StatusBadge from '../components/StatusBadge';
 import ShareDialog from '../components/ShareDialog';
+import { ClashStar, ClashStripe, clashColorAt } from '../components/ClashDecor';
+import { CLASH, CATEGORY_COLORS } from '../theme';
+import { readableText } from '../utils/clash';
 import { formatDateTime, formatTimeRange, remainingText, isFull, isSignupClosed } from '../utils/format';
+
+/** 加载态骨架屏：封面 + 信息卡 */
+function DetailSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="skeleton h-52 w-full rounded-2xl md:h-72" />
+      <div className="space-y-3 rounded-2xl border-2 border-ink bg-white p-4">
+        <div className="skeleton h-6 w-3/4 rounded" />
+        <div className="skeleton h-4 w-1/2 rounded" />
+        <div className="skeleton h-4 w-2/3 rounded" />
+        <div className="skeleton h-10 w-full rounded-xl" />
+      </div>
+    </div>
+  );
+}
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -43,6 +70,7 @@ export default function EventDetail() {
 
   const load = useCallback(() => {
     setLoading(true);
+    setLoadError('');
     getEvent(id)
       .then((d) => setDetail(d))
       .catch((err) => setLoadError(err.message))
@@ -96,17 +124,14 @@ export default function EventDetail() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-16">
-        <CircularProgress />
-      </div>
-    );
+    return <DetailSkeleton />;
   }
   if (loadError || !detail) {
     return (
-      <div className="py-16 text-center text-gray-500">
-        <p>{loadError || '活动不存在'}</p>
-        <Button component={Link} to="/" sx={{ mt: 2 }}>
+      <div className="clash-card flex flex-col items-center justify-center gap-3 px-6 py-14 text-center">
+        <ClashStar size={30} style={{ color: CLASH.magenta }} />
+        <p className="text-sm font-semibold text-ink-soft">{loadError || '活动不存在'}</p>
+        <Button variant="contained" component={Link} to="/" sx={{ mt: 0.5 }}>
           返回首页
         </Button>
       </div>
@@ -147,7 +172,7 @@ export default function EventDetail() {
         {myReg.status === 'pending'
           ? '待审核 · 取消报名'
           : myReg.status === 'waitlisted'
-            ? `候补中 · 取消候补`
+            ? '候补中 · 取消候补'
             : '已报名 · 取消报名'}
       </Button>
     );
@@ -161,11 +186,10 @@ export default function EventDetail() {
     mainButton = (
       <Button
         fullWidth
-        variant="outlined"
-        color="primary"
+        variant="contained"
         disabled={submitting}
         onClick={handleRegisterClick}
-        sx={{ minHeight: 44 }}
+        sx={{ minHeight: 44, backgroundColor: CLASH.violet, '&:hover': { backgroundColor: '#7227C7' } }}
       >
         {token ? '加入候补' : '登录后候补'}
       </Button>
@@ -194,13 +218,17 @@ export default function EventDetail() {
     );
   }
 
+  // 无封面占位：与 EventCard 封面同色规则（分类 id 在撞色色轮上的位置），纯色块 + 大字
+  const coverColor = clashColorAt(event.category_id, CATEGORY_COLORS);
+  const coverText = readableText(coverColor);
+
   return (
     <div className="pb-20">
       <div className="mb-2 flex items-center gap-1">
         <IconButton onClick={() => navigate(-1)} aria-label="返回" sx={{ minWidth: 44, minHeight: 44 }}>
           <ArrowBackIcon />
         </IconButton>
-        <span className="flex-1 text-sm text-gray-500">活动详情</span>
+        <span className="flex-1 text-sm text-ink-mute">活动详情</span>
         <IconButton onClick={() => setShareOpen(true)} aria-label="分享" sx={{ minWidth: 44, minHeight: 44 }}>
           <ShareIcon />
         </IconButton>
@@ -210,60 +238,114 @@ export default function EventDetail() {
         <img
           src={event.cover_url}
           alt={event.title}
-          className="h-52 w-full rounded-xl object-cover md:h-72"
+          className="h-52 w-full rounded-2xl border-2 border-ink object-cover md:h-72"
         />
       ) : (
-        <div className="flex h-52 w-full items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 text-5xl font-bold text-blue-400 md:h-72">
-          {event.title?.slice(0, 1) || '活'}
+        // 纯撞色块 + 大字占位（不用渐变）
+        <div
+          className="flex h-52 w-full items-center justify-center rounded-2xl border-2 border-ink md:h-72"
+          style={{ backgroundColor: coverColor }}
+        >
+          <span className="text-6xl font-extrabold md:text-7xl" style={{ color: coverText }}>
+            {event.title?.slice(0, 1) || '活'}
+          </span>
         </div>
       )}
 
-      <div className="mt-4 rounded-xl bg-white p-4 shadow-sm">
+      {/* ── 信息卡：撞色卡片 + 关键信息色块标签 ─────────────────── */}
+      <div className="clash-card mt-4 p-4">
         <div className="mb-2 flex flex-wrap items-center gap-2">
-          {event.category_name && <Chip label={event.category_name} size="small" color="primary" />}
+          {event.category_name && (
+            <Chip
+              label={event.category_name}
+              size="small"
+              sx={{ borderColor: CLASH.ink, backgroundColor: CLASH.cyan, color: CLASH.ink, fontWeight: 800, borderWidth: 2 }}
+            />
+          )}
           {event.status !== 'approved' && <StatusBadge type="event" status={event.status} />}
           {event.require_approval === 1 && (
             <Chip label="报名需审核" size="small" variant="outlined" color="warning" />
           )}
         </div>
-        <h1 className="text-xl font-bold">{event.title}</h1>
-        <div className="mt-2 space-y-1 text-sm text-gray-600">
-          <p>时间：{formatTimeRange(event.start_time, event.end_time)}</p>
-          <p>地点：{event.location}</p>
-          <p>报名截止：{formatDateTime(event.signup_deadline)}</p>
-          <p>发布者：{event.organizer_name || '-'}</p>
+
+        <h1 className="text-xl font-extrabold tracking-tight text-ink">{event.title}</h1>
+
+        {/* 关键信息：色块标签 + 图标 */}
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-lemon px-3 py-2">
+            <ScheduleIcon sx={{ fontSize: 20 }} />
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">活动时间</p>
+              <p className="truncate text-sm font-bold text-ink">
+                {formatTimeRange(event.start_time, event.end_time)}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-mint px-3 py-2">
+            <PlaceIcon sx={{ fontSize: 20 }} />
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">活动地点</p>
+              <p className="truncate text-sm font-bold text-ink">{event.location}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-haze px-3 py-2">
+            <EventBusyIcon sx={{ fontSize: 20 }} />
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">报名截止</p>
+              <p className="truncate text-sm font-bold text-ink">{formatDateTime(event.signup_deadline)}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-cyan px-3 py-2">
+            <PersonIcon sx={{ fontSize: 20 }} />
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">发布者</p>
+              <p className="truncate text-sm font-bold text-ink">{event.organizer_name || '-'}</p>
+            </div>
+          </div>
         </div>
 
+        {/* 报名进度：百分比加粗放大 */}
         <div className="mt-4">
-          <div className="mb-1 flex justify-between text-xs text-gray-500">
-            <span>报名进度</span>
-            <span>{remainingText(event)}（已成功 {event.approved_count} 人）</span>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <span className="text-xs font-bold text-ink-mute">报名进度</span>
+            <span className="text-lg font-extrabold text-ink">
+              {Math.round(progress)}
+              <span className="text-xs font-bold text-ink-mute">%</span>
+              <span className="ml-2 text-xs font-bold text-ink-mute">{remainingText(event)}</span>
+            </span>
           </div>
           {event.capacity > 0 && <LinearProgress variant="determinate" value={progress} />}
           {waitlistCount > 0 && (
-            <p className="mt-1 text-xs text-blue-600">当前候补 {waitlistCount} 人，有人取消时将按顺序自动递补</p>
+            <p className="mt-1.5 text-xs font-bold text-clash-violet">
+              当前候补 {waitlistCount} 人，有人取消时将按顺序自动递补
+            </p>
           )}
         </div>
 
         {event.status === 'rejected' && event.reject_reason && isOwnerOrAdmin && (
-          <p className="mt-3 rounded-lg bg-red-50 p-2 text-sm text-red-600">
-            审核拒绝理由:{event.reject_reason}
+          <p className="mt-3 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-sm font-bold text-ink">
+            审核拒绝理由：{event.reject_reason}
           </p>
         )}
       </div>
 
-      <div className="mt-4 rounded-xl bg-white p-4 shadow-sm">
-        <h2 className="mb-2 font-semibold">活动简介</h2>
+      {/* ── 简介卡 ─────────────────────────────────────────────── */}
+      <div className="clash-card mt-4 p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <ClashStar size={16} style={{ color: CLASH.magenta }} />
+          <h2 className="text-base font-extrabold text-ink">活动简介</h2>
+        </div>
+        <ClashStripe className="mb-3" />
         {/* 服务端已做白名单过滤，可安全渲染 */}
         <div
-          className="rich-text text-sm text-gray-700"
+          className="rich-text text-sm text-ink-soft"
           dangerouslySetInnerHTML={{ __html: event.description || '暂无简介' }}
         />
       </div>
 
       {/* 底部固定操作栏（适配全面屏安全区） */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-40 border-t bg-white p-3 md:bottom-auto md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-ink bg-white p-3 shadow-[0_-4px_0_0_#12121A] md:bottom-auto md:hidden"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
       >
         <div className="mx-auto max-w-[1200px]">{mainButton}</div>
@@ -274,7 +356,7 @@ export default function EventDetail() {
       <Dialog open={registerOpen} onClose={() => !submitting && setRegisterOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>确认报名</DialogTitle>
         <DialogContent>
-          <p className="mb-3 text-sm text-gray-600">
+          <p className="mb-3 text-sm text-ink-soft">
             {event.require_approval === 1
               ? '该活动报名需发布者审核，审核通过后报名生效。'
               : canWaitlist
@@ -292,9 +374,11 @@ export default function EventDetail() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRegisterOpen(false)} disabled={submitting}>
+          {/* 次要操作：中性描边 */}
+          <Button variant="outlined" onClick={() => setRegisterOpen(false)} disabled={submitting}>
             取消
           </Button>
+          {/* 主操作：宝蓝实心 */}
           <Button variant="contained" onClick={handleRegisterConfirm} disabled={submitting}>
             {submitting ? '提交中…' : '确认报名'}
           </Button>
@@ -305,12 +389,14 @@ export default function EventDetail() {
       <Dialog open={cancelOpen} onClose={() => !submitting && setCancelOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>取消报名</DialogTitle>
         <DialogContent>
-          <p className="text-sm text-gray-600">确定要取消报名「{event.title}」吗？</p>
+          <p className="text-sm text-ink-soft">确定要取消报名「{event.title}」吗？</p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCancelOpen(false)} disabled={submitting}>
+          {/* 危险操作前的退路：中性描边 */}
+          <Button variant="outlined" onClick={() => setCancelOpen(false)} disabled={submitting}>
             再想想
           </Button>
+          {/* 危险操作：警示色实心 */}
           <Button color="error" variant="contained" onClick={handleCancelConfirm} disabled={submitting}>
             {submitting ? '处理中…' : '确认取消'}
           </Button>

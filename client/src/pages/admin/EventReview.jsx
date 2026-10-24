@@ -1,10 +1,11 @@
 /**
  * 管理后台 - 活动审核：待审核队列，通过 / 拒绝（必填理由），可查看详情。
+ *
+ * 视觉：后台克制风格 —— 撞色描边卡片，状态徽标清晰，操作用撞色主色 + 警示色区分。
  */
 import { useCallback, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
-import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -14,7 +15,10 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { listEvents, reviewEvent } from '../../api/adminApi';
 import EmptyState from '../../components/EmptyState';
+import { ClashStar } from '../../components/ClashDecor';
+import { CLASH } from '../../theme';
 import { formatTimeRange, formatDateTime } from '../../utils/format';
+import { PAGINATION_SX, SkeletonList, ErrorState } from '../clashUi';
 
 const PAGE_SIZE = 10;
 
@@ -22,6 +26,7 @@ export default function EventReview() {
   const [data, setData] = useState({ list: [], total: 0 });
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [detailTarget, setDetailTarget] = useState(null);
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -32,9 +37,13 @@ export default function EventReview() {
 
   const load = useCallback(() => {
     setLoading(true);
+    setError('');
     listEvents({ status: 'pending', page, page_size: PAGE_SIZE })
       .then((d) => setData(d))
-      .catch((err) => showToast(err.message, 'error'))
+      .catch((err) => {
+        setError(err.message || '待审核列表加载失败');
+        showToast(err.message, 'error');
+      })
       .finally(() => setLoading(false));
   }, [page]);
 
@@ -76,26 +85,29 @@ export default function EventReview() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">活动审核</h1>
+      <div className="mb-4 flex items-center gap-2">
+        <ClashStar size={20} style={{ color: CLASH.lemon }} />
+        <h1 className="text-xl font-extrabold tracking-tight text-ink">活动审核</h1>
+      </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <CircularProgress />
-        </div>
+        <SkeletonList count={3} />
+      ) : error && data.list.length === 0 ? (
+        <ErrorState text={error} onRetry={load} />
       ) : data.list.length === 0 ? (
         <EmptyState text="暂无待审核活动" />
       ) : (
         <div className="space-y-3">
           {data.list.map((event) => (
-            <div key={event.id} className="rounded-xl bg-white p-4 shadow-sm">
-              <h3 className="font-semibold">{event.title}</h3>
-              <p className="mt-1 text-xs text-gray-500">
-                发布者：{event.organizer_name} · 分类:{event.category_name || '-'}
+            <div key={event.id} className="clash-card p-4">
+              <h3 className="font-bold text-ink">{event.title}</h3>
+              <p className="mt-1 text-xs font-semibold text-ink-mute">
+                发布者：{event.organizer_name} · 分类：{event.category_name || '-'}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs font-semibold text-ink-mute">
                 时间：{formatTimeRange(event.start_time, event.end_time)} · 地点：{event.location}
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs font-semibold text-ink-mute">
                 报名截止：{formatDateTime(event.signup_deadline)} · 名额：
                 {event.capacity === 0 ? '不限' : event.capacity} ·
                 {event.require_approval === 1 ? ' 报名需审核' : ' 报名免审核'}
@@ -135,6 +147,7 @@ export default function EventReview() {
             page={page}
             onChange={(e, p) => setPage(p)}
             color="primary"
+            sx={PAGINATION_SX}
           />
         </div>
       )}
@@ -144,15 +157,17 @@ export default function EventReview() {
         <DialogTitle>{detailTarget?.title}</DialogTitle>
         <DialogContent>
           {detailTarget?.cover_url && (
-            <img src={detailTarget.cover_url} alt="封面" className="mb-3 max-h-48 rounded-lg object-cover" />
+            <img src={detailTarget.cover_url} alt="封面" className="mb-3 max-h-48 rounded-xl border-2 border-ink object-cover" />
           )}
           <div
-            className="rich-text text-sm text-gray-700"
+            className="rich-text text-sm text-ink-soft"
             dangerouslySetInnerHTML={{ __html: detailTarget?.description || '暂无简介' }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDetailTarget(null)}>关闭</Button>
+          <Button variant="outlined" onClick={() => setDetailTarget(null)}>
+            关闭
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -173,7 +188,7 @@ export default function EventReview() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRejectTarget(null)} disabled={submitting}>
+          <Button variant="outlined" onClick={() => setRejectTarget(null)} disabled={submitting}>
             取消
           </Button>
           <Button color="error" variant="contained" onClick={handleReject} disabled={submitting}>

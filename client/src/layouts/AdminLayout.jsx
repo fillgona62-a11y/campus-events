@@ -1,5 +1,7 @@
 /**
  * 管理后台布局：桌面侧边栏 / 移动端抽屉导航 + 内容区。
+ *
+ * 视觉：后台保持克制 —— 侧边栏选中项撞色高亮 + 硬投影，标题栏加撞色点缀（色块 + 四角星）。
  */
 import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
@@ -18,6 +20,8 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import PeopleIcon from '@mui/icons-material/People';
 import HistoryIcon from '@mui/icons-material/History';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { ClashStar, ClashStripe } from '../components/ClashDecor';
+import { CLASH } from '../theme';
 
 const NAV_ITEMS = [
   { label: '数据概览', path: '/admin', icon: <DashboardIcon /> },
@@ -44,13 +48,48 @@ function NavList({ onNavigate }) {
             ? location.pathname === '/admin'
             : location.pathname.startsWith(item.path);
         return (
-          <ListItemButton key={item.path} selected={selected} onClick={() => go(item.path)}>
-            <ListItemIcon>{item.icon}</ListItemIcon>
+          <ListItemButton
+            key={item.path}
+            selected={selected}
+            onClick={() => go(item.path)}
+            sx={{
+              mx: 1,
+              my: 0.5,
+              borderRadius: 12,
+              minHeight: 44,
+              fontWeight: 700,
+              // 选中项：撞色高亮 + 硬投影（克制的单色块，不铺满整条）
+              '&.Mui-selected': {
+                backgroundColor: CLASH.lime,
+                color: CLASH.ink,
+                boxShadow: '3px 3px 0 0 #12121A',
+                '&:hover': { backgroundColor: CLASH.lime },
+              },
+              '&.Mui-selected .MuiListItemIcon-root': { color: CLASH.ink },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 38 }}>{item.icon}</ListItemIcon>
             <ListItemText primary={item.label} />
           </ListItemButton>
         );
       })}
     </List>
+  );
+}
+
+/** 侧边栏顶部品牌区：撞色方块 + 四角星 */
+function Brand() {
+  return (
+    <div className="flex h-14 items-center justify-center gap-2 border-b-2 border-ink">
+      <span
+        className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-ink"
+        style={{ backgroundColor: CLASH.cyan }}
+        aria-hidden="true"
+      >
+        <ClashStar size={15} style={{ color: CLASH.ink }} />
+      </span>
+      <span className="font-extrabold text-ink">管理后台</span>
+    </div>
   );
 }
 
@@ -68,9 +107,7 @@ export default function AdminLayout() {
         }}
         PaperProps={{ className: 'hidden md:block' }}
       >
-        <div className="flex h-14 items-center justify-center border-b font-bold text-primary">
-          管理后台
-        </div>
+        <Brand />
         <NavList />
       </Drawer>
 
@@ -82,14 +119,13 @@ export default function AdminLayout() {
         className="md:hidden"
         sx={{ '& .MuiDrawer-paper': { width: DRAWER_WIDTH } }}
       >
-        <div className="flex h-14 items-center justify-center border-b font-bold text-primary">
-          管理后台
-        </div>
+        <Brand />
         <NavList onNavigate={() => setMobileOpen(false)} />
       </Drawer>
 
       <div className="min-w-0 flex-1">
-        <AppBar position="sticky" color="default" elevation={1}>
+        {/* 标题栏：撞色点缀（色块 + 四角星） */}
+        <AppBar position="sticky" color="default" elevation={0} sx={{ borderBottom: '2px solid #12121A' }}>
           <Toolbar className="gap-2">
             <IconButton
               className="md:hidden"
@@ -99,12 +135,20 @@ export default function AdminLayout() {
             >
               <MenuIcon />
             </IconButton>
-            <span className="font-semibold">校园活动 · 管理后台</span>
+            <span
+              className="flex h-7 w-7 items-center justify-center rounded-lg border-2 border-ink"
+              style={{ backgroundColor: CLASH.lime }}
+              aria-hidden="true"
+            >
+              <ClashStar size={13} style={{ color: CLASH.ink }} />
+            </span>
+            <span className="font-extrabold text-ink">校园活动 · 管理后台</span>
             <div className="flex-1" />
             <IconButton component={Link} to="/" aria-label="返回前台" sx={{ minWidth: 44, minHeight: 44 }}>
               <ArrowBackIcon />
             </IconButton>
           </Toolbar>
+          <ClashStripe />
         </AppBar>
         <main className="mx-auto w-full max-w-[1200px] p-3 md:p-6">
           <Outlet />

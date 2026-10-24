@@ -1,5 +1,7 @@
 /**
  * 管理后台 - 操作日志（F6）：列表 + 操作类型/时间筛选 + 分页，只读（无编辑/删除入口）。
+ *
+ * 视觉：后台克制风格 —— 撞色描边卡片包表格，薄荷绿表头，操作类型用撞色描边徽标。
  */
 import { useCallback, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
@@ -9,7 +11,6 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Pagination from '@mui/material/Pagination';
-import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -21,8 +22,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { listAuditLogs } from '../../api/adminApi';
 import EmptyState from '../../components/EmptyState';
+import { ClashStar } from '../../components/ClashDecor';
+import { CLASH } from '../../theme';
 import { formatDateTime } from '../../utils/format';
 import { AUDIT_ACTION_MAP } from '../../utils/constants';
+import { PAGINATION_SX, CLASH_HEAD_SX, SkeletonList, ErrorState } from '../clashUi';
 
 const PAGE_SIZE = 10;
 
@@ -47,12 +51,14 @@ export default function AuditLogs() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState({ list: [], total: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
   const showToast = (message, severity = 'success') => setToast({ open: true, message, severity });
 
   const load = useCallback(() => {
     setLoading(true);
+    setError('');
     listAuditLogs({
       action: action || undefined,
       start_date: startDate || undefined,
@@ -61,7 +67,10 @@ export default function AuditLogs() {
       page_size: PAGE_SIZE,
     })
       .then((d) => setData(d))
-      .catch((err) => showToast(err.message, 'error'))
+      .catch((err) => {
+        setError(err.message || '操作日志加载失败');
+        showToast(err.message, 'error');
+      })
       .finally(() => setLoading(false));
   }, [action, startDate, endDate, page]);
 
@@ -71,7 +80,10 @@ export default function AuditLogs() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">操作日志</h1>
+      <div className="mb-4 flex items-center gap-2">
+        <ClashStar size={20} style={{ color: CLASH.haze }} />
+        <h1 className="text-xl font-extrabold tracking-tight text-ink">操作日志</h1>
+      </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -114,35 +126,38 @@ export default function AuditLogs() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <CircularProgress />
-        </div>
+        <SkeletonList count={4} />
+      ) : error && data.list.length === 0 ? (
+        <ErrorState text={error} onRetry={load} />
       ) : data.list.length === 0 ? (
         <EmptyState text="暂无操作日志" />
       ) : (
-        <TableContainer className="overflow-x-auto rounded-xl bg-white shadow-sm">
+        <TableContainer className="clash-card overflow-x-auto">
           <Table size="small" sx={{ minWidth: 680 }}>
             <TableHead>
               <TableRow>
-                <TableCell>操作人</TableCell>
-                <TableCell>操作类型</TableCell>
-                <TableCell>对象</TableCell>
-                <TableCell>明细</TableCell>
-                <TableCell>时间</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>操作人</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>操作类型</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>对象</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>明细</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>时间</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.list.map((row) => (
                 <TableRow key={row.id} hover>
-                  <TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>
                     {row.admin.name}
-                    <span className="ml-1 text-xs text-gray-400">（{row.admin.student_id}）</span>
+                    <span className="ml-1 text-xs font-normal text-ink-faint">
+                      （{row.admin.student_id}）
+                    </span>
                   </TableCell>
                   <TableCell>
                     <Chip
                       size="small"
                       variant="outlined"
                       label={AUDIT_ACTION_MAP[row.action]?.label || row.action}
+                      sx={{ borderColor: CLASH.ink, backgroundColor: CLASH.mint, color: CLASH.ink, fontWeight: 800, borderWidth: 2 }}
                     />
                   </TableCell>
                   <TableCell>
@@ -164,6 +179,7 @@ export default function AuditLogs() {
             page={page}
             onChange={(e, p) => setPage(p)}
             color="primary"
+            sx={PAGINATION_SX}
           />
         </div>
       )}

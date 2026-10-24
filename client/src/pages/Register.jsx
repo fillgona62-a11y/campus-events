@@ -1,6 +1,8 @@
 /**
- * 注册页：学号 + 姓名 + 邮箱（验证码，60 秒倒计时重发）+ 图形验证码 + 手机号（选填）+ 密码/确认密码。
+ * 注册页：学号 + 姓名 + 邮箱（验证码，60 秒倒计时重发）+ 图形验证码 + 手机号（选填） + 密码/确认密码。
  * 图形验证码与线上一致：先过人机检测，再发邮箱验证码；验证码一次性使用。
+ *
+ * 视觉：与登录页同款左右分栏撞色布局（品牌区 + 白色表单卡）。
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,6 +13,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { register, sendEmailCode, getCaptcha } from '../api/authApi';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
+import { AuthShell } from './clashUi';
+import { CLASH } from '../theme';
 
 const RESEND_COOLDOWN = 60; // 秒，与后端 EMAIL_CODE_RESEND_COOLDOWN_SEC 对齐
 
@@ -163,10 +167,12 @@ export default function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-md">
-        <h1 className="mb-1 text-center text-2xl font-bold text-primary">注册账号</h1>
-        <p className="mb-6 text-center text-sm text-gray-500">注册后即可发布与报名活动</p>
+    <AuthShell accent={CLASH.magenta} slogan="注册账号，发布与报名校园里的每一场活动">
+      <div className="clash-card p-6 md:p-8">
+        <h2 className="text-center text-2xl font-extrabold tracking-tight text-ink">
+          注册<span className="clash-text-gradient">新账号</span>
+        </h2>
+        <p className="mb-5 mt-1 text-center text-sm text-ink-mute">注册后即可发布与报名活动</p>
 
         {error && (
           <Alert severity="error" className="mb-4">
@@ -198,16 +204,18 @@ export default function Register() {
             onChange={update('email')}
             helperText="用于接收验证码与找回密码"
           />
-          <div>
+
+          {/* 图形验证码：撞色小卡 */}
+          <div className="rounded-2xl border-2 border-ink bg-clash-lemon p-3 shadow-block-ink-sm">
             <div className="flex items-start gap-2">
               <div
-                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center rounded border border-gray-200 bg-gray-50"
+                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-white"
                 onClick={loadCaptcha}
                 title="点击图片刷新验证码"
                 dangerouslySetInnerHTML={{ __html: captcha.svg }}
               />
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={loadCaptcha}
                 disabled={captchaLoading}
                 startIcon={<RefreshIcon />}
@@ -223,14 +231,15 @@ export default function Register() {
               value={form.captcha_code}
               onChange={update('captcha_code')}
               inputProps={{ maxLength: 8 }}
-              sx={{ mt: 1 }}
+              sx={{ mt: 1.5 }}
               helperText={
                 captchaAnswer
                   ? `开发模式：验证码为 ${captchaAnswer}（未配置 SMTP 调试开关时不显示）`
-                  : '点击图片可刷新'
+                  : '看不清？点击图片或右侧按钮可刷新'
               }
             />
           </div>
+
           <div className="flex items-start gap-2">
             <TextField
               required
@@ -249,6 +258,7 @@ export default function Register() {
               {countdown > 0 ? `${countdown} 秒后重发` : sendingCode ? '发送中…' : '发送验证码'}
             </Button>
           </div>
+
           <TextField
             fullWidth
             label="手机号（选填）"
@@ -287,13 +297,20 @@ export default function Register() {
           </Button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-500">
-          已有账号？
-          <Link to="/login" className="text-primary">
-            去登录
-          </Link>
-        </p>
+        <div className="mt-6 space-y-1.5 text-center text-sm">
+          <p className="text-ink-mute">
+            已有账号？
+            <Link to="/login" className="ml-1 font-extrabold text-clash-royal no-underline hover:underline">
+              去登录
+            </Link>
+          </p>
+          <p>
+            <Link to="/" className="text-xs text-ink-faint no-underline hover:text-ink-soft">
+              先逛逛，回首页
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </AuthShell>
   );
 }

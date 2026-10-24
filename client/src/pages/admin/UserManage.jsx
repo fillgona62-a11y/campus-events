@@ -1,11 +1,12 @@
 /**
  * 管理后台 - 用户管理：关键字搜索 + 禁用/启用（禁用后该用户 JWT 立即失效）+ 重置密码（F1）。
+ *
+ * 视觉：后台克制风格 —— 撞色描边卡片包表格，薄荷绿表头，状态徽标清晰。
  */
 import { useCallback, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Pagination from '@mui/material/Pagination';
-import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -21,8 +22,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { listUsers, setUserStatus, resetUserPassword } from '../../api/adminApi';
 import EmptyState from '../../components/EmptyState';
+import { ClashStar } from '../../components/ClashDecor';
+import { CLASH } from '../../theme';
 import { formatDateTime } from '../../utils/format';
 import { useAuthStore } from '../../store/authStore';
+import { PAGINATION_SX, CLASH_HEAD_SX, SkeletonList, ErrorState } from '../clashUi';
 
 const PAGE_SIZE = 10;
 
@@ -33,6 +37,7 @@ export default function UserManage() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState({ list: [], total: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
   // 重置密码：一次性临时密码弹窗（刷新不重现）
   const [tempPassword, setTempPassword] = useState(null);
@@ -43,9 +48,13 @@ export default function UserManage() {
 
   const load = useCallback(() => {
     setLoading(true);
+    setError('');
     listUsers({ keyword: keyword || undefined, page, page_size: PAGE_SIZE })
       .then((d) => setData(d))
-      .catch((err) => showToast(err.message, 'error'))
+      .catch((err) => {
+        setError(err.message || '用户列表加载失败');
+        showToast(err.message, 'error');
+      })
       .finally(() => setLoading(false));
   }, [keyword, page]);
 
@@ -80,7 +89,10 @@ export default function UserManage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-bold">用户管理</h1>
+      <div className="mb-4 flex items-center gap-2">
+        <ClashStar size={20} style={{ color: CLASH.magenta }} />
+        <h1 className="text-xl font-extrabold tracking-tight text-ink">用户管理</h1>
+      </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
         <TextField
@@ -92,35 +104,35 @@ export default function UserManage() {
             if (e.key === 'Enter') { setKeyword(searchInput.trim()); setPage(1); }
           }}
         />
-        <Button variant="outlined" onClick={() => { setKeyword(searchInput.trim()); setPage(1); }}>
+        <Button variant="contained" onClick={() => { setKeyword(searchInput.trim()); setPage(1); }}>
           搜索
         </Button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <CircularProgress />
-        </div>
+        <SkeletonList count={4} />
+      ) : error && data.list.length === 0 ? (
+        <ErrorState text={error} onRetry={load} />
       ) : data.list.length === 0 ? (
         <EmptyState text="没有符合条件的用户" />
       ) : (
-        <TableContainer className="overflow-x-auto rounded-xl bg-white shadow-sm">
+        <TableContainer className="clash-card overflow-x-auto">
           <Table size="small" sx={{ minWidth: 680 }}>
             <TableHead>
               <TableRow>
-                <TableCell>学号</TableCell>
-                <TableCell>姓名</TableCell>
-                <TableCell>手机号</TableCell>
-                <TableCell>角色</TableCell>
-                <TableCell>状态</TableCell>
-                <TableCell>注册时间</TableCell>
-                <TableCell align="right">操作</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>学号</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>姓名</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>手机号</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>角色</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>状态</TableCell>
+                <TableCell sx={CLASH_HEAD_SX}>注册时间</TableCell>
+                <TableCell sx={CLASH_HEAD_SX} align="right">操作</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.list.map((user) => (
                 <TableRow key={user.id} hover>
-                  <TableCell>{user.student_id}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{user.student_id}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.phone || '-'}</TableCell>
                   <TableCell>
@@ -143,9 +155,11 @@ export default function UserManage() {
                     <div className="flex justify-end gap-1">
                       {user.id !== currentUser?.id && user.role !== 'admin' && (
                         <>
+                          {/* 禁用用户：危险操作用警示色 */}
                           <Button
                             size="small"
                             color={user.status === 'active' ? 'error' : 'success'}
+                            variant={user.status === 'active' ? 'contained' : 'outlined'}
                             onClick={() => handleToggle(user)}
                           >
                             {user.status === 'active' ? '禁用' : '启用'}
@@ -171,6 +185,7 @@ export default function UserManage() {
             page={page}
             onChange={(e, p) => setPage(p)}
             color="primary"
+            sx={PAGINATION_SX}
           />
         </div>
       )}
@@ -186,18 +201,21 @@ export default function UserManage() {
         <DialogContent>
           {tempPassword ? (
             <>
-              <p className="mb-2 text-sm text-gray-600">
+              <p className="mb-2 text-sm text-ink-soft">
                 已为用户「{resetTarget?.name}（{resetTarget?.student_id}）」生成临时密码：
               </p>
-              <p className="rounded-lg bg-gray-100 p-3 text-center text-xl font-bold tracking-widest text-primary">
+              <p
+                className="rounded-xl border-2 border-ink p-3 text-center text-xl font-extrabold tracking-widest text-ink"
+                style={{ backgroundColor: CLASH.lemon }}
+              >
                 {tempPassword}
               </p>
-              <p className="mt-3 text-xs text-red-500">
+              <p className="mt-3 text-xs font-bold text-clash-magenta">
                 该临时密码仅此一次展示，关闭后无法再次查看，请立即复制并告知用户；用户登录后请尽快修改密码。
               </p>
             </>
           ) : (
-            <p className="text-sm text-gray-600">{resetting ? '正在重置…' : '重置失败'}</p>
+            <p className="text-sm text-ink-soft">{resetting ? '正在重置…' : '重置失败'}</p>
           )}
         </DialogContent>
         <DialogActions>

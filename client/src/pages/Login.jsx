@@ -1,5 +1,8 @@
 /**
- * 登录页：学号 + 密码，居中卡片。
+ * 登录页：学号 + 密码 + 图形验证码。
+ *
+ * 视觉：左右分栏撞色布局 —— 左侧纯撞色品牌区（大色块 + 四角星 + slogan），
+ * 右侧白色表单卡；移动端上下堆叠，品牌区压缩成一条撞色横幅。
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -10,6 +13,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { login, getCaptcha } from '../api/authApi';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
+import { AuthShell } from './clashUi';
+import { CLASH } from '../theme';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -82,10 +87,12 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-md">
-        <h1 className="mb-1 text-center text-2xl font-bold text-primary">校园活动报名系统</h1>
-        <p className="mb-6 text-center text-sm text-gray-500">登录后报名心仪的活动</p>
+    <AuthShell accent={CLASH.lime}>
+      <div className="clash-card p-6 md:p-8">
+        <h2 className="text-center text-2xl font-extrabold tracking-tight text-ink">
+          登录<span className="clash-text-gradient">校园活动</span>
+        </h2>
+        <p className="mb-5 mt-1 text-center text-sm text-ink-mute">登录后报名心仪的活动</p>
 
         {error && (
           <Alert severity="error" className="mb-4">
@@ -101,16 +108,18 @@ export default function Login() {
             onChange={(e) => setStudentId(e.target.value)}
             autoComplete="username"
           />
-          <div>
+
+          {/* 图形验证码：撞色小卡（墨边 + 硬投影）+ 明确的刷新按钮 */}
+          <div className="rounded-2xl border-2 border-ink bg-clash-cyan p-3 shadow-block-ink-sm">
             <div className="flex items-start gap-2">
               <div
-                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center rounded border border-gray-200 bg-gray-50"
+                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-white"
                 onClick={loadCaptcha}
                 title="点击图片刷新验证码"
                 dangerouslySetInnerHTML={{ __html: captcha.svg }}
               />
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={loadCaptcha}
                 disabled={captchaLoading}
                 startIcon={<RefreshIcon />}
@@ -126,10 +135,11 @@ export default function Login() {
               value={captchaCode}
               onChange={(e) => setCaptchaCode(e.target.value)}
               inputProps={{ maxLength: 8 }}
-              sx={{ mt: 1 }}
-              helperText={captchaAnswer ? `开发模式：验证码为 ${captchaAnswer}` : '点击图片可刷新'}
+              sx={{ mt: 1.5 }}
+              helperText={captchaAnswer ? `开发模式：验证码为 ${captchaAnswer}` : '看不清？点击图片或右侧按钮可刷新'}
             />
           </div>
+
           <TextField
             fullWidth
             type="password"
@@ -150,23 +160,26 @@ export default function Login() {
           </Button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-500">
-          没有账号？
-          <Link to="/register" className="text-primary">
-            去注册
-          </Link>
-        </p>
-        <p className="mt-2 text-center text-sm">
-          <Link to="/forgot-password" className="text-gray-400">
-            忘记密码？
-          </Link>
-        </p>
-        <p className="mt-2 text-center text-sm">
-          <Link to="/" className="text-gray-400">
-            先逛逛，回首页
-          </Link>
-        </p>
+        {/* 底部链接：主链接撞色、次级链接中性、兜底链接更弱 */}
+        <div className="mt-6 space-y-1.5 text-center text-sm">
+          <p className="text-ink-mute">
+            没有账号？
+            <Link to="/register" className="ml-1 font-extrabold text-clash-royal no-underline hover:underline">
+              立即注册
+            </Link>
+          </p>
+          <p>
+            <Link to="/forgot-password" className="font-bold text-ink-soft no-underline hover:text-clash-violet">
+              忘记密码？
+            </Link>
+          </p>
+          <p>
+            <Link to="/" className="text-xs text-ink-faint no-underline hover:text-ink-soft">
+              先逛逛，回首页
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </AuthShell>
   );
 }
