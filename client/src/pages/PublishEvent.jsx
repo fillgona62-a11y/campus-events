@@ -12,7 +12,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import WheelDateTime from '../components/WheelDateTime';
 import dayjs from 'dayjs';
 import { createEvent, updateEvent, getEvent, listCategories, uploadCover } from '../api/eventApi';
 
@@ -177,34 +177,22 @@ export default function PublishEvent() {
         </TextField>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <DateTimePicker
+          <WheelDateTime
             label="开始时间 *"
             value={form.start_time}
             onChange={(v) => update('start_time', v)}
-            format="YYYY-MM-DD HH:mm:ss"
-            ampm={false}
-            views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
-            slotProps={{ textField: { fullWidth: true } }}
           />
-          <DateTimePicker
+          <WheelDateTime
             label="结束时间 *"
             value={form.end_time}
             onChange={(v) => update('end_time', v)}
-            format="YYYY-MM-DD HH:mm:ss"
-            ampm={false}
-            views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
-            slotProps={{ textField: { fullWidth: true } }}
           />
         </div>
 
-        <DateTimePicker
+        <WheelDateTime
           label="报名截止时间 *"
           value={form.signup_deadline}
           onChange={(v) => update('signup_deadline', v)}
-          format="YYYY-MM-DD HH:mm:ss"
-          ampm={false}
-          views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
-          slotProps={{ textField: { fullWidth: true } }}
         />
 
         <TextField
