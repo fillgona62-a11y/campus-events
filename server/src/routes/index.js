@@ -10,6 +10,7 @@ const adminRoutes = require('./adminRoutes');
 const notificationRoutes = require('./notificationRoutes');
 const uploadRoutes = require('./uploadRoutes');
 const checkinRoutes = require('./checkinRoutes');
+const calendarRoutes = require('./calendarRoutes');
 const authController = require('../controllers/authController');
 const captchaModel = require('../models/captchaModel');
 const config = require('../config');
@@ -40,6 +41,7 @@ router.use('/admin', adminRoutes);
 router.use('/', notificationRoutes);
 router.use('/', uploadRoutes);
 router.use('/', checkinRoutes);
+router.use('/calendar', calendarRoutes);
 
 // 诊断接口（部署排障用）：回显本次请求收到的 token 传递情况与密钥指纹
 router.get('/debug/echo', (req, res) => {

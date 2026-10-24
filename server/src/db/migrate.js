@@ -100,6 +100,19 @@ function runMigrations() {
     `CREATE INDEX IF NOT EXISTS idx_reg_waitlist ON registrations(event_id, status, created_at)`
   );
 
+  // 新表：日历备注（一日一条，UNIQUE(user_id, date)）
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS calendar_notes (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id    INTEGER NOT NULL REFERENCES users(id),
+      date       TEXT    NOT NULL,
+      content    TEXT    NOT NULL,
+      created_at TEXT    NOT NULL,
+      updated_at TEXT    NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_calendar_notes_user_date ON calendar_notes(user_id, date);
+  `);
+
   console.log('[migrate] 增量迁移完成');
 }
 

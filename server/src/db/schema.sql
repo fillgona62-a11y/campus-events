@@ -62,6 +62,17 @@ CREATE TABLE IF NOT EXISTS registrations (
   checked_in_at TEXT                                 -- 核销时间（ISO UTC）
 );
 
+-- 日历备注：用户自建的每日备忘（一日一条，UNIQUE(user_id, date)）
+CREATE TABLE IF NOT EXISTS calendar_notes (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  date       TEXT    NOT NULL,                  -- 本地日期 YYYY-MM-DD
+  content    TEXT    NOT NULL,                  -- 备注内容（≤500 字）
+  created_at TEXT    NOT NULL,
+  updated_at TEXT    NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_calendar_notes_user_date ON calendar_notes(user_id, date);
+
 -- 站内信表
 CREATE TABLE IF NOT EXISTS notifications (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
