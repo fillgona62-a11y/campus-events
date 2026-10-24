@@ -17,6 +17,14 @@ const SIGNATURES = {
     buf.length >= 12 &&
     buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
     buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50,
+  // 视频：ISO-BMFF/QuickTime 第 4-8 字节为 'ftyp'
+  '.mp4': (buf) =>
+    buf.length >= 8 && buf[4] === 0x66 && buf[5] === 0x74 && buf[6] === 0x79 && buf[7] === 0x70,
+  '.mov': (buf) =>
+    buf.length >= 8 && buf[4] === 0x66 && buf[5] === 0x74 && buf[6] === 0x79 && buf[7] === 0x70,
+  // Matroska/WebM：EBML 头 1A 45 DF A3
+  '.webm': (buf) =>
+    buf.length >= 4 && buf[0] === 0x1a && buf[1] === 0x45 && buf[2] === 0xdf && buf[3] === 0xa3,
 };
 
 /**

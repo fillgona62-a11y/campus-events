@@ -73,3 +73,10 @@ export function myFavorites(params) {
 export function myLikes(params) {
   return client.get('/forum/me/likes', { params });
 }
+
+/** 上传视频（multipart 字段 file，≤50MB mp4/webm/mov） → {url} */
+export function uploadVideo(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return client.post('/upload/video', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+}

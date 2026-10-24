@@ -52,10 +52,14 @@ const config = {
     password: process.env.ADMIN_PASSWORD || 'admin123',
     name: process.env.ADMIN_NAME || '系统管理员',
   },
-  /** 上传限制：2MB，仅 jpg/png/webp */
+  /** 上传限制：图片 2MB / 视频 50MB（均可用 env 覆盖，单位 MB） */
   upload: {
-    maxSize: 2 * 1024 * 1024,
+    maxSize: (parseInt(process.env.UPLOAD_MAX_SIZE, 10) || 2) * 1024 * 1024,
     allowedMime: ['image/jpeg', 'image/png', 'image/webp'],
+    video: {
+      maxSize: (parseInt(process.env.UPLOAD_VIDEO_MAX_SIZE, 10) || 50) * 1024 * 1024,
+      allowedMime: ['video/mp4', 'video/webm', 'video/quicktime'],
+    },
   },
   /** 邮件通道（F3/F2 验证码；DEV_ECHO=1 不发真邮件） */
   smtp: {

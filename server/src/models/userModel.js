@@ -130,8 +130,19 @@ function count() {
   return db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
 }
 
+/** 按姓名批量查用户（@提及用；仅活跃用户） */
+function findByNames(names) {
+  if (!Array.isArray(names) || !names.length) return [];
+  const uniq = [...new Set(names)];
+  const placeholders = uniq.map(() => '?').join(',');
+  return db
+    .prepare(`SELECT id, name FROM users WHERE name IN (${placeholders}) AND status = 'active'`)
+    .all(...uniq);
+}
+
 module.exports = {
   toPublic,
+  findByNames,
   findByStudentId,
   findById,
   findByEmail,

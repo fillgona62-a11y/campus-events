@@ -7,6 +7,7 @@ const sanitizeHtml = require('sanitize-html');
 const postModel = require('../models/postModel');
 const commentModel = require('../models/commentModel');
 const socialModel = require('../models/socialModel');
+const userModel = require('../models/userModel');
 const notificationService = require('./notificationService');
 const { ApiError } = require('../utils/response');
 const { mask: maskSensitive } = require('../utils/sensitiveWords');
@@ -80,6 +81,22 @@ function notify(userId, title, content) {
   }
 }
 
+/** 从文本提取 @姓名（去标签后匹配，2-20 位中英文/数字/_-） */
+function extractMentions(text) {
+  const plain = stripTags(text || '');
+  return [...new Set([...plain.matchAll(/@([\u4e00-\u9fa5A-Za-z0-9_-]{2,20})/g)].map((m) => m[1]))];
+}
+
+/** @提及联动站内信：通知被@到的用户（不含自己） */
+function notifyMentions(text, actorId) {
+  const names = extractMentions(text);
+  if (!names.length) return;
+  const users = userModel.findByNames(names);
+  for (const u of users) {
+    if (u.id !== actorId) notify(u.id, '有人@了你', '在论坛的帖子/评论中提到了你，去看看吧');
+  }
+}
+
 function parseTopics(topics) {
   if (!Array.isArray(topics)) return null;
   const seen = new Set();
@@ -104,6 +121,7 @@ function createPost(user, { title, content, media, topics }) {
     media: parseVideos(media),
     topics: parseTopics(topics),
   });
+  notifyMentions(content, user.id);
   return post;
 }
 
@@ -190,6 +208,7 @@ function addComment(user, postId, { content, parent_id = 0 }) {
       notify(parent.user_id, '有人回复了你的评论', stripTags(comment.content).slice(0, 50));
     }
   }
+  notifyMentions(content, user.id);
   return comment;
 }
 

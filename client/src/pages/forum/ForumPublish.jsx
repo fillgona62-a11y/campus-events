@@ -18,9 +18,12 @@ import Alert from '@mui/material/Alert';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import ImageIcon from '@mui/icons-material/Image';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
-import { createPost, updatePost, getPost } from '../../api/forumApi';
+import { createPost, updatePost, getPost, uploadVideo } from '../../api/forumApi';
 import { uploadCover } from '../../api/eventApi';
+import VideoEmbed from '../../components/VideoEmbed';
 import { ClashStar, ClashStripe } from '../../components/ClashDecor';
 import { CLASH } from '../../theme';
 
@@ -38,6 +41,9 @@ export default function ForumPublish() {
   const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [embedUrl, setEmbedUrl] = useState('');
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
   const showToast = (message, severity = 'success') => setToast({ open: true, message, severity });
@@ -83,6 +89,7 @@ export default function ForumPublish() {
                 .slice(0, MAX_TOPICS)
             : []
         );
+        setVideos(p.media && Array.isArray(p.media.videos) ? p.media.videos : []);
       })
       .catch((err) => showToast(err.message, 'error'))
       .finally(() => setLoading(false));
@@ -105,6 +112,46 @@ export default function ForumPublish() {
       e.target.value = '';
     }
   };
+
+  const EMBED_RE = /bilibili\.com\/video\/|youtube\.com\/watch\?v=|youtu\.be\//i;
+
+  /** 上传视频（≤50MB mp4/webm/mov） */
+  const handleInsertVideo = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (videos.length >= 5) {
+      showToast('最多添加 5 个视频', 'error');
+      return;
+    }
+    setVideoUploading(true);
+    try {
+      const data = await uploadVideo(file);
+      setVideos((v) => [...v, { type: 'upload', url: data.url }]);
+      showToast('视频已添加');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setVideoUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  /** 添加 B站/YouTube 链接（嵌入播放；后端亦会校验域名） */
+  const handleAddEmbed = () => {
+    const url = embedUrl.trim();
+    if (!EMBED_RE.test(url)) {
+      showToast('请填 B站(bilibili.com/video/…) 或 YouTube 链接', 'error');
+      return;
+    }
+    if (videos.length >= 5) {
+      showToast('最多添加 5 个视频', 'error');
+      return;
+    }
+    setVideos((v) => [...v, { type: 'embed', url }]);
+    setEmbedUrl('');
+  };
+
+  const removeVideo = (idx) => setVideos((v) => v.filter((_, i) => i !== idx));
 
   const addTopic = () => {
     const v = topicDraft.trim().replace(/[,，]/g, '');
@@ -136,7 +183,7 @@ export default function ForumPublish() {
         title: title.trim(),
         // 纯文本换行转 <br>（服务端仍会白名单过滤）
         content: content.replace(/\n/g, '<br>'),
-        media: { videos: [] },
+        media: { videos },
         topics,
       };
       const data = isEdit ? await updatePost(id, payload) : await createPost(payload);
@@ -231,6 +278,62 @@ export default function ForumPublish() {
             inputProps={{ maxLength: 20000 }}
             helperText="内容将在服务端进行安全过滤；图片上传后以 <img> 形式插入正文"
           />
+        </div>
+
+        {/* 视频：上传小视频 或 贴 B站/YouTube 链接 */}
+        <div className="clash-card p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <ClashStar size={16} style={{ color: CLASH.cyan }} />
+            <h2 className="text-base font-extrabold text-ink">视频</h2>
+            <span className="text-xs text-ink-mute">上传 ≤50MB，或贴 B站/YouTube 链接，最多 5 个</span>
+          </div>
+          <ClashStripe className="mb-3" />
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Button
+              variant="outlined"
+              component="label"
+              disabled={videoUploading}
+              startIcon={<VideocamIcon />}
+              sx={{ minHeight: 44 }}
+            >
+              {videoUploading ? '上传中…' : '上传视频'}
+              <input hidden type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleInsertVideo} />
+            </Button>
+            <TextField
+              size="small"
+              label="或粘贴视频链接"
+              placeholder="bilibili.com/video/BV… 或 youtu.be/…"
+              value={embedUrl}
+              onChange={(e) => setEmbedUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddEmbed();
+                }
+              }}
+              sx={{ flex: 1, minWidth: 220 }}
+            />
+            <Button variant="outlined" startIcon={<LinkIcon />} onClick={handleAddEmbed} sx={{ minHeight: 44 }}>
+              添加链接
+            </Button>
+          </div>
+          {videos.length > 0 && (
+            <div className="space-y-2">
+              {videos.map((v, i) => (
+                <div key={i} className="rounded-2xl border-2 border-ink bg-paper-card p-2">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
+                      {v.type === 'upload' ? '上传视频' : '链接嵌入'}
+                    </span>
+                    <Button size="small" color="error" variant="outlined" onClick={() => removeVideo(i)}>
+                      移除
+                    </Button>
+                  </div>
+                  <VideoEmbed type={v.type} url={v.url} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 话题标签 */}
