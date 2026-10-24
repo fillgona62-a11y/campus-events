@@ -49,6 +49,7 @@ desktop.ini
 # ---------- 部署临时产物 ----------
 deploy-package.json
 deploy-stage/
+pkg*/
 
 # ---------- 临时与备份包 ----------
 *.zip

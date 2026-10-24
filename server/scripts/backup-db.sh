@@ -40,6 +40,19 @@ INTEGRITY="$(sqlite3 "$TARGET" 'PRAGMA integrity_check;')"
 REG_COUNT="$(sqlite3 "$TARGET" 'SELECT COUNT(*) FROM registrations;')" || fail "verify query"
 echo "[backup] $(date '+%F %T') created $TARGET (registrations=$REG_COUNT)"
 
+# Uploads (活动封面图)：数据库备份不覆盖用户上传的图片，必须单独归档
+UPLOAD_DIR="${UPLOAD_DIR:-$HOME/campus-events-online/server/uploads}"
+UPLOAD_TARGET="$BACKUP_DIR/campus-events-$DATE-uploads.tar.gz"
+if [ -d "$UPLOAD_DIR" ]; then
+  tar czf "$UPLOAD_TARGET" -C "$(dirname "$UPLOAD_DIR")" "$(basename "$UPLOAD_DIR")" \
+    && echo "[backup] $(date '+%F %T') created $UPLOAD_TARGET" \
+    || echo "[backup] $(date '+%F %T') uploads archive FAILED"
+fi
+
+# 备份文件含用户数据，收紧权限
+chmod 600 "$TARGET" 2>/dev/null
+[ -f "$UPLOAD_TARGET" ] && chmod 600 "$UPLOAD_TARGET" 2>/dev/null
+
 # Offsite transfer (optional). Failure is logged but does not fail the script.
 if [ -n "$REMOTE_TARGET" ]; then
   SCP_OPT="-o ConnectTimeout=20"
@@ -51,8 +64,10 @@ if [ -n "$REMOTE_TARGET" ]; then
   fi
 fi
 
-# Retention: keep the newest KEEP_COPIES archives locally
-find "$BACKUP_DIR" -name 'campus-events-*.db' -type f | sort -r | tail -n +$((KEEP_COPIES + 1)) | while read -r f; do
-  rm -f "$f"
+# Retention: keep the newest KEEP_COPIES archives locally（数据库与上传包各留 KEEP_COPIES 份）
+for PATTERN in 'campus-events-*.db' 'campus-events-*-uploads.tar.gz'; do
+  find "$BACKUP_DIR" -name "$PATTERN" -type f | sort -r | tail -n +$((KEEP_COPIES + 1)) | while read -r f; do
+    rm -f "$f"
+  done
 done
 echo "[backup] $(date '+%F %T') retention done (keep $KEEP_COPIES)"
