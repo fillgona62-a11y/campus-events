@@ -15,11 +15,13 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ShareIcon from '@mui/icons-material/Share';
 import IconButton from '@mui/material/IconButton';
 import { getEvent, registerEvent } from '../api/eventApi';
 import { cancelRegistration } from '../api/registrationApi';
 import { useAuthStore } from '../store/authStore';
 import StatusBadge from '../components/StatusBadge';
+import ShareDialog from '../components/ShareDialog';
 import { formatDateTime, formatTimeRange, remainingText, isFull, isSignupClosed } from '../utils/format';
 
 export default function EventDetail() {
@@ -35,6 +37,7 @@ export default function EventDetail() {
   const [remark, setRemark] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [shareOpen, setShareOpen] = useState(false);
 
   const showToast = (message, severity = 'success') => setToast({ open: true, message, severity });
 
@@ -197,7 +200,10 @@ export default function EventDetail() {
         <IconButton onClick={() => navigate(-1)} aria-label="返回" sx={{ minWidth: 44, minHeight: 44 }}>
           <ArrowBackIcon />
         </IconButton>
-        <span className="text-sm text-gray-500">活动详情</span>
+        <span className="flex-1 text-sm text-gray-500">活动详情</span>
+        <IconButton onClick={() => setShareOpen(true)} aria-label="分享" sx={{ minWidth: 44, minHeight: 44 }}>
+          <ShareIcon />
+        </IconButton>
       </div>
 
       {event.cover_url ? (
@@ -310,6 +316,9 @@ export default function EventDetail() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* 分享弹窗（海报 / 二维码 / 链接） */}
+      <ShareDialog open={shareOpen} onClose={() => setShareOpen(false)} event={event} />
 
       <Snackbar
         open={toast.open}
