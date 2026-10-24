@@ -53,6 +53,25 @@ export const INK_TEXT = '#12121A';
  */
 export function makeTheme(mode = 'light') {
   const isDark = mode === 'dark';
+  // 调色板必须用真实色值（按模式取）：MUI 会在运行时对 palette 颜色做对比度/透明度/
+  // 强调色运算，CSS 变量（var(--x)）无法被解析成 RGB，放进 palette 会触发
+  // Minified MUI error #9。组件 sx / styleOverrides 里的 var() 是纯 CSS 直通
+  // （emission 不解析），不受影响，可继续用；这里只把 palette 换成真实色值。
+  const C = isDark
+    ? {
+        paper: '#0E0E15',
+        paperCard: '#181822',
+        ink: '#ECECF3',
+        inkMute: '#9A9AAB',
+        divider: 'rgba(236,236,243,0.16)',
+      }
+    : {
+        paper: '#FBFAF7',
+        paperCard: '#FFFFFF',
+        ink: '#12121A',
+        inkMute: '#6B6B7B',
+        divider: 'rgba(18,18,26,0.12)',
+      };
 
   return createTheme({
     palette: {
@@ -63,16 +82,16 @@ export function makeTheme(mode = 'light') {
       warning: { main: '#F5A524', contrastText: INK_TEXT },
       error: { main: '#E5384E', contrastText: '#FFFFFF' },
       info: { main: CLASH.violet, contrastText: '#FFFFFF' },
-      // 背景/文字/分割线全部指向 CSS 变量，随 .dark 翻转
+      // 背景/文字/分割线：真实色值（按模式），随 makeTheme(mode) 重新生成而翻转
       background: {
-        default: 'var(--paper)',
-        paper: 'var(--paper-card)',
+        default: C.paper,
+        paper: C.paperCard,
       },
       text: {
-        primary: 'var(--ink-line)',
-        secondary: 'var(--ink-mute)',
+        primary: C.ink,
+        secondary: C.inkMute,
       },
-      divider: 'rgba(var(--ink-rgb), 0.16)',
+      divider: C.divider,
     },
     shape: { borderRadius: 16 },
     typography: {
