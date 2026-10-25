@@ -6,7 +6,7 @@ const categoryModel = require('../models/categoryModel');
 const registrationModel = require('../models/registrationModel');
 const eventService = require('../services/eventService');
 const { ApiError, ok } = require('../utils/response');
-const { ERR, EVENT_STATUS, USER_ROLE } = require('../utils/constants');
+const { ERR, EVENT_STATUS, isAdminRole } = require('../utils/constants');
 const { parsePagination, parseId } = require('../middleware/validate');
 const { buildRegistrationsCsv } = require('../utils/csv');
 
@@ -63,7 +63,7 @@ function detail(req, res, next) {
 
     const viewer = req.user;
     const isOwnerOrAdmin =
-      viewer && (viewer.id === event.organizer_id || viewer.role === USER_ROLE.ADMIN);
+      viewer && (viewer.id === event.organizer_id || isAdminRole(viewer.role));
     if (event.status !== EVENT_STATUS.APPROVED && !isOwnerOrAdmin) {
       // 对公众隐藏非公开状态活动
       throw ApiError.notFound('活动不存在或未发布');
@@ -130,7 +130,7 @@ function myEvents(req, res, next) {
 function assertEventManagePermission(user, eventId) {
   const event = eventModel.findById(eventId);
   if (!event) throw ApiError.notFound('活动不存在');
-  if (user.id !== event.organizer_id && user.role !== USER_ROLE.ADMIN) {
+  if (user.id !== event.organizer_id && !isAdminRole(user.role)) {
     throw ApiError.forbidden('仅活动发布者或管理员可查看报名名单');
   }
   return event;

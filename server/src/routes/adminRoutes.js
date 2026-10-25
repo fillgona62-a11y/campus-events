@@ -35,6 +35,7 @@ router.get('/overview/trend', adminController.overviewTrend);
 router.get('/events', adminController.listEvents);
 router.put('/events/:id/review', validate(reviewSchema), adminController.reviewEvent);
 router.put('/events/:id/offline', adminController.offlineEvent);
+router.put('/events/:id/pin', adminController.setEventPinned);
 router.get('/users', adminController.listUsers);
 router.put('/users/:id/status', validate(userStatusSchema), adminController.setUserStatus);
 router.put('/users/:id/password/reset', adminController.resetUserPassword);

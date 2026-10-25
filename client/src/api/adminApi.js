@@ -23,6 +23,11 @@ export function offlineEvent(id) {
   return client.put(`/admin/events/${id}/offline`);
 }
 
+/** 置顶 / 取消置顶活动 → {event}（event.is_pinned 置顶为 1，取消为 0） */
+export function pinEvent(id) {
+  return client.put(`/admin/events/${id}/pin`);
+}
+
 /** 用户列表：{keyword?, page, page_size} */
 export function listUsers(params) {
   return client.get('/admin/users', { params });

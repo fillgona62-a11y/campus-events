@@ -4,7 +4,7 @@
 const express = require('express');
 const { z } = require('zod');
 const forumController = require('../controllers/forumController');
-const { requireAuth, optionalAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin, optionalAuth } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const { actionLimiter } = require('../middleware/rateLimit');
 
@@ -35,6 +35,8 @@ router.get('/posts/:id', optionalAuth, forumController.getPost);
 router.post('/posts', requireAuth, actionLimiter, validate(postSchema), forumController.createPost);
 router.put('/posts/:id', requireAuth, actionLimiter, validate(postSchema), forumController.updatePost);
 router.delete('/posts/:id', requireAuth, forumController.deletePost);
+// 置顶/取消置顶（管理员）
+router.put('/posts/:id/pin', requireAuth, requireAdmin, forumController.pinPost);
 // 互动
 router.post('/posts/:id/like', requireAuth, actionLimiter, forumController.likePost);
 router.post('/posts/:id/favorite', requireAuth, actionLimiter, forumController.favoritePost);

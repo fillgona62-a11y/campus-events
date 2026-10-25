@@ -49,6 +49,11 @@ export function favoritePost(id) {
   return client.post(`/forum/posts/${id}/favorite`);
 }
 
+/** 置顶 / 取消置顶（管理员）→ {post}（post.is_pinned 置顶为 1，取消为 0） */
+export function pinPost(id) {
+  return client.put(`/forum/posts/${id}/pin`);
+}
+
 /** 关注 / 再点取消 → {following} */
 export function followUser(id) {
   return client.post(`/forum/users/${id}/follow`);

@@ -47,7 +47,7 @@ function listPublic({ keyword, category_id, start_from, start_to, page, page_siz
     .get(...params).c;
   const list = db
     .prepare(
-      `${BASE_SELECT} ${where} ORDER BY e.start_time ASC LIMIT ? OFFSET ?`
+      `${BASE_SELECT} ${where} ORDER BY e.is_pinned DESC, e.start_time ASC LIMIT ? OFFSET ?`
     )
     .all(...params, page_size, (page - 1) * page_size);
   return { list, total, page, page_size };
@@ -228,6 +228,17 @@ function setCheckinCode(id, code) {
   db.prepare('UPDATE events SET checkin_code = ?, updated_at = ? WHERE id = ?').run(code, now, id);
 }
 
+/** 置顶/取消置顶活动（pinned 为真时记录 pinned_at，否则清空） */
+function setPinned(id, pinned) {
+  const now = new Date().toISOString();
+  db.prepare('UPDATE events SET is_pinned = ?, pinned_at = ?, updated_at = ? WHERE id = ?').run(
+    pinned ? 1 : 0,
+    pinned ? now : null,
+    now,
+    id
+  );
+}
+
 module.exports = {
   findById,
   listPublic,
@@ -243,4 +254,5 @@ module.exports = {
   countPending,
   getCheckinCode,
   setCheckinCode,
+  setPinned,
 };

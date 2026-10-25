@@ -273,7 +273,15 @@ export default function ForumHome() {
                 </div>
 
                 {/* 标题 + 正文摘要 */}
-                <h3 className="mt-2 text-base font-extrabold text-ink">{p.title}</h3>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <h3 className="text-base font-extrabold text-ink">{p.title}</h3>
+                  {/* 置顶徽标：所有人可见 */}
+                  {p.is_pinned && (
+                    <span className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-clash-magenta px-1.5 py-0.5 text-[11px] font-extrabold on-clash">
+                      置顶
+                    </span>
+                  )}
+                </div>
                 {summary && <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{summary}</p>}
 
                 {/* 话题 + 统计 */}

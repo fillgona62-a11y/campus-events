@@ -20,7 +20,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { listEvents, offlineEvent } from '../../api/adminApi';
+import { listEvents, offlineEvent, pinEvent } from '../../api/adminApi';
 import StatusBadge from '../../components/StatusBadge';
 import EmptyState from '../../components/EmptyState';
 import { ClashStar } from '../../components/ClashDecor';
@@ -41,6 +41,7 @@ export default function EventManage() {
   const [error, setError] = useState('');
   const [offlineTarget, setOfflineTarget] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [pinning, setPinning] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
   const showToast = (message, severity = 'success') => setToast({ open: true, message, severity });
@@ -72,6 +73,19 @@ export default function EventManage() {
       showToast(err.message, 'error');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handlePin = async (event) => {
+    setPinning(true);
+    try {
+      await pinEvent(event.id);
+      showToast(event.is_pinned ? '已取消置顶' : '已置顶');
+      load();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setPinning(false);
     }
   };
 
@@ -144,6 +158,15 @@ export default function EventManage() {
                     <StatusBadge type="event" status={event.status} />
                   </TableCell>
                   <TableCell align="right">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      disabled={pinning}
+                      onClick={() => handlePin(event)}
+                      sx={{ mr: 1 }}
+                    >
+                      {event.is_pinned ? '取消置顶' : '置顶'}
+                    </Button>
                     {event.status === 'approved' && (
                       <Button size="small" color="error" variant="contained" onClick={() => setOfflineTarget(event)}>
                         下架

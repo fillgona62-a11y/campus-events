@@ -19,6 +19,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAuthStore } from '../store/authStore';
+import { isAdmin } from '../utils/role';
 import { me } from '../api/authApi';
 import BottomNav from '../components/BottomNav';
 import { ClashStar, ClashStripe } from '../components/ClashDecor';
@@ -144,7 +145,7 @@ export default function MainLayout() {
                 <MenuItem onClick={() => { setAnchorEl(null); navigate('/my/events'); }}>
                   我的活动
                 </MenuItem>
-                {user?.role === 'admin' && (
+                {isAdmin(user?.role) && (
                   <MenuItem onClick={() => { setAnchorEl(null); navigate('/admin'); }}>
                     管理后台
                   </MenuItem>

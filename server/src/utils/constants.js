@@ -22,8 +22,13 @@ const REG_STATUS = {
 };
 
 /** 用户角色与状态 */
-const USER_ROLE = { USER: 'user', ADMIN: 'admin' };
+const USER_ROLE = { USER: 'user', ADMIN: 'admin', SUPER_ADMIN: 'super_admin' };
 const USER_STATUS = { ACTIVE: 'active', DISABLED: 'disabled' };
+
+/** 是否管理员角色（大小管理员都算管理员） */
+function isAdminRole(role) {
+  return role === USER_ROLE.ADMIN || role === USER_ROLE.SUPER_ADMIN;
+}
 
 /** 站内信类型 */
 const NOTIFICATION_TYPE = {
@@ -55,6 +60,7 @@ const AUDIT_ACTION = {
   USER_PASSWORD_RESET: 'user_password_reset',
   FORUM_POST_DELETE: 'forum_post_delete',
   FORUM_COMMENT_DELETE: 'forum_comment_delete',
+  EVENT_PIN: 'event_pin',
 };
 
 /** 业务错误码（响应体 code 字段） */
@@ -89,6 +95,7 @@ module.exports = {
   REG_STATUS,
   USER_ROLE,
   USER_STATUS,
+  isAdminRole,
   NOTIFICATION_TYPE,
   EMAIL_CODE_PURPOSE,
   AUDIT_ACTION,

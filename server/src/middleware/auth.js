@@ -1,12 +1,12 @@
 /**
  * JWT 鉴权中间件。
  * requireAuth：校验 token 并实时查询用户状态（disabled 立即 40301）。
- * requireAdmin：在 requireAuth 之后校验 role==='admin'。
+ * requireAdmin：在 requireAuth 之后校验 role 为 admin/super_admin。
  * optionalAuth：有 token 则解析挂载 req.user，无 token 放行（活动详情等场景）。
  */
 const { verifyToken } = require('../utils/jwt');
 const { ApiError } = require('../utils/response');
-const { USER_STATUS, USER_ROLE } = require('../utils/constants');
+const { USER_STATUS, isAdminRole } = require('../utils/constants');
 const userModel = require('../models/userModel');
 
 /** 从请求头提取 Bearer token */
@@ -45,7 +45,7 @@ function requireAuth(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  if (!req.user || req.user.role !== USER_ROLE.ADMIN) {
+  if (!req.user || !isAdminRole(req.user.role)) {
     return next(ApiError.forbidden('仅管理员可执行该操作'));
   }
   next();

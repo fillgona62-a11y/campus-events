@@ -28,6 +28,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import {
   getPost,
@@ -37,11 +38,13 @@ import {
   likePost,
   favoritePost,
   followUser,
+  pinPost,
 } from '../../api/forumApi';
 import VideoEmbed from '../../components/VideoEmbed';
 import { ClashStar, ClashStripe, clashColorAt } from '../../components/ClashDecor';
 import { CLASH } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
+import { isAdmin } from '../../utils/role';
 import { formatDateTime } from '../../utils/format';
 import { ErrorState } from '../clashUi';
 
@@ -173,6 +176,22 @@ export default function ForumPostDetail() {
     }
   };
 
+  // ── 置顶 / 取消置顶（管理员）──
+  const handlePin = async () => {
+    if (acting) return;
+    setActing('pin');
+    try {
+      const d = await pinPost(id);
+      // 整块替换本地 post：is_pinned 为 0/1 整数，按真值判断
+      setDetail((prev) => ({ ...prev, post: d.post }));
+      showToast(d.post.is_pinned ? '已置顶' : '已取消置顶');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setActing('');
+    }
+  };
+
   // ── 评论 ──
   const handleSubmitComment = async () => {
     if (!token) return requireLogin();
@@ -252,6 +271,7 @@ export default function ForumPostDetail() {
   const { post, liked, favorited, following } = detail;
   const isSelf = Boolean(token && user && user.id === post.author_id);
   const canManagePost = isSelf || Boolean(token && user?.role === 'admin');
+  const admin = isAdmin(user?.role);
   const topics = post.topics ? String(post.topics).split(',').filter(Boolean) : [];
   const videos = post.media && Array.isArray(post.media.videos) ? post.media.videos : [];
   const roots = commentTree.get(0) || [];
@@ -364,6 +384,25 @@ export default function ForumPostDetail() {
           </p>
         </div>
         <div className="flex-1" />
+        {/* 置顶按钮：仅管理员（大/小管理员）可见 */}
+        {admin && (
+          <Button
+            onClick={handlePin}
+            disabled={Boolean(acting)}
+            variant="outlined"
+            size="small"
+            startIcon={<PushPinOutlinedIcon />}
+            sx={{
+              minHeight: 44,
+              fontWeight: 800,
+              borderRadius: 12,
+              color: 'var(--ink-line)',
+              border: '2px solid var(--ink-line)',
+            }}
+          >
+            {post.is_pinned ? '取消置顶' : '置顶'}
+          </Button>
+        )}
         {/* 关注按钮：未登录/本人不展示 */}
         {token && !isSelf && (
           <Button
@@ -389,6 +428,13 @@ export default function ForumPostDetail() {
       {/* ── 标题 + 正文 ────────────────────────────────────────── */}
       <div className="clash-card mt-4 p-4">
         <div className="mb-2 flex flex-wrap items-center gap-2">
+          {/* 置顶徽标：所有人可见 */}
+          {post.is_pinned && (
+            <span className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-clash-magenta px-1.5 py-0.5 text-[11px] font-extrabold on-clash">
+              <PushPinOutlinedIcon sx={{ fontSize: 13 }} />
+              置顶
+            </span>
+          )}
           {topics.map((t, i) => (
             <Chip
               key={t}

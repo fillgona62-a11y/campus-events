@@ -3,6 +3,7 @@
  */
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { isAdmin } from '../utils/role';
 
 export default function ProtectedRoute({ admin = false }) {
   const token = useAuthStore((s) => s.token);
@@ -12,7 +13,7 @@ export default function ProtectedRoute({ admin = false }) {
   if (!token) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
-  if (admin && user?.role !== 'admin') {
+  if (admin && !isAdmin(user?.role)) {
     return <Navigate to="/" replace />;
   }
   return <Outlet />;

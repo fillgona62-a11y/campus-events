@@ -199,6 +199,22 @@ function deleteComment(req, res, next) {
   }
 }
 
+/** PUT /admin/events/:id/pin 置顶/取消置顶活动（审计 event_pin） */
+function setEventPinned(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) throw ApiError.badRequest('活动 ID 不合法');
+    const event = eventModel.findById(id);
+    if (!event) throw ApiError.notFound('活动不存在');
+    const pinned = !event.is_pinned;
+    eventModel.setPinned(id, pinned);
+    auditService.log(req.user.id, AUDIT_ACTION.EVENT_PIN, 'event', id, { pinned });
+    ok(res, { event: eventModel.findById(id) });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   overview,
   overviewTrend,
@@ -211,4 +227,5 @@ module.exports = {
   listAuditLogs,
   deletePost,
   deleteComment,
+  setEventPinned,
 };

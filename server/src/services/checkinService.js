@@ -9,7 +9,7 @@ const eventModel = require('../models/eventModel');
 const registrationModel = require('../models/registrationModel');
 const userModel = require('../models/userModel');
 const { ApiError } = require('../utils/response');
-const { ERR, REG_STATUS, USER_ROLE } = require('../utils/constants');
+const { ERR, REG_STATUS, isAdminRole } = require('../utils/constants');
 
 /** 生成 6 位数字核销口令 */
 function randomCode() {
@@ -111,7 +111,7 @@ function stats(operator, eventId) {
 
 /** 断言操作者为活动发布者或管理员 */
 function assertEventManagePermission(operator, event) {
-  if (operator.id !== event.organizer_id && operator.role !== USER_ROLE.ADMIN) {
+  if (operator.id !== event.organizer_id && !isAdminRole(operator.role)) {
     throw ApiError.forbidden('仅活动发布者或管理员可执行该操作');
   }
 }

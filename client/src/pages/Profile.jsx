@@ -15,6 +15,13 @@ import { useAuthStore } from '../store/authStore';
 import { ClashStar, ClashStripe } from '../components/ClashDecor';
 import { CLASH } from '../theme';
 
+/** 角色 → 中文显示（大管理员 / 管理员 / 普通用户） */
+const ROLE_LABEL = {
+  super_admin: '大管理员',
+  admin: '管理员',
+  user: '普通用户',
+};
+
 export default function Profile() {
   const { user, setUser, logout } = useAuthStore();
   const [name, setName] = useState(user?.name || '');
@@ -189,7 +196,7 @@ export default function Profile() {
           <p className="mt-0.5 text-xs font-bold text-ink-mute">学号 {user?.student_id || '-'}</p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
-              {user?.role === 'admin' ? '管理员' : '普通用户'}
+              {ROLE_LABEL[user?.role] || '普通用户'}
             </span>
             <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
               {user?.email ? '已绑定邮箱' : '未绑定邮箱'}

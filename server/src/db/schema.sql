@@ -45,7 +45,10 @@ CREATE TABLE IF NOT EXISTS events (
   created_at      TEXT    NOT NULL,
   updated_at      TEXT    NOT NULL,
   -- ===== 增量 v2（存量库升级走 migrate.js 幂等补齐）=====
-  checkin_code    TEXT                               -- 核销口令（可空，一活动一口令，F4）
+  checkin_code    TEXT,                             -- 核销口令（可空，一活动一口令，F4）
+  -- ===== 增量 v3：活动置顶（老活动 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  is_pinned       INTEGER NOT NULL DEFAULT 0,       -- 是否置顶（1=置顶，公开列表排最前）
+  pinned_at       TEXT                              -- 置顶时间（ISO UTC，NULL=未置顶）
 );
 
 -- 报名表：UNIQUE(event_id, user_id) 防重复报名；取消后再报名为状态重置（UPDATE）
@@ -88,7 +91,10 @@ CREATE TABLE IF NOT EXISTS posts (
   favorite_count INTEGER NOT NULL DEFAULT 0,
   status        TEXT    NOT NULL DEFAULT 'active', -- active / deleted
   created_at    TEXT    NOT NULL,
-  updated_at    TEXT    NOT NULL
+  updated_at    TEXT    NOT NULL,
+  -- ===== 增量 v3：论坛置顶（老帖 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  is_pinned     INTEGER NOT NULL DEFAULT 0,       -- 是否置顶（1=置顶，信息流排最前）
+  pinned_at     TEXT                              -- 置顶时间（ISO UTC，NULL=未置顶）
 );
 CREATE INDEX IF NOT EXISTS idx_posts_author ON posts(author_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_posts_created ON posts(status, created_at);

@@ -10,6 +10,7 @@ const socialModel = require('../models/socialModel');
 const userModel = require('../models/userModel');
 const notificationService = require('./notificationService');
 const { ApiError } = require('../utils/response');
+const { isAdminRole } = require('../utils/constants');
 const { mask: maskSensitive } = require('../utils/sensitiveWords');
 
 const NOTIFY_TYPE = 'forum';
@@ -140,8 +141,17 @@ function updatePost(user, id, { title, content, media, topics }) {
 function deletePost(user, id) {
   const post = postModel.findById(id);
   if (!post || post.status !== 'active') throw ApiError.notFound('帖子不存在');
-  if (post.author_id !== user.id && user.role !== 'admin') throw ApiError.forbidden('无权删除该帖子');
+  if (post.author_id !== user.id && !isAdminRole(user.role)) throw ApiError.forbidden('无权删除该帖子');
   postModel.softDelete(id);
+}
+
+/** 置顶/取消置顶帖子（路由层已 requireAdmin，此处不再判角色） */
+function togglePin(user, id) {
+  const post = postModel.findById(id);
+  if (!post || post.status !== 'active') throw ApiError.notFound('帖子不存在或已删除');
+  const pinned = !post.is_pinned;
+  postModel.setPinned(id, pinned);
+  return postModel.findById(id);
 }
 
 function getPost(user, id) {
@@ -215,7 +225,7 @@ function addComment(user, postId, { content, parent_id = 0 }) {
 function deleteComment(user, id) {
   const comment = commentModel.findById(id);
   if (!comment || comment.status !== 'active') throw ApiError.notFound('评论不存在');
-  if (comment.user_id !== user.id && user.role !== 'admin') throw ApiError.forbidden('无权删除该评论');
+  if (comment.user_id !== user.id && !isAdminRole(user.role)) throw ApiError.forbidden('无权删除该评论');
   commentModel.softDelete(id);
   postModel.incCommentCount(comment.post_id, -1);
 }
@@ -283,6 +293,7 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  togglePin,
   getPost,
   listPosts,
   addComment,

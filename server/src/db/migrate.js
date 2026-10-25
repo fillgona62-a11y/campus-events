@@ -30,6 +30,12 @@ function runMigrations() {
   addColumn('registrations', 'checked_in_at', 'TEXT');
   // events：核销口令（F4）
   addColumn('events', 'checkin_code', 'TEXT');
+  // posts：论坛置顶（v3）
+  addColumn('posts', 'is_pinned', 'INTEGER NOT NULL DEFAULT 0');
+  addColumn('posts', 'pinned_at', 'TEXT');
+  // events：活动置顶（v3）
+  addColumn('events', 'is_pinned', 'INTEGER NOT NULL DEFAULT 0');
+  addColumn('events', 'pinned_at', 'TEXT');
 
   // 邮箱唯一索引：SQLite 唯一索引中 NULL 视为互异，多个老用户 email 为空不冲突
   db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)`);

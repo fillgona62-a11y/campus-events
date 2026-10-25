@@ -54,8 +54,8 @@ function list({ page = 1, page_size = 10, sort = 'latest', topic, keyword, autho
   const total = db.prepare(`SELECT COUNT(*) AS c FROM posts p WHERE ${where}`).get(...params).c;
   const order =
     sort === 'hot'
-      ? '(p.like_count + p.comment_count * 2) DESC, p.created_at DESC'
-      : 'p.created_at DESC';
+      ? 'p.is_pinned DESC, (p.like_count + p.comment_count * 2) DESC, p.created_at DESC'
+      : 'p.is_pinned DESC, p.created_at DESC';
   const list = db
     .prepare(
       `SELECT p.*, ${AUTHOR_COLS} FROM posts p JOIN users u ON u.id = p.author_id
@@ -63,6 +63,17 @@ function list({ page = 1, page_size = 10, sort = 'latest', topic, keyword, autho
     )
     .all(...params, page_size, (page - 1) * page_size);
   return { list, total, page, page_size };
+}
+
+/** 置顶/取消置顶（pinned 为真时记录 pinned_at，否则清空） */
+function setPinned(id, pinned) {
+  const now = new Date().toISOString();
+  db.prepare('UPDATE posts SET is_pinned = ?, pinned_at = ?, updated_at = ? WHERE id = ?').run(
+    pinned ? 1 : 0,
+    pinned ? now : null,
+    now,
+    id
+  );
 }
 
 /** 软删除 */
@@ -90,6 +101,7 @@ module.exports = {
   update,
   findById,
   list,
+  setPinned,
   softDelete,
   incView,
   incCommentCount,

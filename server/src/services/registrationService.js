@@ -20,7 +20,7 @@ const {
   ERR,
   EVENT_STATUS,
   REG_STATUS,
-  USER_ROLE,
+  isAdminRole,
   NOTIFICATION_TYPE,
 } = require('../utils/constants');
 
@@ -202,7 +202,7 @@ function review(organizerId, registrationId, action) {
 
 /** 断言操作为活动发布者或管理员 */
 function assertEventManagePermission(operator, event) {
-  if (operator.id !== event.organizer_id && operator.role !== USER_ROLE.ADMIN) {
+  if (operator.id !== event.organizer_id && !isAdminRole(operator.role)) {
     throw ApiError.forbidden('仅活动发布者或管理员可执行该操作');
   }
 }

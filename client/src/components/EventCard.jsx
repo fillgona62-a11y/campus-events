@@ -13,6 +13,7 @@
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import PlaceIcon from '@mui/icons-material/Place';
+import PushPinIcon from '@mui/icons-material/PushPin';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { useNavigate } from 'react-router-dom';
 import { formatTimeRange, remainingText, isFull, isSignupClosed } from '../utils/format';
@@ -82,6 +83,13 @@ export default function EventCard({ event }) {
           <div className="flex h-full w-full items-center justify-center" style={{ color: onAccent }}>
             <span className="select-none text-6xl font-black leading-none">{firstChar}</span>
           </div>
+        )}
+        {/* 置顶徽标：封面左上角（柔柠黄实心 + 2px 墨边 + on-clash 强制墨字，任何撞色封面上都可读） */}
+        {event.is_pinned && (
+          <span className="on-clash absolute left-3 top-3 inline-flex items-center gap-1 rounded-lg border-2 border-ink bg-clash-lemon px-2 py-0.5 text-xs font-extrabold">
+            <PushPinIcon sx={{ fontSize: 14 }} />
+            置顶
+          </span>
         )}
         {/* 四角星装饰 */}
         <ClashStar size={26} className="absolute right-3 top-3" style={{ color: onAccent, opacity: 0.32 }} />

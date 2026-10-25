@@ -64,6 +64,16 @@ function deletePost(req, res, next) {
   }
 }
 
+function pinPost(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) throw ApiError.badRequest('帖子 ID 不合法');
+    ok(res, { post: forumService.togglePin(req.user, id) });
+  } catch (err) {
+    next(err);
+  }
+}
+
 function addComment(req, res, next) {
   try {
     const id = parseId(req.params.id);
@@ -155,6 +165,7 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  pinPost,
   addComment,
   deleteComment,
   likePost,
