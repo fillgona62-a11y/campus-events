@@ -32,6 +32,7 @@ const userStatusSchema = z.object({
 
 router.get('/overview', adminController.overview);
 router.get('/overview/trend', adminController.overviewTrend);
+router.get('/analytics', adminController.analytics);
 router.get('/events', adminController.listEvents);
 router.put('/events/:id/review', validate(reviewSchema), adminController.reviewEvent);
 router.put('/events/:id/offline', adminController.offlineEvent);

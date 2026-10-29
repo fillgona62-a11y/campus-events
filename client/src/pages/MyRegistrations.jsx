@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import { myRegistrations, cancelRegistration } from '../api/registrationApi';
 import StatusBadge from '../components/StatusBadge';
 import EmptyState from '../components/EmptyState';
+import CheckinQrDialog from '../components/CheckinQrDialog';
 import { ClashStar, clashColorAt } from '../components/ClashDecor';
 import { CLASH, CATEGORY_COLORS } from '../theme';
 import { readableText } from '../utils/clash';
@@ -39,6 +40,7 @@ export default function MyRegistrations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [cancelTarget, setCancelTarget] = useState(null);
+  const [qrTarget, setQrTarget] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
@@ -149,13 +151,17 @@ export default function MyRegistrations() {
                     {formatTimeRange(item.start_time, item.end_time)}
                   </p>
                   <p className="text-xs font-semibold text-ink-mute">{item.location}</p>
-                  {/* 核销凭证提示（F4）：已报名成功的活动，到场报学号核销 */}
+                  {/* 核销凭证（F4/v4）：已报名成功，出示签到二维码 */}
                   {item.status === 'approved' && (
-                    <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink on-clash">
+                    <button
+                      onClick={() => setQrTarget(item)}
+                      disabled={item.checked_in === 1}
+                      className="mt-1 w-full rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-left text-xs font-bold text-ink transition-transform on-clash hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
                       {item.checked_in === 1
-                        ? '已核销入场'
-                        : `到场凭证：${item.title} · 本人学号 ${currentUser?.student_id || ''}（请报学号核销）`}
-                    </p>
+                        ? '已核销入场 ✓'
+                        : '到场签到码 · 点击出示'}
+                    </button>
                   )}
                   <div className="mt-2 flex flex-wrap gap-2">
                     <Button size="small" variant="outlined" onClick={() => navigate(`/events/${item.event_id}`)}>
@@ -201,6 +207,15 @@ export default function MyRegistrations() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* 签到二维码弹窗（v4） */}
+      <CheckinQrDialog
+        open={Boolean(qrTarget)}
+        onClose={() => setQrTarget(null)}
+        eventId={qrTarget?.event_id}
+        studentId={currentUser?.student_id}
+        title={qrTarget?.title}
+      />
 
       <Snackbar
         open={toast.open}

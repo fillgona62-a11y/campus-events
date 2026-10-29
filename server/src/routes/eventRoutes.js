@@ -5,6 +5,7 @@ const express = require('express');
 const { z } = require('zod');
 const eventController = require('../controllers/eventController');
 const registrationController = require('../controllers/registrationController');
+const reviewController = require('../controllers/reviewController');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const { actionLimiter } = require('../middleware/rateLimit');
@@ -63,6 +64,15 @@ const registerSchema = z.object({
   remark: z.string().trim().max(200, '备注最多 200 字').optional(),
 });
 
+const reviewSchema = z.object({
+  rating: z
+    .number({ required_error: '请打分', invalid_type_error: '评分不合法' })
+    .int('评分必须为整数')
+    .min(1, '评分最低 1 星')
+    .max(5, '评分最高 5 星'),
+  content: z.string().trim().max(500, '评价最多 500 字').optional().nullable(),
+});
+
 // 分类
 router.get('/categories', eventController.listCategories);
 
@@ -71,7 +81,20 @@ router.get('/my/events', requireAuth, eventController.myEvents);
 
 // 公开活动列表与详情
 router.get('/events', eventController.listPublic);
+// 热门活动（需在 /events/:id 之前注册，否则被动态段吞掉）
+router.get('/events/hot', eventController.listHot);
 router.get('/events/:id', optionalAuth, eventController.detail);
+
+// 活动评价（v4）
+router.get('/events/:id/reviews', reviewController.list);
+router.get('/events/:id/my-review', requireAuth, reviewController.myReview);
+router.post(
+  '/events/:id/review',
+  requireAuth,
+  actionLimiter,
+  validate(reviewSchema),
+  reviewController.submit
+);
 
 // 发布 / 编辑 / 取消
 router.post('/events', requireAuth, actionLimiter, validate(eventSchema), eventController.create);

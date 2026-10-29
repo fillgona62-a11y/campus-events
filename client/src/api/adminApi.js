@@ -52,3 +52,8 @@ export function listAuditLogs(params) {
 export function overviewTrend(params) {
   return client.get('/admin/overview/trend', { params });
 }
+
+/** 数据大屏聚合（v4）：{days?} → {category_distribution, user_trend, forum} */
+export function analytics(params) {
+  return client.get('/admin/analytics', { params });
+}

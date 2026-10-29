@@ -161,6 +161,38 @@ function listUserIdsByEventAndStatus(eventId, status) {
 }
 
 /**
+ * 某活动报名成功用户列表（含邮箱，v4 提醒任务用）。
+ * 仅返回 approved 且用户有绑定邮箱的记录。
+ * @returns {Array<{user_id:number, email:string, name:string}>}
+ */
+function listApprovedWithEmail(eventId) {
+  return db
+    .prepare(
+      `SELECT r.user_id, u.email, u.name
+       FROM registrations r JOIN users u ON u.id = r.user_id
+       WHERE r.event_id = ? AND r.status = ? AND u.email IS NOT NULL AND u.email != ''`
+    )
+    .all(eventId, REG_STATUS.APPROVED);
+}
+
+/**
+ * 各分类报名人数分布（v4 数据大屏用）：按活动分类聚合已成功报名数。
+ * @returns {Array<{category_name:string, count:number}>}
+ */
+function countByCategory() {
+  return db
+    .prepare(
+      `SELECT c.name AS category_name, COUNT(r.id) AS count
+       FROM registrations r
+       JOIN events e ON e.id = r.event_id
+       JOIN categories c ON c.id = e.category_id
+       WHERE r.status IN ('approved', 'waitlisted')
+       GROUP BY c.id ORDER BY count DESC`
+    )
+    .all();
+}
+
+/**
  * 取活动最早候补者（递补用）：status='waitlisted' 按 created_at ASC, id ASC 第一条。
  * @returns {object|null}
  */
@@ -276,6 +308,8 @@ module.exports = {
   listByUser,
   listForExport,
   listUserIdsByEventAndStatus,
+  listApprovedWithEmail,
+  countByCategory,
   findFirstWaitlisted,
   countWaitlisted,
   waitlistPosition,

@@ -130,6 +130,28 @@ function count() {
   return db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
 }
 
+/**
+ * 按日注册用户趋势（v4 数据大屏用）：近 N 天每天新增用户数（UTC+8 归日期）。
+ * @param {number} days 1~90
+ */
+function trendByDay(days) {
+  const rows = db
+    .prepare(
+      `SELECT date(created_at, '+8 hours') AS d, COUNT(*) AS c
+       FROM users
+       WHERE date(created_at, '+8 hours') >= date('now', '+8 hours', ?)
+       GROUP BY d`
+    )
+    .all(`-${days - 1} days`);
+  const map = new Map(rows.map((r) => [r.d, r.c]));
+  const out = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(Date.now() + 8 * 3600e3 - i * 24 * 3600e3).toISOString().slice(0, 10);
+    out.push({ date: d, count: map.get(d) || 0 });
+  }
+  return out;
+}
+
 /** 按姓名批量查用户（@提及用；仅活跃用户） */
 function findByNames(names) {
   if (!Array.isArray(names) || !names.length) return [];
@@ -155,4 +177,5 @@ module.exports = {
   clearLoginFailures,
   list,
   count,
+  trendByDay,
 };

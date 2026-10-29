@@ -287,6 +287,14 @@ function myComments(user, query) {
   return commentModel.listByUser(user.id, query);
 }
 
+/** 论坛活跃度概览（v4 数据大屏用）：帖子/评论/点赞总数 */
+function forumStats() {
+  const db = require('../db/connection');
+  const post = db.prepare("SELECT COUNT(*) AS c, COALESCE(SUM(like_count),0) AS likes FROM posts WHERE status = 'active'").get();
+  const comment = db.prepare("SELECT COUNT(*) AS c FROM comments WHERE status = 'active'").get();
+  return { posts: post.c || 0, comments: comment.c || 0, likes: post.likes || 0 };
+}
+
 module.exports = {
   sanitizeContent,
   sanitizeComment,
@@ -303,4 +311,5 @@ module.exports = {
   toggleFollow,
   myPosts,
   myComments,
+  forumStats,
 };

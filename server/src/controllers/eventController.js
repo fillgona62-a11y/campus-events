@@ -53,6 +53,18 @@ function listPublic(req, res, next) {
   }
 }
 
+/** GET /events/hot 热门活动（v4：按报名数降序，首页推荐位） */
+function listHot(req, res, next) {
+  try {
+    let limit = parseInt(req.query.limit, 10);
+    if (!Number.isInteger(limit) || limit < 1) limit = 6;
+    if (limit > 20) limit = 20;
+    ok(res, { list: eventModel.listHot(limit) });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /** GET /events/:id 详情（非已发布状态仅发布者/管理员可见），登录时附 my_registration 与候补人数 */
 function detail(req, res, next) {
   try {
@@ -195,6 +207,7 @@ function exportRegistrations(req, res, next) {
 module.exports = {
   listCategories,
   listPublic,
+  listHot,
   detail,
   create,
   update,

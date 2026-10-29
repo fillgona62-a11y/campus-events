@@ -13,6 +13,26 @@ export function listEvents(params) {
   return client.get('/events', { params });
 }
 
+/** 热门活动（v4）：{limit?} → {list} */
+export function listHotEvents(params) {
+  return client.get('/events/hot', { params });
+}
+
+/** 活动评价列表（v4，公开）→ {summary:{count,avg}, list} */
+export function listReviews(id) {
+  return client.get(`/events/${id}/reviews`);
+}
+
+/** 我的评价（v4）→ {review|null} */
+export function myReview(id) {
+  return client.get(`/events/${id}/my-review`);
+}
+
+/** 提交评价（v4）：{rating, content?} */
+export function submitReview(id, data) {
+  return client.post(`/events/${id}/review`, data);
+}
+
 /** 活动详情 → {event, my_registration} */
 export function getEvent(id) {
   return client.get(`/events/${id}`);
@@ -75,6 +95,60 @@ export function uploadCover(file) {
   formData.append('file', file);
   return client.post('/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
+  });
+}
+
+/**
+ * 压缩图片后上传封面（v4：前端 Canvas 压缩，手机大图也能快速上传）。
+ * 超过 2MB 的图片先等比压缩到最长边 1600px、质量 0.8，仍超限再降质量。
+ * @param {File} file 原始图片文件
+ * @returns {Promise<{url:string}>}
+ */
+export async function uploadCoverCompressed(file) {
+  const MAX_MB = 2;
+  const needCompress = file.size > MAX_MB * 1024 * 1024;
+  if (!needCompress) return uploadCover(file);
+
+  const compressed = await compressImage(file, 1600, 0.8);
+  // 压缩后仍超限则进一步降尺寸
+  if (compressed.size > MAX_MB * 1024 * 1024) {
+    const smaller = await compressImage(file, 1024, 0.7);
+    return uploadCover(smaller);
+  }
+  return uploadCover(compressed);
+}
+
+/** 用 Canvas 等比压缩图片，返回新 File */
+function compressImage(file, maxEdge, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      const scale = Math.min(1, maxEdge / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return reject(new Error('图片压缩失败'));
+          const ext = (file.type === 'image/png' && file.size < 5 * 1024 * 1024) ? 'png' : 'jpeg';
+          resolve(new File([blob], file.name.replace(/\.\w+$/, `.${ext === 'png' ? 'png' : 'jpg'}`), { type: `image/${ext}` }));
+        },
+        `image/${file.type === 'image/png' ? 'png' : 'jpeg'}`,
+        quality
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('图片读取失败'));
+    };
+    img.src = url;
   });
 }
 

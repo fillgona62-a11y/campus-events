@@ -7,7 +7,7 @@
  *   3. 桌面导航项 hover 有撞色反馈；未登录「登录」描边、「注册」实心荧光绿
  *   4. 页脚加撞色细条 ClashStripe，法务链接 hover 有颜色变化
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -42,6 +42,8 @@ export default function MainLayout() {
   const location = useLocation();
   const { token, user, setUser, logout } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState(null);
+  // 上次未读数（v4 桌面通知：检测新增通知时弹出系统通知）
+  const lastUnreadRef = useRef(null);
 
   // 活动详情页自带底部固定报名栏，隐藏全局底部 Tab 避免遮挡
   const hideBottomNav = /^\/events\/\d+$/.test(location.pathname);
@@ -54,6 +56,42 @@ export default function MainLayout() {
         .catch(() => {});
     }
   }, [token, setUser]);
+
+  // 桌面通知（v4）：登录后每 60 秒轮询未读数，有新增则弹系统通知
+  useEffect(() => {
+    if (!token) {
+      lastUnreadRef.current = null;
+      return;
+    }
+    // 首次记录基线，避免登录即弹历史未读
+    if (lastUnreadRef.current === null) {
+      lastUnreadRef.current = user?.unread_count ?? 0;
+    }
+    const timer = setInterval(() => {
+      me()
+        .then((data) => {
+          const prev = lastUnreadRef.current ?? 0;
+          const curr = data.user?.unread_count ?? 0;
+          setUser(data.user);
+          if (curr > prev && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('校园活动报名系统', {
+              body: `你有 ${curr - prev} 条新通知，点击查看`,
+            }).onclick = () => navigate('/notifications');
+          }
+          lastUnreadRef.current = curr;
+        })
+        .catch(() => {});
+    }, 60 * 1000);
+    return () => clearInterval(timer);
+  }, [token, setUser, navigate, user?.unread_count]);
+
+  // 请求通知权限（用户点击通知图标时触发，避免一进来就弹权限框）
+  const handleNotificationClick = () => {
+    navigate('/notifications');
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  };
 
   const handleLogout = () => {
     setAnchorEl(null);
@@ -104,7 +142,7 @@ export default function MainLayout() {
             <>
               <IconButton
                 color="inherit"
-                onClick={() => navigate('/notifications')}
+                onClick={handleNotificationClick}
                 aria-label="站内通知"
                 sx={{ minWidth: 44, minHeight: 44 }}
               >

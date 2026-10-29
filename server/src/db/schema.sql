@@ -198,3 +198,24 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_r
 -- 注意：idx_users_email（users.email 唯一索引）不放在本文件——存量库在此处
 -- 尚无 email 列，须由 migrate.js 补齐列后再创建（幂等，见 db/migrate.js）。
 CREATE INDEX IF NOT EXISTS idx_reg_waitlist ON registrations(event_id, status, created_at);
+
+-- ===== v4：活动评价（活动结束后，报名成功用户可打分 + 留言）=====
+CREATE TABLE IF NOT EXISTS event_reviews (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  event_id   INTEGER NOT NULL REFERENCES events(id),
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  rating     INTEGER NOT NULL,                -- 1~5 星
+  content    TEXT,                            -- 评价内容（纯文本，≤500 字）
+  created_at TEXT    NOT NULL,
+  UNIQUE(event_id, user_id)                   -- 一活动一人一评
+);
+CREATE INDEX IF NOT EXISTS idx_reviews_event ON event_reviews(event_id, created_at);
+
+-- ===== v4：提醒发送记录（防重复发送：活动提醒/报名截止提醒）=====
+CREATE TABLE IF NOT EXISTS reminder_logs (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  event_id   INTEGER NOT NULL REFERENCES events(id),
+  kind       TEXT    NOT NULL,                -- start（开始提醒）/ deadline（截止提醒）
+  created_at TEXT    NOT NULL,
+  UNIQUE(event_id, kind)
+);

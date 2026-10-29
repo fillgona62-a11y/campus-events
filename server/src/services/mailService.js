@@ -74,4 +74,27 @@ async function sendCodeMail(email, code, purpose, expireMinutes) {
   }
 }
 
-module.exports = { sendCodeMail };
+/**
+ * 发送提醒邮件（v4：活动开始/报名截止提醒）。
+ * 与验证码邮件共用 transport；DEV_ECHO 或未配置 SMTP 时仅日志、不抛错。
+ * @param {string} email 收件邮箱
+ * @param {string} subject 主题
+ * @param {string} text 正文
+ */
+async function sendReminderMail(email, subject, text) {
+  if (config.smtp.devEcho) {
+    console.log(`[mail][DEV_ECHO] 提醒邮件（未真实发送）→ ${email}：${subject}`);
+    return { sent: true, devEcho: true };
+  }
+  const transport = getTransporter();
+  if (!transport) return { sent: false, devEcho: false };
+  try {
+    await transport.sendMail({ from: config.smtp.from, to: email, subject, text });
+    return { sent: true, devEcho: false };
+  } catch (err) {
+    console.error(`[mail] 提醒邮件发送失败（${email}）：`, err.message);
+    return { sent: false, devEcho: false };
+  }
+}
+
+module.exports = { sendCodeMail, sendReminderMail };

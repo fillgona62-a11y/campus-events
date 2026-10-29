@@ -239,6 +239,48 @@ function setPinned(id, pinned) {
   );
 }
 
+/**
+ * 热门活动（v4）：已上架且未结束，按 approved_count 降序取前 N 个。
+ * 供首页「热门推荐」位使用。
+ * @param {number} limit 返回条数（默认 6）
+ */
+function listHot(limit = 6) {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      `${BASE_SELECT} WHERE e.status = 'approved' AND e.end_time > ?
+       ORDER BY e.approved_count DESC, e.created_at DESC LIMIT ?`
+    )
+    .all(now, limit);
+}
+
+/**
+ * 即将开始的活动（v4，提醒任务用）：已上架、开始时间落在 [now, now+windowMinutes] 区间。
+ * @param {number} windowMinutes 时间窗（分钟）
+ */
+function listStartingSoon(windowMinutes) {
+  const now = new Date().toISOString();
+  const upper = new Date(Date.now() + windowMinutes * 60 * 1000).toISOString();
+  return db
+    .prepare(
+      `${BASE_SELECT} WHERE e.status = 'approved' AND e.start_time > ? AND e.start_time <= ?`
+    )
+    .all(now, upper);
+}
+
+/**
+ * 报名即将截止的活动（v4，提醒任务用）：已上架、报名截止时间落在 [now, now+windowMinutes]。
+ */
+function listDeadlineSoon(windowMinutes) {
+  const now = new Date().toISOString();
+  const upper = new Date(Date.now() + windowMinutes * 60 * 1000).toISOString();
+  return db
+    .prepare(
+      `${BASE_SELECT} WHERE e.status = 'approved' AND e.signup_deadline > ? AND e.signup_deadline <= ?`
+    )
+    .all(now, upper);
+}
+
 module.exports = {
   findById,
   listPublic,
@@ -255,4 +297,7 @@ module.exports = {
   getCheckinCode,
   setCheckinCode,
   setPinned,
+  listHot,
+  listStartingSoon,
+  listDeadlineSoon,
 };

@@ -11,7 +11,7 @@ import Pagination from '@mui/material/Pagination';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { listEvents, listCategories } from '../api/eventApi';
+import { listEvents, listCategories, listHotEvents } from '../api/eventApi';
 import EventCard from '../components/EventCard';
 import CategoryNav from '../components/CategoryNav';
 import SearchBar from '../components/SearchBar';
@@ -31,6 +31,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [categories, setCategories] = useState([]);
   const [data, setData] = useState({ list: [], total: 0 });
+  const [hot, setHot] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   // 失败重试计数：出错时自增以触发重新拉取
@@ -39,6 +40,10 @@ export default function Home() {
   useEffect(() => {
     listCategories()
       .then((d) => setCategories(d.list))
+      .catch(() => {});
+    // 热门活动（v4）：仅首页首屏拉取一次
+    listHotEvents({ limit: 6 })
+      .then((d) => setHot(d.list))
       .catch(() => {});
   }, []);
 
@@ -115,6 +120,41 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── 热门推荐（v4）────────────────────────────────────── */}
+      {hot.length > 0 && (
+        <section className="mb-5">
+          <div className="mb-2 flex items-center gap-2">
+            <ClashStar size={18} style={{ color: CLASH.magenta }} />
+            <h2 className="text-lg font-extrabold tracking-tight text-ink">热门活动</h2>
+            <span className="text-xs font-bold text-ink-mute">按报名热度</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {hot.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => navigate(`/events/${event.id}`)}
+                className="w-40 shrink-0 overflow-hidden rounded-2xl border-2 border-ink bg-paper-card text-left shadow-block-ink-sm transition-transform hover:-translate-y-0.5"
+              >
+                <div
+                  className="flex h-20 items-center justify-center border-b-2 border-ink"
+                  style={{ backgroundColor: CLASH.lemon }}
+                >
+                  <span className="px-2 text-center text-xs font-extrabold leading-tight text-ink line-clamp-2">
+                    {event.title}
+                  </span>
+                </div>
+                <div className="px-3 py-2">
+                  <p className="truncate text-xs font-bold text-ink-soft">{event.location}</p>
+                  <p className="mt-1 text-[11px] font-bold text-ink-mute">
+                    已报名 {event.approved_count} 人
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── 筛选区 ──────────────────────────────────────────────── */}
       <div id="event-list" className="mb-1 flex items-center gap-2">

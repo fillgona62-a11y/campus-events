@@ -16,7 +16,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import dayjs from 'dayjs';
 import WheelDateTime from '../components/WheelDateTime';
-import { createEvent, updateEvent, getEvent, listCategories, uploadCover } from '../api/eventApi';
+import { createEvent, updateEvent, getEvent, listCategories, uploadCoverCompressed } from '../api/eventApi';
 import { ClashStar, ClashStripe } from '../components/ClashDecor';
 import { CLASH } from '../theme';
 
@@ -99,7 +99,8 @@ export default function PublishEvent() {
     if (!file) return;
     setUploading(true);
     try {
-      const data = await uploadCover(file);
+      // v4：超过 2MB 的图片前端自动压缩后上传，手机大图也能快速上传
+      const data = await uploadCoverCompressed(file);
       update('cover_url', data.url);
       showToast('封面上传成功');
     } catch (err) {

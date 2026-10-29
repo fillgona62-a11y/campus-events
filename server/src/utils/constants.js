@@ -41,6 +41,8 @@ const NOTIFICATION_TYPE = {
   PASSWORD_CHANGED: 'password_changed',       // v2：自助改密提醒（F1）
   PASSWORD_RESET: 'password_reset',           // v2：密码被重置提醒（F1/F2）
   WAITLIST_PROMOTED: 'waitlist_promoted',     // v2：候补递补成功（F5）
+  EVENT_REMINDER: 'event_reminder',           // v4：活动开始提醒
+  DEADLINE_REMINDER: 'deadline_reminder',     // v4：报名截止提醒
 };
 
 /** 邮箱验证码用途（F3/F2/F3 联动） */

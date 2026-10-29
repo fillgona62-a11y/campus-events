@@ -119,6 +119,27 @@ function runMigrations() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_calendar_notes_user_date ON calendar_notes(user_id, date);
   `);
 
+  // v4：活动评价 + 提醒发送记录（幂等，老库自动补齐）
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS event_reviews (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      event_id   INTEGER NOT NULL REFERENCES events(id),
+      user_id    INTEGER NOT NULL REFERENCES users(id),
+      rating     INTEGER NOT NULL,
+      content    TEXT,
+      created_at TEXT    NOT NULL,
+      UNIQUE(event_id, user_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_reviews_event ON event_reviews(event_id, created_at);
+    CREATE TABLE IF NOT EXISTS reminder_logs (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      event_id   INTEGER NOT NULL REFERENCES events(id),
+      kind       TEXT    NOT NULL,
+      created_at TEXT    NOT NULL,
+      UNIQUE(event_id, kind)
+    );
+  `);
+
   // 新表：校园论坛（posts/comments/post_likes/post_favorites/user_follows）
   db.exec(`
     CREATE TABLE IF NOT EXISTS posts (

@@ -43,6 +43,25 @@ function overviewTrend(req, res, next) {
   }
 }
 
+/**
+ * GET /admin/analytics 数据大屏聚合（v4）：
+ * 分类报名分布 + 用户增长趋势 + 论坛活跃度概览。
+ */
+function analytics(req, res, next) {
+  try {
+    let days = parseInt(req.query.days, 10);
+    if (!Number.isInteger(days) || days < 1) days = 30;
+    if (days > 90) days = 90;
+    ok(res, {
+      category_distribution: registrationModel.countByCategory(),
+      user_trend: userModel.trendByDay(days),
+      forum: forumService.forumStats ? forumService.forumStats() : null,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /** GET /admin/events 全站活动（全部状态） */
 function listEvents(req, res, next) {
   try {
@@ -218,6 +237,7 @@ function setEventPinned(req, res, next) {
 module.exports = {
   overview,
   overviewTrend,
+  analytics,
   listEvents,
   reviewEvent,
   offlineEvent,

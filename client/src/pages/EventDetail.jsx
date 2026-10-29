@@ -31,6 +31,7 @@ import { cancelRegistration } from '../api/registrationApi';
 import { useAuthStore } from '../store/authStore';
 import StatusBadge from '../components/StatusBadge';
 import ShareDialog from '../components/ShareDialog';
+import EventReviews from '../components/EventReviews';
 import { ClashStar, ClashStripe, clashColorAt } from '../components/ClashDecor';
 import { CLASH, CATEGORY_COLORS } from '../theme';
 import { readableText } from '../utils/clash';
@@ -342,6 +343,9 @@ export default function EventDetail() {
           dangerouslySetInnerHTML={{ __html: event.description || '暂无简介' }}
         />
       </div>
+
+      {/* ── 活动评价（v4）──────────────────────────────────────── */}
+      <EventReviews event={event} />
 
       {/* 底部固定操作栏（适配全面屏安全区） */}
       <div
