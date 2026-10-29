@@ -48,7 +48,11 @@ CREATE TABLE IF NOT EXISTS events (
   checkin_code    TEXT,                             -- 核销口令（可空，一活动一口令，F4）
   -- ===== 增量 v3：活动置顶（老活动 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
   is_pinned       INTEGER NOT NULL DEFAULT 0,       -- 是否置顶（1=置顶，公开列表排最前）
-  pinned_at       TEXT                              -- 置顶时间（ISO UTC，NULL=未置顶）
+  pinned_at       TEXT,                             -- 置顶时间（ISO UTC，NULL=未置顶）
+  -- ===== 增量 v5：定位签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  lat             REAL,                              -- 活动地点纬度（-90~90，NULL=未设置定位）
+  lng             REAL,                              -- 活动地点经度（-180~180，NULL=未设置定位）
+  checkin_radius  REAL    NOT NULL DEFAULT 0.2       -- 签到允许半径（公里，默认 0.2=200 米；0=不限制）
 );
 
 -- 报名表：UNIQUE(event_id, user_id) 防重复报名；取消后再报名为状态重置（UPDATE）

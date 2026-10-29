@@ -115,7 +115,7 @@ function eventPayload(title, overrides = {}) {
   };
 }
 
-/** 核销测试活动：报名截止与开始时间均在数秒内到达，便于现场核销 */
+/** 核销测试活动：报名截止与开始时间均在数秒内到达，便于现场签到；含定位坐标（北京天安门） */
 function checkinEventPayload(title) {
   const now = Date.now();
   return {
@@ -128,6 +128,9 @@ function checkinEventPayload(title) {
     capacity: 5,
     require_approval: false,
     description: '<p>QA 核销测试活动</p>',
+    lat: 39.9087,
+    lng: 116.3975,
+    checkin_radius: 0.2,
   };
 }
 
@@ -631,11 +634,11 @@ async function main() {
     }
   });
 
-  // ---------- 8. 签到核销（F4） ----------
+  // ---------- 8. 签到核销（v5 定位签到） ----------
   suite('签到核销');
-  let ckEvent, ckCode, ckReg;
+  let ckEvent, ckReg;
 
-  await test('核销口令生成/核销全流程', async () => {
+  await test('定位签到全流程', async () => {
     const cr = await api('POST', '/events', { token: org1.token, body: checkinEventPayload(`QA核销_${RUN}`) });
     ckEvent = cr.body.data.event;
     await api('PUT', `/admin/events/${ckEvent.id}/review`, { token: adminToken, body: { action: 'approve' } });
@@ -643,54 +646,63 @@ async function main() {
     const r = await api('POST', `/events/${ckEvent.id}/register`, { token: stu1.token, body: {} });
     assertEq(r.body.code, 0, '报名 code');
     ckReg = r.body.data.registration;
-    // 活动未开始不能生成口令（40911）
-    const early = await api('POST', `/events/${ckEvent.id}/checkin-code`, { token: org1.token });
-    assertEq(early.status, 409, '未开始生成口令 HTTP 状态');
+    // 活动未开始不能签到（40911）
+    const early = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(early.status, 409, '未开始签到 HTTP 状态');
     assertEq(early.body.code, 40911, '错误码');
     // 等待活动开始
     await sleep(3500);
-    // 生成口令
-    const gen = await api('POST', `/events/${ckEvent.id}/checkin-code`, { token: org1.token });
-    assertEq(gen.body.code, 0, '生成口令 code');
-    assert(/^\d{6}$/.test(gen.body.data.checkin_code), '口令应为 6 位数字');
-    ckCode = gen.body.data.checkin_code;
-    // 查看口令
-    const got = await api('GET', `/events/${ckEvent.id}/checkin-code`, { token: org1.token });
-    assertEq(got.body.data.checkin_code, ckCode, '口令应一致');
   });
 
-  await test('口令错误核销被拒（40909）', async () => {
-    const wrong = ckCode === '000000' ? '111111' : '000000';
-    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, code: wrong } });
-    assertEq(r.status, 400, 'HTTP 状态');
-    assertEq(r.body.code, 40909, '错误码');
+  await test('不在签到范围内被拒（409）', async () => {
+    // 用远离活动地点的坐标（上海）
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 31.2304, lng: 121.4737 } });
+    assertEq(r.status, 409, 'HTTP 状态');
+    assertEq(r.body.code, 40911, '错误码（不在范围）');
   });
 
-  await test('未报名学号核销被拒（40912）', async () => {
-    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu2.user.student_id, code: ckCode } });
+  await test('未报名学号签到被拒（40912）', async () => {
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu2.user.student_id, lat: 39.9087, lng: 116.3975 } });
     assertEq(r.status, 409, 'HTTP 状态');
     assertEq(r.body.code, 40912, '错误码');
   });
 
-  await test('正确核销成功并更新统计', async () => {
-    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, code: ckCode } });
-    assertEq(r.body.code, 0, '核销 code');
+  await test('在范围内签到成功并更新统计', async () => {
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(r.body.code, 0, '签到 code');
     assertEq(r.body.data.student_id, stu1.user.student_id, '学号');
-    assert(r.body.data.checked_in_at, '应有核销时间');
-    // 重复核销 → 40910
-    const again = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, code: ckCode } });
+    assert(r.body.data.checked_in_at, '应有签到时间');
+    assert(r.body.data.distance_m != null, '应有距离');
+    // 重复签到 → 40910
+    const again = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
     assertEq(again.status, 409, 'HTTP 状态');
     assertEq(again.body.code, 40910, '错误码');
     // 统计
     const s = await api('GET', `/events/${ckEvent.id}/checkin/stats`, { token: org1.token });
     assertEq(s.body.data.approved_count, 1, '报名成功数');
-    assertEq(s.body.data.checked_in_count, 1, '已核销数');
-    assertEq(s.body.data.unchecked_count, 0, '未核销数');
-    // 名单核销状态筛选
+    assertEq(s.body.data.checked_in_count, 1, '已签到数');
+    assertEq(s.body.data.unchecked_count, 0, '未签到数');
+    // 名单签到状态筛选
     const list = await api('GET', `/events/${ckEvent.id}/registrations?checked_in=1`, { token: org1.token });
-    assertEq(list.body.data.total, 1, '已核销筛选');
+    assertEq(list.body.data.total, 1, '已签到筛选');
     const list0 = await api('GET', `/events/${ckEvent.id}/registrations?checked_in=0`, { token: org1.token });
-    assertEq(list0.body.data.total, 0, '未核销筛选');
+    assertEq(list0.body.data.total, 0, '未签到筛选');
+  });
+
+  await test('学生自助定位签到（self-checkin）', async () => {
+    // 新建一个活动给 stu2 签到
+    const cr = await api('POST', '/events', { token: org1.token, body: checkinEventPayload(`QA自助签到_${RUN}`) });
+    const ev = cr.body.data.event;
+    await api('PUT', `/admin/events/${ev.id}/review`, { token: adminToken, body: { action: 'approve' } });
+    await api('POST', `/events/${ev.id}/register`, { token: stu2.token, body: {} });
+    await sleep(3500);
+    // stu2 自助签到（在范围内）
+    const r = await api('POST', `/events/${ev.id}/self-checkin`, { token: stu2.token, body: { lat: 39.9087, lng: 116.3975 } });
+    assertEq(r.body.code, 0, '自助签到 code');
+    assertEq(r.body.data.student_id, stu2.user.student_id, '本人学号');
+    // 不在范围内 → 409
+    const far = await api('POST', `/events/${ev.id}/self-checkin`, { token: stu2.token, body: { lat: 31.2304, lng: 121.4737 } });
+    assertEq(far.status, 409, '不在范围 HTTP 状态');
   });
 
   // ---------- 9. 权限边界 ----------
@@ -713,8 +725,8 @@ async function main() {
     assertEq(r.status, 403, 'HTTP 状态');
   });
 
-  await test('非发布者核销他人活动被拒（40301）', async () => {
-    const r = await api('POST', `/events/${ckEvent.id}/checkin-code`, { token: stu2.token });
+  await test('非发布者签到他人活动被拒（40301）', async () => {
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: stu2.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
     assertEq(r.status, 403, 'HTTP 状态');
     assertEq(r.body.code, 40301, '错误码');
   });

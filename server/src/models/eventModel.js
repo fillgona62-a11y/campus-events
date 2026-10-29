@@ -108,8 +108,8 @@ function insert(data) {
       `INSERT INTO events
        (title, category_id, cover_url, location, start_time, end_time, signup_deadline,
         capacity, approved_count, organizer_id, require_approval, description, status,
-        reject_reason, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'pending', NULL, ?, ?)`
+        reject_reason, lat, lng, checkin_radius, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'pending', NULL, ?, ?, ?, ?, ?)`
     )
     .run(
       data.title,
@@ -123,6 +123,9 @@ function insert(data) {
       data.organizer_id,
       data.require_approval,
       data.description || null,
+      data.lat ?? null,
+      data.lng ?? null,
+      data.checkin_radius ?? 0.2,
       now,
       now
     );
@@ -136,7 +139,8 @@ function update(id, data) {
     `UPDATE events SET
        title = ?, category_id = ?, cover_url = ?, location = ?,
        start_time = ?, end_time = ?, signup_deadline = ?, capacity = ?,
-       require_approval = ?, description = ?, status = 'pending', reject_reason = NULL,
+       require_approval = ?, description = ?, lat = ?, lng = ?, checkin_radius = ?,
+       status = 'pending', reject_reason = NULL,
        updated_at = ?
      WHERE id = ?`
   ).run(
@@ -150,6 +154,9 @@ function update(id, data) {
     data.capacity,
     data.require_approval,
     data.description || null,
+    data.lat ?? null,
+    data.lng ?? null,
+    data.checkin_radius ?? 0.2,
     now,
     id
   );

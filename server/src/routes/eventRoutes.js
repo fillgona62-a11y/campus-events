@@ -50,6 +50,14 @@ const eventSchema = z
       .refine((s) => s.startsWith('/uploads/'), '封面图路径不合法')
       .optional()
       .nullable(),
+    // 定位签到（v5）：lat/lng 成对出现；checkin_radius 单位公里
+    lat: z.number().min(-90, '纬度不合法').max(90, '纬度不合法').optional().nullable(),
+    lng: z.number().min(-180, '经度不合法').max(180, '经度不合法').optional().nullable(),
+    checkin_radius: z.number().min(0, '签到半径不能为负').max(50, '签到半径过大').optional().nullable(),
+  })
+  .refine((d) => (d.lat == null) === (d.lng == null), {
+    message: '经度与纬度需同时设置',
+    path: ['lat'],
   })
   .refine((d) => Date.parse(d.end_time) > Date.parse(d.start_time), {
     message: '结束时间必须晚于开始时间',
