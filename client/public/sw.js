@@ -5,7 +5,7 @@
  * 版本管理：CACHE 常量改名即升级（campus-events-v1 → v2）。
  * 每次发版评估是否需要 bump：前端有非 hash 资源变更时必须 bump。
  */
-const CACHE = 'campus-events-v1';
+const CACHE = 'campus-events-v2';
 
 // 安装时预缓存应用外壳（离线时避免白屏）
 const PRECACHE_URLS = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
