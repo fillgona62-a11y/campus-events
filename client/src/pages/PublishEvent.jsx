@@ -35,6 +35,7 @@ const INITIAL_FORM = {
   lat: null,
   lng: null,
   checkin_radius: 0.2,
+  beacon_uuid: '',
 };
 
 /** 分区标题：撞色小星 + 标题 + 分隔条 */
@@ -95,6 +96,7 @@ export default function PublishEvent() {
           lat: e.lat ?? null,
           lng: e.lng ?? null,
           checkin_radius: e.checkin_radius ?? 0.2,
+          beacon_uuid: e.beacon_uuid || '',
         });
       })
       .catch((err) => showToast(err.message, 'error'))
@@ -166,6 +168,7 @@ export default function PublishEvent() {
         lat: form.lat ?? null,
         lng: form.lng ?? null,
         checkin_radius: form.checkin_radius ?? 0.2,
+        beacon_uuid: form.beacon_uuid ? form.beacon_uuid.trim() : null,
       };
       if (isEdit) {
         await updateEvent(id, payload);
@@ -285,6 +288,15 @@ export default function PublishEvent() {
             lat={form.lat}
             lng={form.lng}
             onPick={(lat, lng) => { update('lat', lat); update('lng', lng); }}
+          />
+          <TextField
+            fullWidth
+            label="蓝牙信标 UUID（选填，用于小程序签到）"
+            value={form.beacon_uuid}
+            onChange={(e) => update('beacon_uuid', e.target.value)}
+            helperText="填写活动现场 iBeacon 信标的 UUID，格式如 FDA50693-A4E2-4FB1-AFCF-C6EB07647825；留空则仅定位签到"
+            inputProps={{ maxLength: 64 }}
+            placeholder="FDA50693-A4E2-4FB1-AFCF-C6EB07647825"
           />
         </FormSection>
 
