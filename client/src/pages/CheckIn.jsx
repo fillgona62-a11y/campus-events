@@ -6,6 +6,7 @@
  */
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Html5Qrcode } from 'html5-qrcode';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
@@ -16,7 +17,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import { checkinQrText } from '../components/CheckinQrDialog';
 import {
   getEvent,
   getCheckinCode,
@@ -39,13 +39,11 @@ export default function CheckIn() {
   const [message, setMessage] = useState({ text: '', severity: 'info' });
   const [submitting, setSubmitting] = useState(false);
   const [generating, setGenerating] = useState(false);
-  // 扫码核销（v4）：打开摄像头扫码，解析学号自动填入
+  // 扫码核销（v4）：html5-qrcode 打开摄像头扫码，解析学号自动填入
   const [scanOpen, setScanOpen] = useState(false);
   const [scanError, setScanError] = useState('');
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  const detectorRef = useRef(null);
-  const scanningRef = useRef(false);
+  const scannerRef = useRef(null);
+  const scannerRegionId = 'checkin-scanner-region';
 
   const showMessage = (text, severity = 'info') => setMessage({ text, severity });
 
@@ -86,66 +84,52 @@ export default function CheckIn() {
     }
   };
 
-  // 停止摄像头
-  const stopScan = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
+  // 停止扫码（清理 html5-qrcode 实例与摄像头）
+  const stopScan = async () => {
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch {
+        /* 忽略停止异常 */
+      }
+      scannerRef.current = null;
     }
-    scanningRef.current = false;
   };
 
-  const openScan = async () => {
+  // 打开扫码弹窗并启动 html5-qrcode（支持 Chrome/Edge/安卓浏览器，含 iOS 部分场景）
+  const openScan = () => {
     setScanError('');
     setScanOpen(true);
-    // 优先用原生 BarcodeDetector
-    if ('BarcodeDetector' in window) {
-      try {
-        detectorRef.current = new window.BarcodeDetector({ formats: ['qr_code'] });
-      } catch {
-        detectorRef.current = null;
-      }
-    }
-    if (!detectorRef.current) {
-      setScanError('当前浏览器不支持原生扫码，请使用 Chrome/Edge 最新版，或手动输入学号核销');
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      scanningRef.current = true;
-      scanLoop();
-    } catch {
-      setScanError('无法访问摄像头，请检查权限或手动输入学号核销');
-    }
-  };
-
-  // 持续扫描二维码
-  const scanLoop = async () => {
-    if (!scanningRef.current) return;
-    if (videoRef.current && detectorRef.current && videoRef.current.readyState >= 2) {
-      try {
-        const codes = await detectorRef.current.detect(videoRef.current);
-        if (codes && codes.length > 0) {
-          const text = codes[0].rawValue;
-          const m = text.match(/^campus-checkin:(\d+):([A-Za-z0-9_]+)$/);
-          if (m && Number(m[1]) === Number(id)) {
-            setForm((f) => ({ ...f, student_id: m[2] }));
-            showMessage(`已识别学号 ${m[2]}，请确认口令后核销`, 'success');
-            stopScan();
-            setScanOpen(false);
-            return;
+    // 弹窗渲染后再初始化（DOM 就绪）
+    setTimeout(() => {
+      if (!document.getElementById(scannerRegionId)) return;
+      if (scannerRef.current) return;
+      const scanner = new Html5Qrcode(scannerRegionId);
+      scannerRef.current = scanner;
+      scanner
+        .start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          (decodedText) => {
+            const m = decodedText.match(/^campus-checkin:(\d+):([A-Za-z0-9_]+)$/);
+            if (m && Number(m[1]) === Number(id)) {
+              setForm((f) => ({ ...f, student_id: m[2] }));
+              showMessage(`已识别学号 ${m[2]}，请确认口令后核销`, 'success');
+              handleScanClose();
+            }
+          },
+          () => {
+            /* 每帧未识别，忽略 */
           }
-        }
-      } catch {
-        /* 单帧识别失败继续 */
-      }
-    }
-    requestAnimationFrame(scanLoop);
+        )
+        .catch(() => {
+          setScanError('无法访问摄像头，请检查浏览器权限，或手动输入学号核销');
+        });
+    }, 100);
   };
 
-  // 弹窗关闭时停止摄像头
+  // 弹窗关闭时停止扫码
   const handleScanClose = () => {
     stopScan();
     setScanOpen(false);
@@ -293,24 +277,21 @@ export default function CheckIn() {
         </Button>
       </form>
 
-      {/* 扫码核销弹窗（v4） */}
+      {/* 扫码核销弹窗（v4：html5-qrcode 兼容多浏览器） */}
       <Dialog open={scanOpen} onClose={handleScanClose} fullWidth maxWidth="sm">
         <DialogTitle>扫码核销</DialogTitle>
         <DialogContent>
           {scanError ? (
             <Alert severity="warning">{scanError}</Alert>
           ) : (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full rounded-xl border-2 border-ink"
-              style={{ maxHeight: 360, backgroundColor: '#000' }}
+            <div
+              id={scannerRegionId}
+              className="w-full overflow-hidden rounded-xl border-2 border-ink"
+              style={{ minHeight: 300, backgroundColor: '#000' }}
             />
           )}
           <p className="mt-2 text-xs font-semibold text-ink-mute">
-            将学生的签到二维码对准摄像头，识别成功后自动填入学号。
+            将学生的签到二维码对准摄像头，识别成功后自动填入学号。若无法打开摄像头，可手动输入学号核销。
           </p>
         </DialogContent>
         <DialogActions>
