@@ -9,7 +9,6 @@ const registrationRoutes = require('./registrationRoutes');
 const adminRoutes = require('./adminRoutes');
 const notificationRoutes = require('./notificationRoutes');
 const uploadRoutes = require('./uploadRoutes');
-const checkinRoutes = require('./checkinRoutes');
 const calendarRoutes = require('./calendarRoutes');
 const forumRoutes = require('./forumRoutes');
 const authController = require('../controllers/authController');
@@ -41,7 +40,6 @@ router.use('/', registrationRoutes);
 router.use('/admin', adminRoutes);
 router.use('/', notificationRoutes);
 router.use('/', uploadRoutes);
-router.use('/', checkinRoutes);
 router.use('/calendar', calendarRoutes);
 router.use('/forum', forumRoutes);
 

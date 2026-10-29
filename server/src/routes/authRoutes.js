@@ -59,12 +59,6 @@ const loginSchema = z.object({
   password: z.string({ required_error: '密码不能为空' }).min(1, '密码不能为空'),
 });
 
-// 小程序登录：免图形验证码（v6）
-const loginMiniappSchema = z.object({
-  student_id: z.string({ required_error: '学号不能为空' }).trim().min(1, '学号不能为空'),
-  password: z.string({ required_error: '密码不能为空' }).min(1, '密码不能为空'),
-});
-
 const updateMeSchema = z.object({
   name: z.string().trim().min(1, '姓名不能为空').max(32, '姓名最多 32 个字符').optional(),
   phone: z
@@ -131,8 +125,6 @@ const bindEmailSchema = z.object({
 
 router.post('/register', registerLimiter, validate(registerSchema), authController.register);
 router.post('/login', loginLimiter, validate(loginSchema), authController.login);
-// 小程序登录（v6）：免图形验证码，仍限流防暴力破解
-router.post('/login-miniapp', loginLimiter, validate(loginMiniappSchema), authController.loginMiniapp);
 // 发送邮箱验证码：register/reset_password 免登录；bind_email 需登录（optionalAuth 挂载用户，控制器内校验）
 router.post(
   '/email-code/send',

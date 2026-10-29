@@ -67,10 +67,9 @@ export default function RegistrationTable({
   exporting = false,
   onPromote,
   onRemove,
-  onCheckIn,
   onCancel,
 }) {
-  const hasActions = Boolean(requireApproval || onPromote || onCheckIn || onCancel);
+  const hasActions = Boolean(requireApproval || onPromote || onCancel);
 
   return (
     <div>
@@ -110,15 +109,14 @@ export default function RegistrationTable({
               <TableCell>手机号</TableCell>
               <TableCell>备注</TableCell>
               <TableCell>状态</TableCell>
-              <TableCell>核销状态</TableCell>
               <TableCell>报名时间</TableCell>
               {hasActions && <TableCell align="right">操作</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.length === 0 ? (
+              {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={hasActions ? 8 : 7} sx={{ border: 0, py: 6 }}>
+                <TableCell colSpan={hasActions ? 7 : 6} sx={{ border: 0, py: 6 }}>
                   <div className="flex flex-col items-center justify-center gap-3 text-center">
                     <span className="flex h-14 w-14 -rotate-6 items-center justify-center rounded-2xl border-2 border-ink bg-clash-cyan shadow-block-ink-sm on-clash">
                       <ClashStar size={26} style={{ color: CLASH.ink }} />
@@ -154,9 +152,6 @@ export default function RegistrationTable({
                         </span>
                       )}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge type="checked" status={row.checked_in} />
                   </TableCell>
                   <TableCell>{formatDateTime(row.created_at)}</TableCell>
                   {hasActions && (
@@ -206,18 +201,6 @@ export default function RegistrationTable({
                           </>
                         )}
 
-                        {/* 逐行核销：仅对已报名成功且未核销的记录显示 */}
-                        {onCheckIn && row.status === 'approved' && row.checked_in !== 1 && (
-                          <Button
-                            size="small"
-                            variant="contained"
-                            onClick={() => onCheckIn(row)}
-                            sx={clashButton(CLASH.lime)}
-                          >
-                            核销
-                          </Button>
-                        )}
-
                         {/* 逐行取消报名：仅对未取消的记录显示 */}
                         {onCancel && row.status !== 'cancelled' && (
                           <Button
@@ -233,7 +216,6 @@ export default function RegistrationTable({
                         {/* 无任何可执行操作时的占位 */}
                         {!((row.status === 'pending' && requireApproval) ||
                           (row.status === 'waitlisted' && onPromote) ||
-                          (onCheckIn && row.status === 'approved' && row.checked_in !== 1) ||
                           (onCancel && row.status !== 'cancelled')) && (
                           <span className="text-xs text-ink-faint">已处理</span>
                         )}

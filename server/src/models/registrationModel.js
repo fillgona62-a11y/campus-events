@@ -1,7 +1,7 @@
 /**
  * 报名模型：registrations 表 SQL 封装。
- * UNIQUE(event_id, user_id) 防重复；upsert 支持“取消后重新报名”（状态重置、核销态重置）。
- * v2 扩展：候补顺位计算（SQL 子查询）、核销字段读写、报名趋势统计（UTC+8 归日期）。
+ * UNIQUE(event_id, user_id) 防重复；upsert 支持“取消后重新报名”（状态重置）。
+ * v2 扩展：候补顺位计算（SQL 子查询）、报名趋势统计（UTC+8 归日期）。
  */
 const db = require('../db/connection');
 const { REG_STATUS } = require('../utils/constants');
@@ -18,7 +18,7 @@ function findByEventAndUser(eventId, userId) {
 
 /**
  * 写入报名：不存在则 INSERT；已存在（唯一索引冲突）则 UPDATE 状态/备注，
- * 实现“取消后可重新报名”；重新报名时核销态重置为 0。
+ * 实现“取消后可重新报名”。
  */
 function upsert({ event_id, user_id, remark, status }) {
   const now = new Date().toISOString();
@@ -27,7 +27,7 @@ function upsert({ event_id, user_id, remark, status }) {
      VALUES (?, ?, ?, ?, ?, ?)
      ON CONFLICT(event_id, user_id)
      DO UPDATE SET status = excluded.status, remark = excluded.remark,
-                   updated_at = excluded.updated_at, checked_in = 0, checked_in_at = NULL`
+                   updated_at = excluded.updated_at`
   ).run(event_id, user_id, remark || null, status, now, now);
   return findByEventAndUser(event_id, user_id);
 }
@@ -42,28 +42,11 @@ function updateStatus(id, status) {
   );
 }
 
-/** 标记已核销（F4，checked_in=1 + 核销时间） */
-function markCheckedIn(id, checkedInAt) {
-  db.prepare('UPDATE registrations SET checked_in = 1, checked_in_at = ? WHERE id = ?').run(
-    checkedInAt,
-    id
-  );
-}
-
 /** 统计活动指定状态报名数 */
 function countByEventAndStatus(eventId, status) {
   return db
     .prepare('SELECT COUNT(*) AS c FROM registrations WHERE event_id = ? AND status = ?')
     .get(eventId, status).c;
-}
-
-/** 统计活动指定状态 + 指定核销状态的报名数 */
-function countByEventStatusCheckedIn(eventId, status, checkedIn) {
-  return db
-    .prepare(
-      'SELECT COUNT(*) AS c FROM registrations WHERE event_id = ? AND status = ? AND checked_in = ?'
-    )
-    .get(eventId, status, checkedIn).c;
 }
 
 /** 候补顺位子查询：同活动 waitlisted 记录按 created_at ASC, id ASC 的排名（第 1 位最早）。
@@ -79,19 +62,14 @@ const WAITLIST_POSITION_SQL = `CASE WHEN r.status = '${REG_STATUS.WAITLISTED}'
 
 /**
  * 单活动报名名单（含用户信息），按报名时间升序。
- * v2：支持 checked_in 核销状态筛选；行含 checked_in / checked_in_at；
  * waitlisted 行附 waitlist_position 顺位。
  */
-function listByEvent(eventId, { status, checked_in, page, page_size }) {
+function listByEvent(eventId, { status, page, page_size }) {
   const conditions = ['r.event_id = ?'];
   const params = [eventId];
   if (status) {
     conditions.push('r.status = ?');
     params.push(status);
-  }
-  if (checked_in !== undefined && checked_in !== null) {
-    conditions.push('r.checked_in = ?');
-    params.push(checked_in ? 1 : 0);
   }
   const where = `WHERE ${conditions.join(' AND ')}`;
   const total = db
@@ -99,7 +77,7 @@ function listByEvent(eventId, { status, checked_in, page, page_size }) {
     .get(...params).c;
   const list = db
     .prepare(
-      `SELECT r.id, r.remark, r.status, r.created_at, r.checked_in, r.checked_in_at,
+      `SELECT r.id, r.remark, r.status, r.created_at,
               ${WAITLIST_POSITION_SQL} AS waitlist_position,
               u.student_id, u.name, u.phone
        FROM registrations r
@@ -126,11 +104,10 @@ function listByUser(userId, { tab, page, page_size }) {
   const order = tab === 'past' ? 'e.start_time DESC' : 'e.start_time ASC';
   const list = db
     .prepare(
-      `SELECT r.id, r.status, r.remark, r.created_at, r.checked_in,
+      `SELECT r.id, r.status, r.remark, r.created_at,
               ${WAITLIST_POSITION_SQL} AS waitlist_position,
               e.id AS event_id, e.title, e.cover_url, e.location,
-              e.start_time, e.end_time, e.signup_deadline, e.status AS event_status,
-              e.lat, e.lng, e.checkin_radius, e.beacon_uuid
+              e.start_time, e.end_time, e.signup_deadline, e.status AS event_status
        FROM registrations r
        JOIN events e ON e.id = r.event_id
        ${where} ORDER BY ${order} LIMIT ? OFFSET ?`
@@ -139,11 +116,11 @@ function listByUser(userId, { tab, page, page_size }) {
   return { list, total, page, page_size };
 }
 
-/** 导出用：单活动全部报名记录（含核销字段，按报名时间升序） */
+/** 导出用：单活动全部报名记录（按报名时间升序） */
 function listForExport(eventId) {
   return db
     .prepare(
-      `SELECT r.remark, r.status, r.checked_in, r.created_at,
+      `SELECT r.remark, r.status, r.created_at,
               u.student_id, u.name, u.phone
        FROM registrations r
        JOIN users u ON u.id = r.user_id
@@ -302,9 +279,7 @@ module.exports = {
   findByEventAndUser,
   upsert,
   updateStatus,
-  markCheckedIn,
   countByEventAndStatus,
-  countByEventStatusCheckedIn,
   listByEvent,
   listByUser,
   listForExport,

@@ -19,7 +19,6 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import dayjs from 'dayjs';
 import { myRegistrations, cancelRegistration } from '../api/registrationApi';
-import { selfCheckin, getCurrentPosition } from '../api/eventApi';
 import StatusBadge from '../components/StatusBadge';
 import EmptyState from '../components/EmptyState';
 import { ClashStar, clashColorAt } from '../components/ClashDecor';
@@ -39,7 +38,6 @@ export default function MyRegistrations() {
   const [error, setError] = useState('');
   const [cancelTarget, setCancelTarget] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [checkingInId, setCheckingInId] = useState(null);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
   const showToast = (message, severity = 'success') => setToast({ open: true, message, severity });
@@ -71,21 +69,6 @@ export default function MyRegistrations() {
       showToast(err.message, 'error');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  // 学生自助定位签到（v5）：获取当前位置 → 提交签到
-  const handleSelfCheckin = async (item) => {
-    setCheckingInId(item.id);
-    try {
-      const pos = await getCurrentPosition();
-      const d = await selfCheckin(item.event_id, pos);
-      showToast(`签到成功！距活动地点约 ${d.distance_m} 米`);
-      load();
-    } catch (err) {
-      showToast(err.message, 'error');
-    } finally {
-      setCheckingInId(null);
     }
   };
 
@@ -164,22 +147,6 @@ export default function MyRegistrations() {
                     {formatTimeRange(item.start_time, item.end_time)}
                   </p>
                   <p className="text-xs font-semibold text-ink-mute">{item.location}</p>
-                  {/* 定位签到（v5）：已报名成功，活动进行中可定位签到 */}
-                  {item.status === 'approved' && (
-                    item.checked_in === 1 ? (
-                      <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink on-clash">
-                        已签到 ✓
-                      </p>
-                    ) : (
-                      <button
-                        onClick={() => handleSelfCheckin(item)}
-                        disabled={checkingInId === item.id}
-                        className="mt-1 w-full rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-left text-xs font-bold text-ink transition-transform on-clash hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {checkingInId === item.id ? '定位签到中…' : '📍 定位签到'}
-                      </button>
-                    )
-                  )}
                   <div className="mt-2 flex flex-wrap gap-2">
                     <Button size="small" variant="outlined" onClick={() => navigate(`/events/${item.event_id}`)}>
                       查看详情

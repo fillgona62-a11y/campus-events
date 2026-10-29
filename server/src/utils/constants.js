@@ -82,10 +82,7 @@ const ERR = {
   EMAIL_EXISTS: 40906,        // v2：邮箱已被注册/绑定
   EMAIL_CODE_INVALID: 40907,  // v2：验证码不正确/已过期/已作废
   EMAIL_CODE_TOO_FREQUENT: 40908, // v2：验证码发送过于频繁（HTTP 429）
-  CHECKIN_CODE_WRONG: 40909,  // v2：核销口令不正确（F4）
-  ALREADY_CHECKED_IN: 40910,  // v2：该同学已核销（F4）
-  CHECKIN_TIME_INVALID: 40911,// v2：活动未开始/已结束，不能核销（F4）
-  NOT_REGISTERED: 40912,      // v2：该学号未成功报名此活动（F4）
+  NOT_REGISTERED: 40912,      // v2：该学号未成功报名此活动
   INTERNAL: 50000,            // 服务器内部错误
 };
 
