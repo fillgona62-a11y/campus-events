@@ -115,6 +115,25 @@ function eventPayload(title, overrides = {}) {
   };
 }
 
+/** 核销测试活动：报名截止与开始时间均在数秒内到达，便于现场签到；含定位坐标（北京天安门） */
+function checkinEventPayload(title) {
+  const now = Date.now();
+  return {
+    title,
+    category_id: 1,
+    location: '教学楼 A101',
+    signup_deadline: new Date(now + 2000).toISOString(),
+    start_time: new Date(now + 3000).toISOString(),
+    end_time: new Date(now + 2 * 3600e3).toISOString(),
+    capacity: 5,
+    require_approval: false,
+    description: '<p>QA 核销测试活动</p>',
+    lat: 39.9087,
+    lng: 116.3975,
+    checkin_radius: 0.2,
+  };
+}
+
 async function main() {
   console.log(`API 测试目标：${BASE}，运行前缀：qa_${RUN}_*`);
   console.log('提示：验证码类用例要求服务器 SMTP_DEV_ECHO=1\n');
@@ -615,7 +634,78 @@ async function main() {
     }
   });
 
-  // ---------- 8. 权限边界 ----------
+  // ---------- 8. 签到核销（v5 定位签到） ----------
+  suite('签到核销');
+  let ckEvent, ckReg;
+
+  await test('定位签到全流程', async () => {
+    const cr = await api('POST', '/events', { token: org1.token, body: checkinEventPayload(`QA核销_${RUN}`) });
+    ckEvent = cr.body.data.event;
+    await api('PUT', `/admin/events/${ckEvent.id}/review`, { token: adminToken, body: { action: 'approve' } });
+    // stu1 报名（截止前）
+    const r = await api('POST', `/events/${ckEvent.id}/register`, { token: stu1.token, body: {} });
+    assertEq(r.body.code, 0, '报名 code');
+    ckReg = r.body.data.registration;
+    // 活动未开始不能签到（40911）
+    const early = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(early.status, 409, '未开始签到 HTTP 状态');
+    assertEq(early.body.code, 40911, '错误码');
+    // 等待活动开始
+    await sleep(3500);
+  });
+
+  await test('不在签到范围内被拒（409）', async () => {
+    // 用远离活动地点的坐标（上海）
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 31.2304, lng: 121.4737 } });
+    assertEq(r.status, 409, 'HTTP 状态');
+    assertEq(r.body.code, 40911, '错误码（不在范围）');
+  });
+
+  await test('未报名学号签到被拒（40912）', async () => {
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu2.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(r.status, 409, 'HTTP 状态');
+    assertEq(r.body.code, 40912, '错误码');
+  });
+
+  await test('在范围内签到成功并更新统计', async () => {
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(r.body.code, 0, '签到 code');
+    assertEq(r.body.data.student_id, stu1.user.student_id, '学号');
+    assert(r.body.data.checked_in_at, '应有签到时间');
+    assert(r.body.data.distance_m != null, '应有距离');
+    // 重复签到 → 40910
+    const again = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org1.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(again.status, 409, 'HTTP 状态');
+    assertEq(again.body.code, 40910, '错误码');
+    // 统计
+    const s = await api('GET', `/events/${ckEvent.id}/checkin/stats`, { token: org1.token });
+    assertEq(s.body.data.approved_count, 1, '报名成功数');
+    assertEq(s.body.data.checked_in_count, 1, '已签到数');
+    assertEq(s.body.data.unchecked_count, 0, '未签到数');
+    // 名单签到状态筛选
+    const list = await api('GET', `/events/${ckEvent.id}/registrations?checked_in=1`, { token: org1.token });
+    assertEq(list.body.data.total, 1, '已签到筛选');
+    const list0 = await api('GET', `/events/${ckEvent.id}/registrations?checked_in=0`, { token: org1.token });
+    assertEq(list0.body.data.total, 0, '未签到筛选');
+  });
+
+  await test('学生自助定位签到（self-checkin）', async () => {
+    // 新建一个活动给 stu2 签到
+    const cr = await api('POST', '/events', { token: org1.token, body: checkinEventPayload(`QA自助签到_${RUN}`) });
+    const ev = cr.body.data.event;
+    await api('PUT', `/admin/events/${ev.id}/review`, { token: adminToken, body: { action: 'approve' } });
+    await api('POST', `/events/${ev.id}/register`, { token: stu2.token, body: {} });
+    await sleep(3500);
+    // stu2 自助签到（在范围内）
+    const r = await api('POST', `/events/${ev.id}/self-checkin`, { token: stu2.token, body: { lat: 39.9087, lng: 116.3975 } });
+    assertEq(r.body.code, 0, '自助签到 code');
+    assertEq(r.body.data.student_id, stu2.user.student_id, '本人学号');
+    // 不在范围内 → 409
+    const far = await api('POST', `/events/${ev.id}/self-checkin`, { token: stu2.token, body: { lat: 31.2304, lng: 121.4737 } });
+    assertEq(far.status, 409, '不在范围 HTTP 状态');
+  });
+
+  // ---------- 9. 权限边界 ----------
   suite('权限边界');
 
   await test('普通用户访问管理员接口被拒（40301）', async () => {
@@ -633,6 +723,12 @@ async function main() {
   await test('非发布者查看他人活动名单被拒（40301）', async () => {
     const r = await api('GET', `/events/${event1.id}/registrations`, { token: stu2.token });
     assertEq(r.status, 403, 'HTTP 状态');
+  });
+
+  await test('非发布者签到他人活动被拒（40301）', async () => {
+    const r = await api('POST', `/events/${ckEvent.id}/checkin`, { token: stu2.token, body: { student_id: stu1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(r.status, 403, 'HTTP 状态');
+    assertEq(r.body.code, 40301, '错误码');
   });
 
   await test('被禁用用户的 token 立即失效（40301）', async () => {
@@ -758,7 +854,7 @@ async function main() {
 
   // ---------- 13. CSV 导出 ----------
   suite('CSV 导出');
-  await test('名单导出：BOM 头 + 固定列 + 正确文件名', async () => {
+  await test('名单导出：BOM 头 + 固定列（含核销状态列） + 正确文件名', async () => {
     const res = await api('GET', `/events/${event1.id}/registrations/export`, { token: org1.token, raw: true });
     assertEq(res.status, 200, 'HTTP 状态');
     // 注意：res.text() 的 UTF-8 解码会自动剥离 BOM，须用 arrayBuffer 验证原始字节 EF BB BF
@@ -766,7 +862,7 @@ async function main() {
     assert(buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf, 'CSV 应以 BOM(EF BB BF) 开头');
     const text = buf.toString('utf8');
     const header = text.replace(/^﻿/, '').split('\r\n')[0].trim();
-    assertEq(header, '"学号","姓名","手机号","备注","状态","报名时间"', 'CSV 列头');
+    assertEq(header, '"学号","姓名","手机号","备注","状态","核销状态","报名时间"', 'CSV 列头');
     const cd = res.headers.get('content-disposition') || '';
     assert(cd.includes(`event_${event1.id}_registrations.csv`), '文件名不符');
     assert(text.includes('QA学生一'), 'CSV 应含已报名学生');

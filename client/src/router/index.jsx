@@ -19,6 +19,7 @@ const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 const PublishEvent = lazy(() => import('../pages/PublishEvent'));
 const MyEvents = lazy(() => import('../pages/MyEvents'));
 const EventRegistrations = lazy(() => import('../pages/EventRegistrations'));
+const CheckIn = lazy(() => import('../pages/CheckIn'));
 const MyRegistrations = lazy(() => import('../pages/MyRegistrations'));
 const Notifications = lazy(() => import('../pages/Notifications'));
 const Profile = lazy(() => import('../pages/Profile'));
@@ -86,6 +87,7 @@ const router = createBrowserRouter([
           { path: 'events/:id/edit', element: lazyElement(<PublishEvent />) },
           { path: 'my/events', element: lazyElement(<MyEvents />) },
           { path: 'my/events/:id/registrations', element: lazyElement(<EventRegistrations />) },
+          { path: 'my/events/:id/checkin', element: lazyElement(<CheckIn />) },
           { path: 'my/registrations', element: lazyElement(<MyRegistrations />) },
           { path: 'notifications', element: lazyElement(<Notifications />) },
           { path: 'profile', element: lazyElement(<Profile />) },

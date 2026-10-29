@@ -59,6 +59,10 @@ function buildPayload(payload) {
     capacity: payload.capacity,
     require_approval: payload.require_approval ? 1 : 0,
     description: sanitizeDescription(payload.description),
+    lat: payload.lat ?? null,
+    lng: payload.lng ?? null,
+    checkin_radius: payload.checkin_radius ?? 0.2,
+    beacon_uuid: payload.beacon_uuid ? String(payload.beacon_uuid).trim().toUpperCase() : null,
   };
 }
 

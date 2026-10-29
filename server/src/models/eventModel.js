@@ -108,8 +108,8 @@ function insert(data) {
       `INSERT INTO events
        (title, category_id, cover_url, location, start_time, end_time, signup_deadline,
         capacity, approved_count, organizer_id, require_approval, description, status,
-        reject_reason, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'pending', NULL, ?, ?)`
+        reject_reason, lat, lng, checkin_radius, beacon_uuid, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'pending', NULL, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       data.title,
@@ -123,6 +123,10 @@ function insert(data) {
       data.organizer_id,
       data.require_approval,
       data.description || null,
+      data.lat ?? null,
+      data.lng ?? null,
+      data.checkin_radius ?? 0.2,
+      data.beacon_uuid || null,
       now,
       now
     );
@@ -136,7 +140,8 @@ function update(id, data) {
     `UPDATE events SET
        title = ?, category_id = ?, cover_url = ?, location = ?,
        start_time = ?, end_time = ?, signup_deadline = ?, capacity = ?,
-       require_approval = ?, description = ?, status = 'pending', reject_reason = NULL,
+       require_approval = ?, description = ?, lat = ?, lng = ?, checkin_radius = ?,
+       beacon_uuid = ?, status = 'pending', reject_reason = NULL,
        updated_at = ?
      WHERE id = ?`
   ).run(
@@ -150,6 +155,10 @@ function update(id, data) {
     data.capacity,
     data.require_approval,
     data.description || null,
+    data.lat ?? null,
+    data.lng ?? null,
+    data.checkin_radius ?? 0.2,
+    data.beacon_uuid || null,
     now,
     id
   );
@@ -214,6 +223,18 @@ function countOngoing() {
 }
 function countPending() {
   return db.prepare("SELECT COUNT(*) AS c FROM events WHERE status = 'pending'").get().c;
+}
+
+/** 读取活动核销口令（F4，null 表示未生成） */
+function getCheckinCode(id) {
+  const row = db.prepare('SELECT checkin_code FROM events WHERE id = ?').get(id);
+  return row ? row.checkin_code : null;
+}
+
+/** 写入/覆盖核销口令（F4：重复调用覆盖旧值，旧口令立即失效） */
+function setCheckinCode(id, code) {
+  const now = new Date().toISOString();
+  db.prepare('UPDATE events SET checkin_code = ?, updated_at = ? WHERE id = ?').run(code, now, id);
 }
 
 /** 置顶/取消置顶活动（pinned 为真时记录 pinned_at，否则清空） */
@@ -282,6 +303,8 @@ module.exports = {
   countOpen,
   countOngoing,
   countPending,
+  getCheckinCode,
+  setCheckinCode,
   setPinned,
   listHot,
   listStartingSoon,

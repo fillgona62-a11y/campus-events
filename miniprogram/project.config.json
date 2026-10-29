@@ -1,0 +1,23 @@
+{
+  "description": "校园活动签到小程序（蓝牙信标 + 定位签到）",
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": ".workbuddy"
+      }
+    ],
+    "include": []
+  },
+  "setting": {
+    "bundle": false,
+    "es6": true,
+    "minified": true,
+    "postcss": true,
+    "urlCheck": false
+  },
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "campus-events-checkin",
+  "miniprogramRoot": "./"
+}

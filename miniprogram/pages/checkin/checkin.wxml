@@ -1,0 +1,35 @@
+<view class="page">
+    <view class="header">
+        <text class="title">{{title}}</text>
+        <text class="subtitle">蓝牙信标 + 定位签到</text>
+    </view>
+
+    <view class="status-card">
+        <view class="status-icon {{status}}">
+            <text wx:if="{{status === 'scanning'}}">📡</text>
+            <text wx:elif="{{status === 'located'}}">📍</text>
+            <text wx:elif="{{status === 'success'}}">✅</text>
+            <text wx:else>🔘</text>
+        </view>
+        <text class="status-text">{{statusText}}</text>
+    </view>
+
+    <view wx:if="{{event && event.beacon_uuid}}" class="beacon-info">
+        <text class="label">活动信标</text>
+        <text class="uuid">{{event.beacon_uuid}}</text>
+    </view>
+
+    <view wx:if="{{event && !event.beacon_uuid}}" class="beacon-info warn">
+        <text>该活动未配置蓝牙信标，将仅使用定位签到。</text>
+    </view>
+
+    <button
+        class="btn-primary checkin-btn"
+        bindtap="startCheckin"
+        disabled="{{scanning || loading || status === 'success'}}"
+    >
+        {{scanning ? '扫描中…' : (status === 'success' ? '已签到' : '开始签到')}}
+    </button>
+
+    <text class="tip">请靠近活动现场后签到，需同时满足信标扫描与定位范围。</text>
+</view>

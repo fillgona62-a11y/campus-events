@@ -151,3 +151,35 @@ function compressImage(file, maxEdge, quality) {
     img.src = url;
   });
 }
+
+// ===== 签到核销（v5 定位签到）=====
+
+/** 定位签到（组织者/管理员代签）：{student_id, lat, lng} → {student_id, name, checked_in_at, distance_m} */
+export function checkin(eventId, data) {
+  return client.post(`/events/${eventId}/checkin`, data);
+}
+
+/** 学生自助定位签到（本人 token）：{lat, lng} → {student_id, name, checked_in_at, distance_m} */
+export function selfCheckin(eventId, data) {
+  return client.post(`/events/${eventId}/self-checkin`, data);
+}
+
+/** 核销统计 → {approved_count, checked_in_count, unchecked_count} */
+export function checkinStats(eventId) {
+  return client.get(`/events/${eventId}/checkin/stats`);
+}
+
+/** 获取浏览器定位（Promise 封装 navigator.geolocation） */
+export function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('当前浏览器不支持定位'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => reject(new Error('定位失败，请检查定位权限后重试')),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    );
+  });
+}

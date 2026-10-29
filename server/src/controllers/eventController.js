@@ -148,7 +148,7 @@ function assertEventManagePermission(user, eventId) {
   return event;
 }
 
-/** GET /events/:id/registrations 报名名单（候补行附顺位） */
+/** GET /events/:id/registrations 报名名单（支持核销状态筛选，候补行附顺位） */
 function listRegistrations(req, res, next) {
   try {
     const id = parseId(req.params.id);
@@ -156,7 +156,11 @@ function listRegistrations(req, res, next) {
     assertEventManagePermission(req.user, id);
     const { page, page_size } = parsePagination(req.query);
     const status = req.query.status ? String(req.query.status) : undefined;
-    ok(res, registrationModel.listByEvent(id, { status, page, page_size }));
+    let checkedIn;
+    if (req.query.checked_in === '0' || req.query.checked_in === '1') {
+      checkedIn = Number(req.query.checked_in);
+    }
+    ok(res, registrationModel.listByEvent(id, { status, checked_in: checkedIn, page, page_size }));
   } catch (err) {
     next(err);
   }

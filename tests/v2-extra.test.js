@@ -115,6 +115,26 @@ function eventPayload(title, overrides = {}) {
   };
 }
 
+/** 核销测试活动：截止与开始均在数秒内到达；含定位坐标（北京天安门） */
+function checkinEventPayload(title, overrides = {}) {
+  const now = Date.now();
+  return {
+    title,
+    category_id: 1,
+    location: '教学楼 A101',
+    signup_deadline: new Date(now + 2000).toISOString(),
+    start_time: new Date(now + 3000).toISOString(),
+    end_time: new Date(now + 2 * 3600e3).toISOString(),
+    capacity: 5,
+    require_approval: false,
+    description: '<p>QA 核销补充测试</p>',
+    lat: 39.9087,
+    lng: 116.3975,
+    checkin_radius: 0.2,
+    ...overrides,
+  };
+}
+
 /** 创建 + 审核通过活动，返回 event */
 async function createApprovedEvent(orgToken, adminToken, title, overrides = {}) {
   const cr = await api('POST', '/events', { token: orgToken, body: eventPayload(title, overrides) });
@@ -302,6 +322,79 @@ async function main() {
     assert(!ids.includes(w2.user.student_id), '已移出的 w2 不应被递补');
   });
 
+  // ---------- 5. 签到错误链（v5 定位签到：活动不对 / 未成功报名 / 已签到 / 不在范围 / 时间窗） ----------
+  suite('签到错误链');
+  let ckEvent, otherEvent;
+
+  await test('签到校验链：活动不对 40912 / 候补中 40912 / 不在范围 40911 / 已签到 40910', async () => {
+    // w3 报名的是另一个活动（活动不对场景）
+    otherEvent = await createApprovedEvent(org.token, adminToken, `QA他活动_${RUN}`, { capacity: 5 });
+    const ro = await api('POST', `/events/${otherEvent.id}/register`, { token: w3.token, body: {} });
+    assertEq(ro.body.data.registration.status, 'approved', 'w3 应报名成功（其他活动）');
+    // 签到目标活动：capacity=1，w1 成功、w2 候补
+    const cr = await api('POST', '/events', { token: org.token, body: checkinEventPayload(`QA签到链_${RUN}`, { capacity: 1 }) });
+    ckEvent = cr.body.data.event;
+    await api('PUT', `/admin/events/${ckEvent.id}/review`, { token: adminToken, body: { action: 'approve' } });
+    const r1 = await api('POST', `/events/${ckEvent.id}/register`, { token: w1.token, body: {} });
+    assertEq(r1.body.data.registration.status, 'approved', 'w1 应报名成功');
+    const r2 = await api('POST', `/events/${ckEvent.id}/register`, { token: w2.token, body: {} });
+    assertEq(r2.body.data.waitlisted, true, 'w2 应候补');
+    await sleep(3500); // 等活动开始
+    const pos = { lat: 39.9087, lng: 116.3975 };
+    // ① 活动不对：w3 报名的是别的活动 → 40912
+    const wrongEvent = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org.token, body: { student_id: w3.user.student_id, ...pos } });
+    assertEq(wrongEvent.status, 409, '活动不对 HTTP 状态');
+    assertEq(wrongEvent.body.code, 40912, '活动不对错误码');
+    // ② 未成功报名（候补中）→ 40912
+    const waitlisted = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org.token, body: { student_id: w2.user.student_id, ...pos } });
+    assertEq(waitlisted.status, 409, '候补中签到 HTTP 状态');
+    assertEq(waitlisted.body.code, 40912, '候补中签到错误码');
+    // ③ 不在范围（上海坐标）→ 40911
+    const far = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org.token, body: { student_id: w1.user.student_id, lat: 31.2304, lng: 121.4737 } });
+    assertEq(far.status, 409, '不在范围 HTTP 状态');
+    assertEq(far.body.code, 40911, '不在范围错误码');
+    // ④ 正确签到 → 成功
+    const ok = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org.token, body: { student_id: w1.user.student_id, ...pos } });
+    assertEq(ok.body.code, 0, '正确签到 code');
+    // ⑤ 重复签到 → 40910
+    const again = await api('POST', `/events/${ckEvent.id}/checkin`, { token: org.token, body: { student_id: w1.user.student_id, ...pos } });
+    assertEq(again.status, 409, '重复签到 HTTP 状态');
+    assertEq(again.body.code, 40910, '重复签到错误码');
+  });
+
+  await test('时间窗校验：已结束活动签到 40911；未开始活动签到 40911', async () => {
+    const now = Date.now();
+    const pos = { lat: 39.9087, lng: 116.3975 };
+    // 已结束活动（无需报名，时间窗最先校验）
+    const ended = await api('POST', '/events', {
+      token: org.token,
+      body: eventPayload(`QA已结束_${RUN}`, {
+        start_time: new Date(now - 2 * 3600e3).toISOString(),
+        signup_deadline: new Date(now - 3 * 3600e3).toISOString(),
+        end_time: new Date(now - 1 * 3600e3).toISOString(),
+      }),
+    });
+    const endedId = ended.body.data.event.id;
+    const r1 = await api('POST', `/events/${endedId}/checkin`, { token: org.token, body: { student_id: w1.user.student_id, ...pos } });
+    assertEq(r1.status, 409, '已结束签到 HTTP 状态');
+    assertEq(r1.body.code, 40911, '已结束签到错误码');
+    assert(/已结束/.test(r1.body.message || ''), '应提示活动已结束');
+    // 未开始活动
+    const future = await api('POST', '/events', {
+      token: org.token,
+      body: eventPayload(`QA未开始_${RUN}`, {
+        start_time: new Date(now + 2 * 3600e3).toISOString(),
+        signup_deadline: new Date(now + 1 * 3600e3).toISOString(),
+        end_time: new Date(now + 3 * 3600e3).toISOString(),
+      }),
+    });
+    const futureId = future.body.data.event.id;
+    const r2 = await api('POST', `/events/${futureId}/checkin`, { token: org.token, body: { student_id: w1.user.student_id, ...pos } });
+    assertEq(r2.status, 409, '未开始签到 HTTP 状态');
+    assertEq(r2.body.code, 40911, '未开始签到错误码');
+    assert(/未开始/.test(r2.body.message || ''), '应提示活动未开始');
+  });
+
   // ---------- 6. 审计日志权限与筛选（F6） ----------
   suite('审计日志');
 
@@ -358,10 +451,10 @@ async function main() {
     assertEq(trend.body.data.days[6].count, 2, '当日有效报名数应为 2');
   });
 
-  // ---------- 8. CSV 导出与候补文案（F5） ----------
+  // ---------- 8. CSV 导出核销列与候补文案（F4/F5） ----------
   suite('CSV 导出');
 
-  await test('CSV 含候补中状态文案', async () => {
+  await test('CSV 含核销状态列值（未核销）与候补中状态文案', async () => {
     const ev = await createApprovedEvent(org.token, adminToken, `QACSV_${RUN}`, { capacity: 1 });
     await api('POST', `/events/${ev.id}/register`, { token: w1.token, body: {} });
     await api('POST', `/events/${ev.id}/register`, { token: w2.token, body: {} }); // 候补
@@ -370,8 +463,9 @@ async function main() {
     const buf = Buffer.from(await res.arrayBuffer());
     const text = buf.toString('utf8');
     const header = text.replace(/^\uFEFF/, '').split('\r\n')[0].trim();
-    assertEq(header, '"学号","姓名","手机号","备注","状态","报名时间"', 'CSV 列头');
+    assertEq(header, '"学号","姓名","手机号","备注","状态","核销状态","报名时间"', 'CSV 列头');
     assert(text.includes('候补中'), 'CSV 应含候补中文案');
+    assert(text.includes('未核销'), 'CSV 应含未核销列值');
     assert(text.includes(w1.user.student_id), 'CSV 应含报名学生学号');
   });
 
@@ -520,6 +614,20 @@ async function main() {
       },
     });
     assertEq(r2.body.code, 40907, '匹配后验证码错误应 40907');
+  });
+
+  await test('【探针】签到接口应限发布者/管理员（设计 §5.3-⑫）：无关用户代签他人应 40301', async () => {
+    // 构造：已开始活动，w1、w2 报名成功且未签到
+    const cr = await api('POST', '/events', { token: org.token, body: checkinEventPayload(`QA签到权限_${RUN}`, { capacity: 2 }) });
+    const ev = cr.body.data.event;
+    await api('PUT', `/admin/events/${ev.id}/review`, { token: adminToken, body: { action: 'approve' } });
+    await api('POST', `/events/${ev.id}/register`, { token: w1.token, body: {} });
+    await api('POST', `/events/${ev.id}/register`, { token: w2.token, body: {} });
+    await sleep(3500); // 等活动开始
+    // w3：非发布者、非管理员，尝试代签他人
+    const probe = await api('POST', `/events/${ev.id}/checkin`, { token: w3.token, body: { student_id: w1.user.student_id, lat: 39.9087, lng: 116.3975 } });
+    assertEq(probe.status, 403, '无关用户签到 HTTP 状态应为 403');
+    assertEq(probe.body.code, 40301, '无关用户签到错误码应为 40301（设计 §5.3-⑫ 标注发布者/管理员）');
   });
 
   // ---------- 汇总 ----------

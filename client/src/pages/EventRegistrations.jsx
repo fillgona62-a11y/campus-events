@@ -15,6 +15,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { getEvent, listRegistrations, exportRegistrations, registrationsTrend } from '../api/eventApi';
 import { reviewRegistration, promoteWaitlist, removeWaitlist } from '../api/registrationApi';
 import RegistrationTable from '../components/RegistrationTable';
@@ -40,6 +41,7 @@ export default function EventRegistrations() {
 
   const [event, setEvent] = useState(null);
   const [status, setStatus] = useState('');
+  const [checkedIn, setCheckedIn] = useState('');
   const [page, setPage] = useState(1);
   const [data, setData] = useState({ list: [], total: 0 });
   const [trend, setTrend] = useState({ days: [], total: 0 });
@@ -68,6 +70,7 @@ export default function EventRegistrations() {
     setError('');
     listRegistrations(id, {
       status: status || undefined,
+      checked_in: checkedIn || undefined,
       page,
       page_size: PAGE_SIZE,
     })
@@ -77,7 +80,7 @@ export default function EventRegistrations() {
         showToast(err.message, 'error');
       })
       .finally(() => setLoading(false));
-  }, [id, status, page]);
+  }, [id, status, checkedIn, page]);
 
   useEffect(() => {
     load();
@@ -136,6 +139,14 @@ export default function EventRegistrations() {
           报名名单{event ? ` · ${event.title}` : ''}
         </h1>
         <div className="flex-1" />
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<QrCodeScannerIcon />}
+          onClick={() => navigate(`/my/events/${id}/checkin`)}
+        >
+          核销台
+        </Button>
       </div>
 
       {event?.require_approval === 1 && (
@@ -155,6 +166,18 @@ export default function EventRegistrations() {
           <Tab key={tab.value} label={tab.label} value={tab.value} />
         ))}
       </Tabs>
+
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-sm font-bold text-ink-mute">核销状态：</span>
+        <Tabs
+          value={checkedIn}
+          onChange={(e, v) => { setCheckedIn(v); setPage(1); }}
+        >
+          <Tab label="全部" value="" />
+          <Tab label="已核销" value="1" />
+          <Tab label="未核销" value="0" />
+        </Tabs>
+      </div>
 
       {loading ? (
         <SkeletonList count={5} />

@@ -16,6 +16,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import dayjs from 'dayjs';
 import WheelDateTime from '../components/WheelDateTime';
+import LocationPicker from '../components/LocationPicker';
 import { createEvent, updateEvent, getEvent, listCategories, uploadCoverCompressed } from '../api/eventApi';
 import { ClashStar, ClashStripe } from '../components/ClashDecor';
 import { CLASH } from '../theme';
@@ -31,6 +32,10 @@ const INITIAL_FORM = {
   require_approval: false,
   description: '',
   cover_url: '',
+  lat: null,
+  lng: null,
+  checkin_radius: 0.2,
+  beacon_uuid: '',
 };
 
 /** 分区标题：撞色小星 + 标题 + 分隔条 */
@@ -88,6 +93,10 @@ export default function PublishEvent() {
           require_approval: e.require_approval === 1,
           description: (e.description || '').replace(/<br\s*\/?>/gi, '\n'),
           cover_url: e.cover_url || '',
+          lat: e.lat ?? null,
+          lng: e.lng ?? null,
+          checkin_radius: e.checkin_radius ?? 0.2,
+          beacon_uuid: e.beacon_uuid || '',
         });
       })
       .catch((err) => showToast(err.message, 'error'))
@@ -156,6 +165,10 @@ export default function PublishEvent() {
         // 纯文本简介：换行转为 <br>（服务端仍会白名单过滤）
         description: form.description ? form.description.replace(/\n/g, '<br>') : '',
         cover_url: form.cover_url || null,
+        lat: form.lat ?? null,
+        lng: form.lng ?? null,
+        checkin_radius: form.checkin_radius ?? 0.2,
+        beacon_uuid: form.beacon_uuid ? form.beacon_uuid.trim() : null,
       };
       if (isEdit) {
         await updateEvent(id, payload);
@@ -270,6 +283,20 @@ export default function PublishEvent() {
             error={Boolean(fieldErrors.location)}
             helperText={fieldErrors.location || '填写具体教学楼 / 场地，方便同学找过来'}
             inputProps={{ maxLength: 120 }}
+          />
+          <LocationPicker
+            lat={form.lat}
+            lng={form.lng}
+            onPick={(lat, lng) => { update('lat', lat); update('lng', lng); }}
+          />
+          <TextField
+            fullWidth
+            label="蓝牙信标 UUID（选填，用于小程序签到）"
+            value={form.beacon_uuid}
+            onChange={(e) => update('beacon_uuid', e.target.value)}
+            helperText="填写活动现场 iBeacon 信标的 UUID，格式如 FDA50693-A4E2-4FB1-AFCF-C6EB07647825；留空则仅定位签到"
+            inputProps={{ maxLength: 64 }}
+            placeholder="FDA50693-A4E2-4FB1-AFCF-C6EB07647825"
           />
         </FormSection>
 
