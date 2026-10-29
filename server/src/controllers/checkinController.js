@@ -14,13 +14,14 @@ function parseEventId(raw) {
   return id;
 }
 
-/** POST /events/:id/checkin 定位签到（学生学号 + 实时定位；限活动发布者或管理员） */
+/** POST /events/:id/checkin 定位+信标签到（学生学号 + 实时定位；限活动发布者或管理员） */
 function checkin(req, res, next) {
   try {
     const result = checkinService.checkin(req.user, parseEventId(req.params.id), {
       student_id: req.body.student_id,
       lat: req.body.lat,
       lng: req.body.lng,
+      beacon_uuid: req.body.beacon_uuid,
     });
     ok(res, result, '签到成功');
   } catch (err) {
@@ -28,12 +29,13 @@ function checkin(req, res, next) {
   }
 }
 
-/** POST /events/:id/self-checkin 学生自助定位签到（本人 token + 实时定位） */
+/** POST /events/:id/self-checkin 学生自助定位+信标签到（本人 token + 实时定位） */
 function selfCheckin(req, res, next) {
   try {
     const result = checkinService.selfCheckin(req.user, parseEventId(req.params.id), {
       lat: req.body.lat,
       lng: req.body.lng,
+      beacon_uuid: req.body.beacon_uuid,
     });
     ok(res, result, '签到成功');
   } catch (err) {

@@ -12,7 +12,7 @@ const { actionLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
 
-// 定位签到：学生学号 + 实时经纬度
+// 定位签到：学生学号 + 实时经纬度 + 可选蓝牙信标
 const checkinSchema = z.object({
   student_id: z.string({ required_error: '学号不能为空' }).trim().min(1, '学号不能为空').max(32),
   lat: z
@@ -23,9 +23,10 @@ const checkinSchema = z.object({
     .number({ required_error: '请开启定位后签到', invalid_type_error: '经度不合法' })
     .min(-180, '经度不合法')
     .max(180, '经度不合法'),
+  beacon_uuid: z.string().trim().max(64).optional().nullable(),
 });
 
-// 学生自助定位签到：只需实时经纬度（无需学号）
+// 学生自助定位签到：只需实时经纬度 + 可选蓝牙信标（无需学号）
 const selfCheckinSchema = z.object({
   lat: z
     .number({ required_error: '请开启定位后签到', invalid_type_error: '纬度不合法' })
@@ -35,6 +36,7 @@ const selfCheckinSchema = z.object({
     .number({ required_error: '请开启定位后签到', invalid_type_error: '经度不合法' })
     .min(-180, '经度不合法')
     .max(180, '经度不合法'),
+  beacon_uuid: z.string().trim().max(64).optional().nullable(),
 });
 
 // 注意：路径中的 :id 为活动 id

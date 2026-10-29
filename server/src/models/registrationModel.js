@@ -129,7 +129,8 @@ function listByUser(userId, { tab, page, page_size }) {
       `SELECT r.id, r.status, r.remark, r.created_at, r.checked_in,
               ${WAITLIST_POSITION_SQL} AS waitlist_position,
               e.id AS event_id, e.title, e.cover_url, e.location,
-              e.start_time, e.end_time, e.signup_deadline, e.status AS event_status
+              e.start_time, e.end_time, e.signup_deadline, e.status AS event_status,
+              e.lat, e.lng, e.checkin_radius, e.beacon_uuid
        FROM registrations r
        JOIN events e ON e.id = r.event_id
        ${where} ORDER BY ${order} LIMIT ? OFFSET ?`

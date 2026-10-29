@@ -52,7 +52,9 @@ CREATE TABLE IF NOT EXISTS events (
   -- ===== 增量 v5：定位签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
   lat             REAL,                              -- 活动地点纬度（-90~90，NULL=未设置定位）
   lng             REAL,                              -- 活动地点经度（-180~180，NULL=未设置定位）
-  checkin_radius  REAL    NOT NULL DEFAULT 0.2       -- 签到允许半径（公里，默认 0.2=200 米；0=不限制）
+  checkin_radius  REAL    NOT NULL DEFAULT 0.2,      -- 签到允许半径（公里，默认 0.2=200 米；0=不限制）
+  -- ===== 增量 v6：蓝牙信标签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  beacon_uuid     TEXT                               -- 蓝牙信标 UUID（大写 36 位；NULL=未启用信标签到）
 );
 
 -- 报名表：UNIQUE(event_id, user_id) 防重复报名；取消后再报名为状态重置（UPDATE）

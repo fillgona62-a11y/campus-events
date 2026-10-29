@@ -169,6 +169,54 @@ function getCaptcha(req, res, next) {
   }
 }
 
+/**
+ * POST /auth/login-miniapp 小程序登录（v6）：免图形验证码，但保留账号锁定与密码校验。
+ * 小程序环境自带微信账号体系，可信度高于裸网页，且登录限流已防暴力破解，
+ * 故不再要求图形验证码（小程序无法便捷显示 SVG 验证码）。
+ */
+function loginMiniapp(req, res, next) {
+  try {
+    const { student_id, password } = req.body;
+    const user = userModel.findByStudentId(student_id);
+
+    // 账号锁定优先判定
+    if (user && user.locked_until && Date.parse(user.locked_until) > Date.now()) {
+      const remainMin = Math.max(
+        1,
+        Math.ceil((Date.parse(user.locked_until) - Date.now()) / 60000)
+      );
+      throw new ApiError(ERR.ACCOUNT_LOCKED, `账号已锁定，请 ${remainMin} 分钟后再试`, 423);
+    }
+
+    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+      if (user) {
+        const { locked } = userModel.recordLoginFailure(
+          user,
+          config.loginLock.minutes,
+          config.loginLock.maxAttempts
+        );
+        if (locked) {
+          throw new ApiError(
+            ERR.ACCOUNT_LOCKED,
+            `密码错误次数过多，账号已锁定，请 ${config.loginLock.minutes} 分钟后再试`,
+            423
+          );
+        }
+      }
+      throw ApiError.unauthorized('学号或密码错误');
+    }
+
+    if (user.status !== USER_STATUS.ACTIVE) {
+      throw ApiError.forbidden('账号已被禁用，请联系管理员');
+    }
+    userModel.clearLoginFailures(user.id);
+    const token = signToken(user);
+    ok(res, { token, user: userModel.toPublic(user) }, '登录成功');
+  } catch (err) {
+    next(err);
+  }
+}
+
 /** GET /auth/me 返回当前用户（含未读通知数） */
 function me(req, res, next) {
   try {
@@ -277,6 +325,7 @@ module.exports = {
   register,
   getCaptcha,
   login,
+  loginMiniapp,
   me,
   updateMe,
   changePassword,

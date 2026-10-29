@@ -40,6 +40,8 @@ function runMigrations() {
   addColumn('events', 'lat', 'REAL');
   addColumn('events', 'lng', 'REAL');
   addColumn('events', 'checkin_radius', 'REAL NOT NULL DEFAULT 0.2');
+  // events：蓝牙信标签到（v6）
+  addColumn('events', 'beacon_uuid', 'TEXT');
 
   // 邮箱唯一索引：SQLite 唯一索引中 NULL 视为互异，多个老用户 email 为空不冲突
   db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
