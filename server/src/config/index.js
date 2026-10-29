@@ -42,6 +42,15 @@ const config = {
   uploadDir: resolveDir(process.env.UPLOAD_DIR, './uploads'),
   /** 前端构建产物目录（存在时由 Express 托管；线上部署包形态为 webroot） */
   clientDist: resolveClientDist(),
+  /**
+   * CORS 允许来源白名单（逗号分隔）。默认空 = 仅同源放行（生产：单进程托管前后端）。
+   * 开发期前后端分离（:5173 → :3000）时由 Vite proxy 转发，请求对后端而言仍为同源，
+   * 无需额外配置；仅在确有跨域需求时设置 CORS_ORIGINS=* 或具体域名。
+   */
+  corsOrigins: (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
   /** 图形验证码配置（有效期秒数，一次性使用） */
   captcha: {
     ttlSeconds: parseInt(process.env.CAPTCHA_TTL, 10) || 300,

@@ -24,7 +24,23 @@ app.use(
     contentSecurityPolicy: false, // SPA 单域部署，CSP 交由前置 Nginx 配置
   })
 );
-app.use(cors());
+// CORS：默认仅同源放行；配置白名单（CORS_ORIGINS）后按来源动态放行。
+// 生产为单进程托管前后端（同源），开发经 Vite proxy 转发（后端视角仍同源），
+// 故一般无需跨域，默认关闭以避免任意站点读取接口。
+const corsOptions = {
+  origin(origin, callback) {
+    // 同源请求（无 Origin 头，如服务端间调用/浏览器同源）直接放行
+    if (!origin) return callback(null, true);
+    if (
+      config.corsOrigins.includes('*') ||
+      config.corsOrigins.includes(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
+};
+app.use(cors(corsOptions));
 app.use(compression());
 app.use(express.json({ limit: '1mb' }));
 

@@ -66,12 +66,16 @@ function countByEventStatusCheckedIn(eventId, status, checkedIn) {
     .get(eventId, status, checkedIn).c;
 }
 
-/** 候补顺位子查询：同活动 waitlisted 记录按 created_at ASC, id ASC 的排名（第 1 位最早） */
-const WAITLIST_POSITION_SQL = `(
-  SELECT COUNT(*) + 1 FROM registrations w
-  WHERE w.event_id = r.event_id AND w.status = '${REG_STATUS.WAITLISTED}'
-    AND (w.created_at < r.created_at OR (w.created_at = r.created_at AND w.id < r.id))
-)`;
+/** 候补顺位子查询：同活动 waitlisted 记录按 created_at ASC, id ASC 的排名（第 1 位最早）。
+ *  用 CASE 包裹：仅对 waitlisted 行才计算顺位，非候补行直接为 NULL，
+ *  避免为大量非候补行执行无意义的相关 COUNT 子查询。 */
+const WAITLIST_POSITION_SQL = `CASE WHEN r.status = '${REG_STATUS.WAITLISTED}'
+  THEN (
+    SELECT COUNT(*) + 1 FROM registrations w
+    WHERE w.event_id = r.event_id AND w.status = '${REG_STATUS.WAITLISTED}'
+      AND (w.created_at < r.created_at OR (w.created_at = r.created_at AND w.id < r.id))
+  )
+  ELSE NULL END`;
 
 /**
  * 单活动报名名单（含用户信息），按报名时间升序。

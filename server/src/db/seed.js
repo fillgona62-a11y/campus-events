@@ -16,8 +16,8 @@ const postModel = require('../models/postModel');
 /** 预置分类（按 sort 排序展示） */
 const CATEGORIES = ['讲座', '社团', '体育', '文艺', '志愿', '其他'];
 
-/** 3 个小管理员（role=admin）。密码默认 admin123，建议上线后修改。 */
-const SUB_ADMIN_PASSWORD = 'admin123';
+/** 3 个小管理员（role=admin）。密码可通过 SUB_ADMIN_PASSWORD 环境变量配置，默认 admin123，建议上线后修改。 */
+const SUB_ADMIN_PASSWORD = process.env.SUB_ADMIN_PASSWORD || 'admin123';
 const SUB_ADMINS = [
   { student_id: 'admin01', name: '小管理员 · 一' },
   { student_id: 'admin02', name: '小管理员 · 二' },

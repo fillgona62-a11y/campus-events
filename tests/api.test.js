@@ -177,7 +177,12 @@ async function main() {
     const r = await api('POST', '/auth/login', { body: { student_id: 'admin', password: 'admin123' } });
     assertEq(r.status, 200, 'HTTP 状态');
     assertEq(r.body.code, 0, 'code');
-    assertEq(r.body.data.user.role, 'admin', '角色');
+    // v3 角色分级：主管理员升级为 super_admin（isAdminRole 对 admin/super_admin 均放行）
+    assertEq(
+      r.body.data.user.role === 'admin' || r.body.data.user.role === 'super_admin',
+      true,
+      '角色'
+    );
     adminToken = r.body.data.token;
   });
 
