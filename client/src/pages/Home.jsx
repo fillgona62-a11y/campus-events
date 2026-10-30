@@ -1,8 +1,7 @@
 /**
- * 首页：撞色 Hero 区 + 搜索 + 分类筛选 + 活动卡片流 + 分页。
+ * 首页：清爽 Hero + 搜索 + 分类筛选 + 活动卡片流 + 分页。
  *
- * 视觉：Hero 为纯撞色大色块（无渐变）+ 四角星装饰 + 硬边投影；
- * 列表区用骨架屏占位，分页选中项换成撞色荧光绿。
+ * 视觉：柔和渐变 Hero、干净白卡、克制配色，成熟清爽的校园风。
  */
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -16,8 +15,6 @@ import EventCard from '../components/EventCard';
 import CategoryNav from '../components/CategoryNav';
 import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
-import { ClashBlob, ClashStar, ClashStripe } from '../components/ClashDecor';
-import { CLASH } from '../theme';
 import { useAuthStore } from '../store/authStore';
 import { PAGINATION_SX, SkeletonCard, ErrorState } from './clashUi';
 
@@ -72,39 +69,49 @@ export default function Home() {
 
   return (
     <div>
-      {/* ── 撞色 Hero：纯色块平铺 + 四角星装饰 ───────────────────── */}
-      <section
-        className="relative mb-5 overflow-hidden border-2 border-ink px-5 py-8 shadow-block-ink md:px-10 md:py-12"
-        style={{ backgroundColor: CLASH.lime }}
-      >
-        <ClashBlob color={CLASH.magenta} top={-80} right={-40} size={220} opacity={0.28} />
-        <ClashBlob color={CLASH.cyan} bottom={-90} left={-50} size={200} opacity={0.3} />
-        <ClashStar
-          size={30}
-          className="absolute right-10 top-10 animate-float"
-          style={{ color: CLASH.ink }}
+      {/* ── Hero：清爽渐变横幅，无硬边/硬投影 ───────────────────── */}
+      <section className="relative mb-6 overflow-hidden rounded-2xl px-6 py-10 md:px-12 md:py-16">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(120deg, #f5f1e8 0%, #eef2ea 45%, #e8eef0 100%)',
+          }}
+          aria-hidden="true"
         />
-        <ClashStar size={18} className="absolute bottom-16 right-32" style={{ color: CLASH.ink }} />
+        {/* 极淡的装饰光斑 */}
+        <div
+          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full opacity-30 blur-3xl"
+          style={{ backgroundColor: '#a8c0a0' }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full opacity-25 blur-3xl"
+          style={{ backgroundColor: '#b99a63' }}
+          aria-hidden="true"
+        />
 
         <div className="relative max-w-2xl">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-paper-card px-3 py-1 text-xs font-extrabold">
-            <ClashStar size={12} style={{ color: CLASH.magenta }} />
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1 text-xs font-medium text-ink-soft backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#b3432f' }} />
             校园活动 · 报名中心
           </p>
-          <h1 className="text-3xl font-black leading-tight tracking-tight text-ink md:text-5xl">
-            发现校园里的<span className="text-clash-royal">每一种可能</span>
+          <h1 className="text-3xl font-semibold leading-tight tracking-tight text-ink md:text-5xl">
+            发现校园里的
+            <br />
+            <span style={{ color: '#9c6b3f' }}>每一种可能</span>
           </h1>
-          <p className="mt-3 max-w-xl text-sm font-semibold text-ink-soft md:text-base">
-            讲座、比赛、社团招新、志愿服务——一键报名，名额实时可见，有人取消还会自动递补。
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-ink-mute md:text-base">
+            讲座、比赛、社团招新、志愿服务，一键报名，名额实时可见，有人取消还会自动递补。
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap gap-3">
             <Button
               variant="contained"
               size="large"
               endIcon={<ArrowForwardIcon />}
               onClick={() => document.getElementById('event-list')?.scrollIntoView({ behavior: 'smooth' })}
-              sx={{ backgroundColor: CLASH.royal, '&:hover': { backgroundColor: '#011B6B' } }}
+              sx={{ borderRadius: '10px', boxShadow: '0 4px 14px rgba(156,107,63,0.28)' }}
             >
               去逛活动
             </Button>
@@ -113,7 +120,7 @@ export default function Home() {
               size="large"
               startIcon={<AddCircleOutlineIcon />}
               onClick={handlePublish}
-              sx={{ backgroundColor: 'var(--paper-card)' }}
+              sx={{ borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.6)' }}
             >
               发布活动
             </Button>
@@ -121,34 +128,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 热门推荐────────────────────────────────────── */}
+      {/* ── 热门推荐 ────────────────────────────────────── */}
       {hot.length > 0 && (
-        <section className="mb-5">
-          <div className="mb-2 flex items-center gap-2">
-            <ClashStar size={18} style={{ color: CLASH.magenta }} />
-            <h2 className="text-lg font-extrabold tracking-tight text-ink">热门活动</h2>
-            <span className="text-xs font-bold text-ink-mute">按报名热度</span>
+        <section className="mb-6">
+          <div className="mb-3 flex items-baseline gap-2">
+            <h2 className="text-lg font-semibold text-ink">热门活动</h2>
+            <span className="text-xs text-ink-mute">按报名热度</span>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {hot.map((event) => (
               <button
                 key={event.id}
                 onClick={() => navigate(`/events/${event.id}`)}
-                className="w-40 shrink-0 overflow-hidden rounded-2xl border-2 border-ink bg-paper-card text-left shadow-block-ink-sm transition-transform hover:-translate-y-0.5"
+                className="w-40 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-paper-card text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
               >
                 <div
-                  className="flex h-20 items-center justify-center border-b-2 border-ink"
-                  style={{ backgroundColor: CLASH.lemon }}
+                  className="flex h-20 items-center justify-center px-3"
+                  style={{ background: 'linear-gradient(135deg, #f0ece2, #e8ece6)' }}
                 >
-                  <span className="px-2 text-center text-xs font-extrabold leading-tight text-ink line-clamp-2">
+                  <span className="line-clamp-2 text-center text-xs font-medium leading-tight text-ink-soft">
                     {event.title}
                   </span>
                 </div>
-                <div className="px-3 py-2">
-                  <p className="truncate text-xs font-bold text-ink-soft">{event.location}</p>
-                  <p className="mt-1 text-[11px] font-bold text-ink-mute">
-                    已报名 {event.approved_count} 人
-                  </p>
+                <div className="px-3 py-2.5">
+                  <p className="truncate text-xs text-ink-mute">{event.location}</p>
+                  <p className="mt-1 text-[11px] text-ink-faint">已报名 {event.approved_count} 人</p>
                 </div>
               </button>
             ))}
@@ -173,8 +177,6 @@ export default function Home() {
         value={categoryId}
         onChange={(id) => { setCategoryId(id); setPage(1); }}
       />
-
-      <ClashStripe className="my-3" />
 
       {/* ── 列表区：加载 / 错误 / 空 / 正常 四态 ──────────────────── */}
       {loading ? (

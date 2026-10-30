@@ -1,14 +1,12 @@
 /**
- * EventCard.jsx — 活动卡片（撞色风格）
+ * EventCard.jsx — 活动卡片（清爽现代校园风）
  *
  * 视觉要点：
- *   1. 封面占位是「纯撞色块 + 巨大首字」，不是渐变；颜色由分类在色轮中的位置决定
- *   2. 卡片本体用 .clash-card（2px 墨线 + 硬边投影 + 悬停浮起 + 按压下沉）
- *   3. 分类标签与名额状态都是「撞色实心 + 2px 墨边」的小徽标，而不是红绿文字
- *   4. 「立即报名」是明确的主 CTA（宝蓝实心 + 硬投影），禁用时变灰并写清原因
- *   5. 整卡可点且键盘可达（Tab 聚焦 + Enter / Space 触发）
- *
- * @param {{event: object}} props
+ *   1. 干净白卡 + 柔和阴影 + 轻微悬浮，无硬描边/硬投影
+ *   2. 封面优先展示真实图片；无图时用低饱和分类色渐变占位
+ *   3. 分类用淡色文字徽标，名额状态用细线胶囊，克制不抢眼
+ *   4. 标题一行截断，信息层级清晰（标题 > 时间/地点）
+ *   5. 整卡可点且键盘可达
  */
 import { useState } from 'react';
 import Button from '@mui/material/Button';
@@ -17,21 +15,16 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { useNavigate } from 'react-router-dom';
 import { formatTimeRange, remainingText, isFull, isSignupClosed } from '../utils/format';
-import { CLASH, CATEGORY_COLORS } from '../theme';
-import { clashColorAt, ClashStar } from './ClashDecor';
-import { readableText } from '../utils/clash';
+import { CATEGORY_COLORS } from '../theme';
+import { clashColorAt } from './ClashDecor';
 
-/** 名额状态徽标配置：bg 为撞色实心，fg 依据亮度自动取墨色/白色 */
+/** 名额状态徽标：细线胶囊，文字区分 */
 function quotaBadge(event, full, closed) {
-  if (closed) return { bg: CLASH.haze, label: '报名已截止' };
-  if (full) return { bg: CLASH.magenta, label: '名额已满' };
-  // 名额即将耗尽时换成柔柠黄预警，避免一眼看过去全是同色
+  if (closed) return { label: '报名已截止', color: '#9a9aab' };
+  if (full) return { label: '名额已满', color: '#b3432f' };
   const remaining = event.capacity > 0 ? event.capacity - event.approved_count : Infinity;
   const tight = Number.isFinite(remaining) && remaining <= 3;
-  return {
-    bg: tight ? CLASH.lemon : CLASH.mint,
-    label: remainingText(event),
-  };
+  return { label: remainingText(event), color: tight ? '#a8823f' : '#5f7d5a' };
 }
 
 export default function EventCard({ event }) {
@@ -42,23 +35,19 @@ export default function EventCard({ event }) {
   const closed = isSignupClosed(event);
   const disabled = full || closed;
 
-  // 封面撞色：与 CategoryNav 用同一个色轮取色规则，同一分类全局同色
   const accent = clashColorAt(event.category_id, CATEGORY_COLORS);
-  const onAccent = readableText(accent);
   const quota = quotaBadge(event, full, closed);
-  const firstChar = event.title?.slice(0, 1) || '活';
 
   const goDetail = () => navigate(`/events/${event.id}`);
 
   return (
     <article
-      className="clash-card flex cursor-pointer flex-col overflow-hidden"
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-ink/10 bg-paper-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
       role="button"
       tabIndex={0}
       aria-label={`查看活动：${event.title || ''}`}
       onClick={goDetail}
       onKeyDown={(e) => {
-        // 事件来自内部按钮时不再重复触发（避免一次按键触发两次跳转）
         if (e.target !== e.currentTarget) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -66,108 +55,84 @@ export default function EventCard({ event }) {
         }
       }}
     >
-      {/* ── 封面：纯撞色块 + 巨大首字 ───────────────────── */}
-      <div
-        className="relative h-40 w-full overflow-hidden border-b-2 border-ink"
-        style={{ backgroundColor: accent }}
-      >
+      {/* 封面：真实图优先，无图用分类色渐变 */}
+      <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br" style={{ background: `linear-gradient(135deg, ${accent}22, ${accent}0d)` }}>
         {event.cover_url && !coverFailed ? (
           <img
             src={event.cover_url}
             alt={event.title}
             loading="lazy"
             onError={() => setCoverFailed(true)}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center" style={{ color: onAccent }}>
-            <span className="select-none text-6xl font-black leading-none">{firstChar}</span>
+          <div className="flex h-full w-full items-center justify-center" style={{ color: accent }}>
+            <span className="text-3xl font-semibold opacity-40">{event.title?.slice(0, 1) || '活'}</span>
           </div>
         )}
-        {/* 置顶徽标：封面左上角（柔柠黄实心 + 2px 墨边 + on-clash 强制墨字，任何撞色封面上都可读） */}
+        {/* 置顶标记：左上角淡色胶囊 */}
         {event.is_pinned && (
-          <span className="on-clash absolute left-3 top-3 inline-flex items-center gap-1 rounded-lg border-2 border-ink bg-clash-lemon px-2 py-0.5 text-xs font-extrabold">
-            <PushPinIcon sx={{ fontSize: 14 }} />
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/45 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur">
+            <PushPinIcon sx={{ fontSize: 13 }} />
             置顶
           </span>
         )}
-        {/* 四角星装饰 */}
-        <ClashStar size={26} className="absolute right-3 top-3" style={{ color: onAccent, opacity: 0.32 }} />
-        <ClashStar size={14} className="absolute bottom-3 left-3" style={{ color: onAccent, opacity: 0.24 }} />
       </div>
 
-      {/* ── 内容 ───────────────────────────────────────── */}
+      {/* 内容 */}
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex flex-wrap items-center gap-2">
           {event.category_name && (
             <span
-              className="inline-flex items-center rounded-lg border-2 border-ink px-2 py-0.5 text-xs font-bold"
-              style={{ backgroundColor: accent, color: onAccent }}
+              className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+              style={{ backgroundColor: `${accent}18`, color: accent }}
             >
               {event.category_name}
             </span>
           )}
           <span
-            className="inline-flex items-center rounded-lg border-2 border-ink px-2 py-0.5 text-xs font-bold"
-            style={{ backgroundColor: quota.bg, color: readableText(quota.bg) }}
+            className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium"
+            style={{ borderColor: `${quota.color}55`, color: quota.color }}
           >
             {quota.label}
           </span>
         </div>
 
-        <h3 className="line-clamp-2 text-base font-extrabold leading-snug text-ink">{event.title}</h3>
+        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-ink">{event.title}</h3>
 
-        <p className="flex items-start gap-1 text-xs text-ink-mute">
-          <ScheduleIcon sx={{ fontSize: 14, mt: '2px', flexShrink: 0 }} />
-          <span className="line-clamp-1">{formatTimeRange(event.start_time, event.end_time)}</span>
-        </p>
-        <p className="flex items-start gap-1 text-xs text-ink-mute">
-          <PlaceIcon sx={{ fontSize: 14, mt: '2px', flexShrink: 0 }} />
-          <span className="line-clamp-1">{event.location}</span>
-        </p>
+        <div className="mt-auto space-y-1.5 pt-1">
+          <p className="flex items-center gap-1.5 text-xs text-ink-mute">
+            <ScheduleIcon sx={{ fontSize: 14, flexShrink: 0 }} />
+            <span className="line-clamp-1">{formatTimeRange(event.start_time, event.end_time)}</span>
+          </p>
+          <p className="flex items-center gap-1.5 text-xs text-ink-mute">
+            <PlaceIcon sx={{ fontSize: 14, flexShrink: 0 }} />
+            <span className="line-clamp-1">{event.location}</span>
+          </p>
+        </div>
 
-        {/* ── 主 CTA ───────────────────────────────────── */}
-        <div className="mt-auto pt-2">
+        <div className="mt-2 pt-1">
           <Button
             fullWidth
             variant="contained"
+            size="small"
             onClick={(e) => {
               e.stopPropagation();
               goDetail();
             }}
             disabled={disabled}
             sx={{
-              minHeight: 44,
-              fontWeight: 800,
-              borderRadius: '14px',
-              border: '2px solid var(--ink-line)',
+              minHeight: 36,
+              fontWeight: 600,
+              borderRadius: '8px',
+              textTransform: 'none',
+              boxShadow: 'none',
               ...(disabled
-                ? {
-                    backgroundColor: '#D7D7E2',
-                    color: '#6B6B7B',
-                    boxShadow: 'none',
-                    '&:hover': { backgroundColor: '#D7D7E2', boxShadow: 'none' },
-                    // 覆盖 MUI 自带的 .Mui-disabled 禁用底色，保证灰度统一
-                    '&.Mui-disabled': {
-                      backgroundColor: '#D7D7E2',
-                      color: '#6B6B7B',
-                      boxShadow: 'none',
-                    },
-                  }
-                : {
-                    backgroundColor: CLASH.royal,
-                    color: '#FFFFFF',
-                    boxShadow: '4px 4px 0 0 var(--ink-line)',
-                    '&:hover': {
-                      backgroundColor: CLASH.royal,
-                      boxShadow: '6px 6px 0 0 var(--ink-line)',
-                      transform: 'translate(-2px, -2px)',
-                    },
-                    '&:active': { boxShadow: '1px 1px 0 0 var(--ink-line)', transform: 'translate(2px, 2px)' },
-                  }),
+                ? { backgroundColor: '#e5e3dd', color: '#9a9aab', '&:hover': { backgroundColor: '#e5e3dd' } }
+                : {}),
             }}
           >
-            {closed ? '报名已截止' : full ? '名额已满' : '立即报名'}
+            {closed ? '报名已截止' : full ? '名额已满' : '查看详情'}
           </Button>
         </div>
       </div>

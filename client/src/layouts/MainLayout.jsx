@@ -1,11 +1,7 @@
 /**
- * 前台主布局：顶栏（撞色 Logo + 导航 + 用户菜单/通知角标）+ 内容区 + 移动端底部 Tab。
+ * 前台主布局：顶栏（Logo + 导航 + 用户菜单/通知角标）+ 内容区 + 移动端底部 Tab。
  *
- * 视觉：
- *   1. 顶栏用 theme 已设好的纸色毛玻璃（AppBar 默认样式）
- *   2. Logo 左侧加撞色方块 + 四角星图标，文字用 clash-text-gradient
- *   3. 桌面导航项 hover 有撞色反馈；未登录「登录」描边、「注册」实心荧光绿
- *   4. 页脚加撞色细条 ClashStripe，法务链接 hover 有颜色变化
+ * 视觉：顶栏纸色毛玻璃、简洁文字 Logo、清爽导航 hover、克制配色。
  */
 import { useEffect, useState, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
@@ -22,18 +18,17 @@ import { useAuthStore } from '../store/authStore';
 import { isAdmin } from '../utils/role';
 import { me } from '../api/authApi';
 import BottomNav from '../components/BottomNav';
-import { ClashStar, ClashStripe } from '../components/ClashDecor';
 import ThemeToggle from '../components/ThemeToggle';
 import { CLASH } from '../theme';
 
-/** 桌面导航项：撞色 hover 反馈 */
+/** 桌面导航项：清爽 hover 反馈 */
 const navSx = {
   color: CLASH.ink,
-  fontWeight: 700,
-  borderRadius: 12,
+  fontWeight: 500,
+  borderRadius: 8,
   '&:hover': {
-    backgroundColor: 'rgba(178,252,6,0.35)',
-    color: CLASH.ink,
+    backgroundColor: 'rgba(156,107,63,0.08)',
+    color: '#9c6b3f',
   },
 };
 
@@ -104,16 +99,16 @@ export default function MainLayout() {
       {/* 顶栏：纸色毛玻璃（AppBar 默认样式已在 theme 中配置） */}
       <AppBar position="sticky" color="default">
         <Toolbar className="mx-auto w-full max-w-[1200px] gap-2 px-3">
-          {/* Logo：撞色方块 + 四角星 */}
+          {/* Logo：简洁文字标 */}
           <Link to="/" className="mr-2 flex items-center gap-2 no-underline">
             <span
-              className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-ink shadow-block-ink-sm"
-              style={{ backgroundColor: CLASH.lime }}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-white"
+              style={{ backgroundColor: '#9c6b3f' }}
               aria-hidden="true"
             >
-              <ClashStar size={18} style={{ color: CLASH.ink }} />
+              <span className="text-base font-semibold">校</span>
             </span>
-            <span className="clash-text-gradient text-lg font-extrabold tracking-tight">校园活动</span>
+            <span className="text-lg font-semibold tracking-tight text-ink">校园活动</span>
           </Link>
 
           <div className="hidden gap-1 md:flex">
@@ -159,11 +154,10 @@ export default function MainLayout() {
                   sx={{
                     width: 32,
                     height: 32,
-                    bgcolor: CLASH.lime,
-                    color: CLASH.ink,
+                    bgcolor: '#9c6b3f',
+                    color: '#fff',
                     fontSize: 14,
-                    fontWeight: 800,
-                    border: '2px solid var(--ink-line)',
+                    fontWeight: 600,
                   }}
                 >
                   {user?.name?.slice(0, 1) || '我'}
@@ -193,12 +187,11 @@ export default function MainLayout() {
             </>
           ) : (
             <div className="flex gap-1.5">
-              {/* 登录：描边（次要）；注册：实心荧光绿（主行动） */}
               <Button
                 variant="outlined"
                 component={Link}
                 to="/login"
-                sx={{ borderColor: CLASH.ink, color: CLASH.ink, fontWeight: 700 }}
+                sx={{ color: 'var(--ink-line)', fontWeight: 500 }}
               >
                 登录
               </Button>
@@ -206,14 +199,7 @@ export default function MainLayout() {
                 variant="contained"
                 component={Link}
                 to="/register"
-                sx={{
-                  backgroundColor: CLASH.lime,
-                  color: CLASH.ink,
-                  fontWeight: 800,
-                  boxShadow: '3px 3px 0 0 var(--ink-line)',
-                  '&:hover': { backgroundColor: CLASH.lime, transform: 'translate(-1px,-1px)', boxShadow: '4px 4px 0 0 var(--ink-line)' },
-                  '&:active': { transform: 'translate(2px,2px)', boxShadow: '1px 1px 0 0 var(--ink-line)' },
-                }}
+                sx={{ fontWeight: 600 }}
               >
                 注册
               </Button>
@@ -226,20 +212,19 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {/* 页脚：撞色细条 + 法务入口 */}
-      <footer className="bg-paper-card pb-28 pt-0 md:pb-4">
-        <ClashStripe />
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-x-4 gap-y-1 px-3 py-4 text-xs text-ink-mute">
-          <span className="font-bold text-ink-soft">校园活动报名系统</span>
+      {/* 页脚：简洁分隔 + 法务入口 */}
+      <footer className="border-t border-ink/8 bg-paper-card pb-28 pt-0 md:pb-4">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-x-4 gap-y-1 px-3 py-5 text-xs text-ink-mute">
+          <span className="font-medium text-ink-soft">校园活动报名系统</span>
           <Link
             to="/privacy"
-            className="no-underline transition-colors hover:text-clash-violet"
+            className="no-underline transition-colors hover:text-ink"
           >
             隐私政策
           </Link>
           <Link
             to="/terms"
-            className="no-underline transition-colors hover:text-clash-violet"
+            className="no-underline transition-colors hover:text-ink"
           >
             用户协议
           </Link>
