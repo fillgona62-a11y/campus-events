@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 // 移动优先断点：sm 640 / md 768 / lg 1024 / xl 1280（Tailwind 默认）
-// 视觉基调：撞色（Clash）——高饱和大色块 + 硬边投影 + 四角星装饰
+// 视觉基调：水墨国风——低饱和东方色 + 柔和阴影 + 克制留白
 // 暗色模式：darkMode:'class' + 中性色（ink/paper）改为 CSS 变量，随 .dark 翻转
 export default {
   // 暗色模式以 html.dark 类驱动（由 ThemeModeProvider 控制，默认跟随系统）
@@ -9,19 +9,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ── 撞色八色板（取自参考图，明度不变，两种模式通用）────────────
+        // ── 东方色板（水墨风，明度随模式微调）────────────
         clash: {
-          lime: '#B2FC06', // 荧光绿
-          magenta: '#ED35F9', // 樱珞紫
-          violet: '#8A3BEC', // 绀星紫
-          cyan: '#81FCFF', // 霁澜青
-          haze: '#8DA6D2', // 雾霭蓝
-          mint: '#A4E2C6', // 薄荷绿
-          lemon: '#F9D77C', // 柔柠黄
-          royal: '#012696', // 宝蓝色
+          lime: '#6D7F6D',    // 山青
+          magenta: '#B3432F', // 朱砂
+          violet: '#3F5068',  // 黛蓝
+          cyan: '#5F7D5A',    // 竹青
+          haze: '#A39D92',    // 浅墨
+          mint: '#A8823F',    // 藤黄
+          lemon: '#B99A63',   // 描金
+          royal: '#9C6B3F',   // 赭石
         },
-        // ── 中性色（主题化：亮色=#12121A 墨 / 暗色=奶白，靠 CSS 变量翻转）──
-        // ink.DEFAULT 既作文字色也作描边/硬投影色：两种模式下二者取值相同
+        // ── 中性色（主题化：亮色=#2B2A28 墨 / 暗色=奶白，靠 CSS 变量翻转）──
+        // ink.DEFAULT 既作文字色也作描边色：两种模式下二者取值相同
         ink: {
           DEFAULT: 'var(--ink-line)',
           soft: 'var(--ink-soft)',
@@ -34,9 +34,9 @@ export default {
         },
         // 兼容旧代码里的 primary 用法
         primary: {
-          DEFAULT: '#012696',
-          dark: '#012696',
-          lime: '#B2FC06',
+          DEFAULT: '#9C6B3F',
+          dark: '#7A5230',
+          lime: '#6D7F6D',
         },
       },
       fontFamily: {
@@ -47,26 +47,32 @@ export default {
           'Arial',
           'sans-serif',
         ],
+        serif: [
+          '"Songti SC"',
+          '"STSong"',
+          '"SimSun"',
+          'serif',
+        ],
       },
       borderRadius: {
-        '4xl': '28px',
-        '5xl': '36px',
+        '4xl': '20px',
+        '5xl': '24px',
       },
       boxShadow: {
         // 柔和悬浮（卡片静置）
-        pop: '0 12px 30px -14px rgba(18,18,26,.28)',
-        'pop-lg': '0 28px 60px -22px rgba(18,18,26,.40)',
-        // 硬边投影（撞色风格）：墨线色随模式翻转（亮色=墨 / 暗色=奶白，形成反相贴纸感）
-        'block-ink': '4px 4px 0 0 var(--ink-line)',
-        'block-ink-lg': '6px 6px 0 0 var(--ink-line)',
-        'block-ink-sm': '2px 2px 0 0 var(--ink-line)',
-        // 彩色硬投影（撞色块本身，明度不变，两种模式通用）
-        'block-lime': '4px 4px 0 0 #B2FC06',
-        'block-magenta': '4px 4px 0 0 #ED35F9',
-        'block-violet': '4px 4px 0 0 #8A3BEC',
-        'block-cyan': '4px 4px 0 0 #81FCFF',
-        'block-lemon': '4px 4px 0 0 #F9D77C',
-        'block-royal': '4px 4px 0 0 #012696',
+        pop: '0 10px 24px -14px rgba(43,42,40,.22)',
+        'pop-lg': '0 24px 50px -22px rgba(43,42,40,.32)',
+        // 柔和投影（水墨风格）：细、淡，替代硬边投影
+        'block-ink': '0 2px 8px rgba(43,42,40,0.08)',
+        'block-ink-lg': '0 6px 18px rgba(43,42,40,0.12)',
+        'block-ink-sm': '0 1px 4px rgba(43,42,40,0.06)',
+        // 东方色柔和投影
+        'block-lime': '0 2px 8px rgba(109,127,109,0.24)',
+        'block-magenta': '0 2px 8px rgba(179,67,47,0.22)',
+        'block-violet': '0 2px 8px rgba(63,80,104,0.22)',
+        'block-cyan': '0 2px 8px rgba(95,125,90,0.24)',
+        'block-lemon': '0 2px 8px rgba(185,154,99,0.24)',
+        'block-royal': '0 2px 8px rgba(156,107,63,0.24)',
       },
       keyframes: {
         'pop-in': {
@@ -75,7 +81,7 @@ export default {
         },
         float: {
           '0%,100%': { transform: 'translateY(0) rotate(0deg)' },
-          '50%': { transform: 'translateY(-8px) rotate(6deg)' },
+          '50%': { transform: 'translateY(-6px) rotate(0deg)' },
         },
         'spin-slow': {
           '0%': { transform: 'rotate(0deg)' },
@@ -91,14 +97,14 @@ export default {
         },
       },
       animation: {
-        'pop-in': 'pop-in .28s cubic-bezier(.22,1,.36,1) both',
+        'pop-in': 'pop-in .28s ease both',
         float: 'float 5s ease-in-out infinite',
         'spin-slow': 'spin-slow 18s linear infinite',
         shimmer: 'shimmer 1.6s linear infinite',
-        'slide-up': 'slide-up .32s cubic-bezier(.22,1,.36,1) both',
+        'slide-up': 'slide-up .32s ease both',
       },
       transitionTimingFunction: {
-        clash: 'cubic-bezier(.22,1,.36,1)',
+        clash: 'cubic-bezier(.4,0,.2,1)',
       },
     },
   },

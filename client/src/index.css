@@ -3,34 +3,52 @@
 @tailwind utilities;
 
 /* ============================================================
-   主题变量（暗色模式核心）
-   :root        = 亮色（默认）
-   html.dark    = 暗色（由 ThemeModeProvider 切换 <html> 类）
-   中性色（墨/纸）翻转；撞色八色板明度不变，两种模式通用。
+   主题变量（水墨国风 · 亮/暗双模式）
+   :root        = 亮色（默认，宣纸底）
+   html.dark    = 暗色（墨夜底）
+   中性色（墨/纸）翻转；东方色板明度随模式微调，保证对比度。
    ============================================================ */
 :root {
-  --paper: #fbfaf7;          /* 页面底色 */
-  --paper-card: #ffffff;     /* 卡片/表面底色 */
-  --ink-line: #12121a;       /* 文字 + 2px 墨线描边 + 硬投影色（亮色=墨） */
-  --ink-soft: #3a3a46;
-  --ink-mute: #6b6b7b;
-  --ink-faint: #9a9aab;
-  --ink-rgb: 18, 18, 26;     /* 用于 rgba() 半透明（如网格线/滚动条） */
-  --appbar-bg: rgba(251, 250, 247, 0.88); /* 顶栏毛玻璃底色 */
+  /* 纸与墨 */
+  --paper: #f5f1e8;          /* 页面底色（宣纸/米白） */
+  --paper-card: #fbf9f4;     /* 卡片/表面底色（略亮的宣纸） */
+  --ink-line: #2b2a28;       /* 主文字/描边（浓墨） */
+  --ink-soft: #4a4742;       /* 次级文字（淡墨） */
+  --ink-mute: #7a756c;       /* 辅助文字（灰墨） */
+  --ink-faint: #a39d92;      /* 弱化文字（浅墨） */
+  --ink-rgb: 43, 42, 40;     /* 用于 rgba() 半透明 */
+  --appbar-bg: rgba(245, 241, 232, 0.9); /* 顶栏毛玻璃底色 */
+
+  /* 东方色板（水墨风：赭石、山青、朱砂、竹青、藤黄、黛蓝） */
+  --accent-sepia: #9c6b3f;   /* 赭石（主强调） */
+  --accent-mountain: #6d7f6d;/* 山青（沉稳绿） */
+  --accent-cinnabar: #b3432f;/* 朱砂（印章红，点缀） */
+  --accent-bamboo: #5f7d5a;  /* 竹青 */
+  --accent-vine: #a8823f;    /* 藤黄 */
+  --accent-indigo: #3f5068;  /* 黛蓝 */
+  --accent-gold: #b99a63;    /* 描金 */
 }
 
 html.dark {
-  --paper: #0e0e15;
-  --paper-card: #181822;
-  --ink-line: #ececf3;       /* 暗色下墨线/文字翻为奶白，硬投影呈反相贴纸感 */
-  --ink-soft: #c9c9d4;
-  --ink-mute: #9a9aab;
-  --ink-faint: #6b6b7b;
-  --ink-rgb: 236, 236, 243;
-  --appbar-bg: rgba(14, 14, 21, 0.85);
+  --paper: #1a1917;          /* 墨夜底 */
+  --paper-card: #242220;     /* 略亮的墨底 */
+  --ink-line: #e8e2d5;       /* 主文字/描边（月色奶白） */
+  --ink-soft: #c9c2b4;
+  --ink-mute: #9c958a;
+  --ink-faint: #6f6a61;
+  --ink-rgb: 232, 226, 213;
+  --appbar-bg: rgba(26, 25, 23, 0.9);
+
+  --accent-sepia: #b98a5a;
+  --accent-mountain: #8a9a8a;
+  --accent-cinnabar: #c96a52;
+  --accent-bamboo: #7d9a78;
+  --accent-vine: #c0a05c;
+  --accent-indigo: #7d90ab;
+  --accent-gold: #cbb181;
 }
 
-/* 全局基础样式：移动优先 · 撞色（Clash）风格 */
+/* 全局基础样式：移动优先 · 水墨国风 */
 html,
 body,
 #root {
@@ -41,27 +59,27 @@ body {
   margin: 0;
   background-color: var(--paper);
   color: var(--ink-line);
-  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'PingFang SC', 'Songti SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  /* 极淡的撞色晕染背景，避免大面积纯色显得平淡 */
+  /* 淡墨山水晕染背景：柔和、克制，留白为主 */
   background-image:
-    radial-gradient(circle at 12% -4%, rgba(178, 252, 6, 0.16), transparent 42%),
-    radial-gradient(circle at 92% 2%, rgba(237, 53, 249, 0.13), transparent 40%),
-    radial-gradient(circle at 50% 108%, rgba(129, 252, 255, 0.14), transparent 46%);
+    radial-gradient(circle at 16% -6%, rgba(108, 92, 72, 0.10), transparent 45%),
+    radial-gradient(circle at 88% 4%, rgba(61, 80, 104, 0.08), transparent 42%),
+    radial-gradient(circle at 50% 110%, rgba(109, 127, 109, 0.10), transparent 48%);
   background-attachment: fixed;
 }
 
-/* 暗色下降低晕染强度，避免亮斑刺眼 */
+/* 暗色下降低晕染强度 */
 html.dark body {
   background-image:
-    radial-gradient(circle at 12% -4%, rgba(178, 252, 6, 0.08), transparent 42%),
-    radial-gradient(circle at 92% 2%, rgba(237, 53, 249, 0.07), transparent 40%),
-    radial-gradient(circle at 50% 108%, rgba(129, 252, 255, 0.08), transparent 46%);
+    radial-gradient(circle at 16% -6%, rgba(185, 138, 90, 0.08), transparent 45%),
+    radial-gradient(circle at 88% 4%, rgba(125, 144, 171, 0.07), transparent 42%),
+    radial-gradient(circle at 50% 110%, rgba(138, 154, 138, 0.07), transparent 48%);
 }
 
-/* 文本选中：撞色荧光绿 */
+/* 文本选中：朱砂淡染 */
 ::selection {
-  background: #b2fc06;
+  background: rgba(179, 67, 47, 0.22);
   color: var(--ink-line);
 }
 
@@ -89,18 +107,18 @@ html.dark body {
 .rich-text img {
   max-width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 .rich-text p {
   margin: 0.5em 0;
-  line-height: 1.75;
+  line-height: 1.8;
 }
 .rich-text h1,
 .rich-text h2,
 .rich-text h3,
 .rich-text h4 {
   margin: 0.8em 0 0.4em;
-  font-weight: 700;
+  font-weight: 600;
 }
 .rich-text ul,
 .rich-text ol {
@@ -108,18 +126,18 @@ html.dark body {
   margin: 0.5em 0;
 }
 .rich-text a {
-  color: #012696;
+  color: var(--accent-sepia);
   text-decoration: underline;
 }
 html.dark .rich-text a {
-  color: #8da6d2; /* 雾霭蓝，暗底可读 */
+  color: var(--accent-gold);
 }
 .rich-text blockquote {
   margin: 0.8em 0;
   padding: 0.6em 0.9em;
-  border-left: 4px solid #b2fc06;
-  background: rgba(178, 252, 6, 0.12);
-  border-radius: 0 12px 12px 0;
+  border-left: 3px solid var(--accent-cinnabar);
+  background: rgba(179, 67, 47, 0.06);
+  border-radius: 0 8px 8px 0;
 }
 
 /* 横向滚动分类条隐藏滚动条 */
@@ -130,73 +148,63 @@ html.dark .rich-text a {
   display: none;
 }
 
-/* ── 撞色装饰：四角星 ───────────────────────────────── */
+/* ── 国风装饰：印章方印（原四角星替换为朱砂方印） ───────── */
 .clash-star {
   display: inline-block;
   background: currentColor;
-  clip-path: polygon(
-    50% 0%,
-    60% 38%,
-    100% 50%,
-    60% 62%,
-    50% 100%,
-    40% 62%,
-    0% 50%,
-    40% 38%
-  );
+  border-radius: 2px;
+  transform: rotate(0deg);
 }
 
-/* 撞色条纹：分类色条 / 装饰分隔 */
+/* 水墨渐变条纹：墨 → 赭石 → 山青 → 朱砂（克制的国风色带） */
 .clash-stripe {
-  height: 6px;
+  height: 3px;
   border-radius: 999px;
   background: linear-gradient(
     90deg,
-    #b2fc06 0%,
-    #ed35f9 22%,
-    #8a3bec 44%,
-    #81fcff 66%,
-    #f9d77c 84%,
-    #012696 100%
+    #2b2a28 0%,
+    #9c6b3f 30%,
+    #6d7f6d 60%,
+    #b3432f 100%
   );
 }
 
-/* 撞色渐变文字（用于大标题强调） */
+/* 国风渐变文字（大标题强调：墨 → 赭石 → 朱砂） */
 .clash-text-gradient {
-  background: linear-gradient(96deg, #012696 0%, #8a3bec 38%, #ed35f9 68%, #b2fc06 100%);
+  background: linear-gradient(96deg, #2b2a28 0%, #9c6b3f 55%, #b3432f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* 卡片：撞色描边 + 硬边投影（底色/描边/投影均随主题翻转） */
+/* 卡片：柔和阴影 + 细描边（水墨的克制，替代硬边投影） */
 .clash-card {
   background: var(--paper-card);
-  border: 2px solid var(--ink-line);
-  border-radius: 20px;
-  box-shadow: 4px 4px 0 0 var(--ink-line);
+  border: 1px solid rgba(var(--ink-rgb), 0.10);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(43, 42, 40, 0.06);
   transition:
-    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .clash-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 0 var(--ink-line);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(43, 42, 40, 0.10);
 }
 .clash-card:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 0 var(--ink-line);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(43, 42, 40, 0.06);
 }
 
-/* 撞色块上的文字：无论亮/暗模式都强制为墨色（撞色块本身明度不变，需深字保证对比度） */
+/* 深色块上的文字：暗色模式下跟随主题翻转（原撞色块强制墨字改为随主题） */
 .on-clash,
 .on-clash * {
-  color: #12121a !important;
+  color: var(--ink-line) !important;
 }
 
-/* 键盘可达性：统一的焦点环 */
+/* 键盘可达性：统一的焦点环（朱砂色） */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 3px solid #8a3bec;
+  outline: 2px solid var(--accent-cinnabar);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -212,9 +220,9 @@ a,
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(var(--ink-rgb), 0.06) 25%,
-    rgba(var(--ink-rgb), 0.12) 37%,
-    rgba(var(--ink-rgb), 0.06) 63%
+    rgba(var(--ink-rgb), 0.05) 25%,
+    rgba(var(--ink-rgb), 0.10) 37%,
+    rgba(var(--ink-rgb), 0.05) 63%
   );
   background-size: 500px 100%;
   animation: shimmer 1.6s linear infinite;
