@@ -1,5 +1,5 @@
 /**
- * 活动评价模型：event_reviews 表 SQL 封装（v4）。
+ * 活动评价模型：event_reviews 表 SQL 封装。
  * 一活动一人一评（UNIQUE(event_id, user_id)）；仅活动结束后、报名成功（approved）用户可评。
  */
 const db = require('../db/connection');

@@ -1,5 +1,5 @@
 /**
- * 个人资料：学号（只读）+ 完善姓名/手机号 + 修改密码卡片（F1）+ 邮箱卡片（F3 联动绑定/换绑）。
+ * 个人资料：学号（只读）+ 完善姓名/手机号 + 修改密码卡片+ 邮箱卡片（联动绑定/换绑）。
  *
  * 视觉：撞色圆形头像（首字）+ 资料项卡片列表。
  */
@@ -252,7 +252,7 @@ export default function Profile() {
         </Button>
       </section>
 
-      {/* 修改密码卡片（F1） */}
+      {/* 修改密码卡片 */}
       <section className="clash-card space-y-4 p-4 md:p-6">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.lemon }} />
@@ -295,7 +295,7 @@ export default function Profile() {
         </Button>
       </section>
 
-      {/* 邮箱卡片（F3 联动：绑定后可用于找回密码） */}
+      {/* 邮箱卡片（联动：绑定后可用于找回密码） */}
       <section className="clash-card space-y-4 p-4 md:p-6">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.cyan }} />

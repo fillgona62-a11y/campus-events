@@ -1,6 +1,6 @@
 /**
  * 我的报名：即将开始 / 已结束 Tab，可查看详情或取消报名（截止前）。
- * v2：候补中展示顺位；已报名成功活动展示核销凭证提示（F4/F5）。
+ * 候补中展示顺位；已报名成功活动展示核销凭证提示。
  *
  * 视觉：列表项撞色卡片化（左色块封面 + 状态徽标），三态齐全。
  */
@@ -74,7 +74,7 @@ export default function MyRegistrations() {
     }
   };
 
-  // 学生自助定位签到（v5）：获取当前位置 → 提交签到
+  // 学生自助定位签到：获取当前位置 → 提交签到
   const handleSelfCheckin = async (item) => {
     setCheckingInId(item.id);
     try {
@@ -164,7 +164,7 @@ export default function MyRegistrations() {
                     {formatTimeRange(item.start_time, item.end_time)}
                   </p>
                   <p className="text-xs font-semibold text-ink-mute">{item.location}</p>
-                  {/* 定位签到（v5）：已报名成功，活动进行中可定位签到 */}
+                  {/* 定位签到：已报名成功，活动进行中可定位签到 */}
                   {item.status === 'approved' && (
                     item.checked_in === 1 ? (
                       <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink on-clash">

@@ -1,5 +1,5 @@
 /**
- * 提醒发送记录模型：reminder_logs 表 SQL 封装（v4）。
+ * 提醒发送记录模型：reminder_logs 表 SQL 封装。
  * UNIQUE(event_id, kind) 保证同一活动的同一种提醒只发一次。
  */
 const db = require('../db/connection');

@@ -57,7 +57,7 @@ function review(req, res, next) {
   }
 }
 
-/** PUT /registrations/:id/waitlist/promote 手动提升候补（F5，发布者/管理员） */
+/** PUT /registrations/:id/waitlist/promote 手动提升候补（发布者/管理员） */
 function promoteWaitlist(req, res, next) {
   try {
     const id = parseId(req.params.id);
@@ -69,7 +69,7 @@ function promoteWaitlist(req, res, next) {
   }
 }
 
-/** POST /registrations/:id/waitlist/remove 移出候补（F5，发布者/管理员） */
+/** POST /registrations/:id/waitlist/remove 移出候补（发布者/管理员） */
 function removeWaitlist(req, res, next) {
   try {
     const id = parseId(req.params.id);

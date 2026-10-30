@@ -287,7 +287,7 @@ function myComments(user, query) {
   return commentModel.listByUser(user.id, query);
 }
 
-/** 论坛活跃度概览（v4 数据大屏用）：帖子/评论/点赞总数 */
+/** 论坛活跃度概览：帖子/评论/点赞总数 */
 function forumStats() {
   const db = require('../db/connection');
   const post = db.prepare("SELECT COUNT(*) AS c, COALESCE(SUM(like_count),0) AS likes FROM posts WHERE status = 'active'").get();

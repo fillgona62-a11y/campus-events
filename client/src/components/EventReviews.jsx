@@ -1,5 +1,5 @@
 /**
- * EventReviews.jsx — 活动评价区块（v4）
+ * EventReviews.jsx — 活动评价区块
  * 活动结束后：报名成功用户可打分（1~5 星）+ 留言；所有人可见评价列表与平均分。
  */
 import { useEffect, useState } from 'react';

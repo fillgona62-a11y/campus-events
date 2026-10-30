@@ -13,12 +13,12 @@ export function reviewRegistration(id, action) {
   return client.put(`/registrations/${id}/review`, { action });
 }
 
-/** 手动提升候补（F5，发布者/管理员）→ {registration} */
+/** 手动提升候补（发布者/管理员）→ {registration} */
 export function promoteWaitlist(id) {
   return client.put(`/registrations/${id}/waitlist/promote`);
 }
 
-/** 移出候补（F5，发布者/管理员）→ null */
+/** 移出候补（发布者/管理员）→ null */
 export function removeWaitlist(id) {
   return client.post(`/registrations/${id}/waitlist/remove`);
 }

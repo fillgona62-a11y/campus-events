@@ -9,10 +9,10 @@ const REG_STATUS_TEXT = {
   approved: '已成功',
   rejected: '已拒绝',
   cancelled: '已取消',
-  waitlisted: '候补中', // v2 新增
+  waitlisted: '候补中', // 新增
 };
 
-/** 核销状态中文文案（v2 新增列） */
+/** 核销状态中文文案 */
 const CHECKED_IN_TEXT = { 0: '未核销', 1: '已核销' };
 
 /** CSV 单元格转义：统一加双引号并转义内部引号，防逗号/换行破坏结构 */

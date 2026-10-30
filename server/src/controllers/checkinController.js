@@ -1,7 +1,6 @@
 /**
- * 核销控制器（v5 定位签到）：定位签到、核销统计的请求编排。
+ * 核销控制器：定位签到、核销统计的请求编排。
  * 权限口径与报名名单一致：活动发布者或管理员。
- * v5 起移除口令生成/查看（彻底替换为定位签到）。
  */
 const checkinService = require('../services/checkinService');
 const { ApiError, ok } = require('../utils/response');

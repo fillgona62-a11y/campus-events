@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 );
 
-// PWA（F10）：生产环境注册 service worker（开发期不注册，避免缓存干扰热更新）
+// PWA：生产环境注册 service worker（开发期不注册，避免缓存干扰热更新）
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {

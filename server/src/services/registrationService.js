@@ -1,5 +1,5 @@
 /**
- * 报名服务：报名/取消/审核事务逻辑（防超卖防重复核心）+ 候补递补（F5）。
+ * 报名服务：报名/取消/审核事务逻辑（防超卖防重复核心）+ 候补递补。
  *
  * 防重复：UNIQUE(event_id, user_id) 数据库兜底 + 服务层前置校验。
  * 防超卖：直接报名、审核通过、递补占用全部在事务内执行单条条件 UPDATE
@@ -7,7 +7,7 @@
  *        SQLite 单写者串行化天然避免超卖。
  * 名额时机：require_approval=0 报名时立即占名额；require_approval=1 时
  *          名额延迟到发布者 approve 才原子占用。
- * 候补（v2）：直接报名活动满员时不再报错，转入 waitlisted 并返回顺位；
+ * 候补：直接报名活动满员时不再报错，转入 waitlisted 并返回顺位；
  *          取消 approved 时同事务自动递补最早候补者（占名额失败则保留候补）；
  *          组织者/管理员可手动提升（占名额 + 转正）或移出（转 cancelled）。
  */
@@ -65,7 +65,7 @@ function register(userId, eventId, remark) {
       return { registration, waitlisted: false, waitlist_position: null };
     }
 
-    // 直接报名：事务内原子占用名额，影响 0 行即名额已满 → 转候补（F5）
+    // 直接报名：事务内原子占用名额，影响 0 行即名额已满 → 转候补
     const affected = eventModel.bumpApprovedCount(eventId, 1, true);
     if (affected === 0) {
       const registration = registrationModel.upsert({
@@ -208,7 +208,7 @@ function assertEventManagePermission(operator, event) {
 }
 
 /**
- * 手动提升候补（F5，发布者/管理员）：
+ * 手动提升候补（发布者/管理员）：
  * 校验 status=waitlisted（否则 40905）→ 事务内条件 UPDATE 占名额（失败 40903）
  * → 转 approved → 站内信通知。
  */
@@ -242,7 +242,7 @@ function promoteWaitlist(operator, registrationId) {
 }
 
 /**
- * 移出候补（F5，发布者/管理员）：
+ * 移出候补（发布者/管理员）：
  * 校验 status=waitlisted（否则 40905）→ 置 cancelled（不发站内信）。
  */
 function removeWaitlist(operator, registrationId) {

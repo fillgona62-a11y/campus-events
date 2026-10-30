@@ -13,22 +13,22 @@ export function listEvents(params) {
   return client.get('/events', { params });
 }
 
-/** 热门活动（v4）：{limit?} → {list} */
+/** 热门活动：{limit?} → {list} */
 export function listHotEvents(params) {
   return client.get('/events/hot', { params });
 }
 
-/** 活动评价列表（v4，公开）→ {summary:{count,avg}, list} */
+/** 活动评价列表→ {summary:{count,avg}, list} */
 export function listReviews(id) {
   return client.get(`/events/${id}/reviews`);
 }
 
-/** 我的评价（v4）→ {review|null} */
+/** 我的评价→ {review|null} */
 export function myReview(id) {
   return client.get(`/events/${id}/my-review`);
 }
 
-/** 提交评价（v4）：{rating, content?} */
+/** 提交评价：{rating, content?} */
 export function submitReview(id, data) {
   return client.post(`/events/${id}/review`, data);
 }
@@ -63,7 +63,7 @@ export function listRegistrations(id, params) {
   return client.get(`/events/${id}/registrations`, { params });
 }
 
-/** 单活动报名趋势（F8）：{days?} → {days:[{date,count}], total} */
+/** 单活动报名趋势：{days?} → {days:[{date,count}], total} */
 export function registrationsTrend(id, params) {
   return client.get(`/events/${id}/registrations/trend`, { params });
 }
@@ -99,7 +99,7 @@ export function uploadCover(file) {
 }
 
 /**
- * 压缩图片后上传封面（v4：前端 Canvas 压缩，手机大图也能快速上传）。
+ * 压缩图片后上传封面（前端 Canvas 压缩，手机大图也能快速上传）。
  * 超过 2MB 的图片先等比压缩到最长边 1600px、质量 0.8，仍超限再降质量。
  * @param {File} file 原始图片文件
  * @returns {Promise<{url:string}>}
@@ -152,7 +152,7 @@ function compressImage(file, maxEdge, quality) {
   });
 }
 
-// ===== 签到核销（v5 定位签到）=====
+// ===== 签到核销=====
 
 /** 定位签到（组织者/管理员代签）：{student_id, lat, lng} → {student_id, name, checked_in_at, distance_m} */
 export function checkin(eventId, data) {

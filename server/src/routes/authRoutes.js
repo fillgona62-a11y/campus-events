@@ -10,7 +10,7 @@ const { loginLimiter, registerLimiter, emailCodeLimiter } = require('../middlewa
 
 const router = express.Router();
 
-// 学号：3~32 位字母/数字/下划线；密码 6~64 位；手机号可为空或 11 位大陆手机号；邮箱必填（F3）
+// 学号：3~32 位字母/数字/下划线；密码 6~64 位；手机号可为空或 11 位大陆手机号；邮箱必填
 // 图形验证码字段：注册必须带，先过人机检测再发邮箱验证码（与线上一致）
 const captchaFields = {
   captcha_id: z.string({ required_error: '请获取图形验证码' }).trim().min(1, '请获取图形验证码'),
@@ -59,7 +59,7 @@ const loginSchema = z.object({
   password: z.string({ required_error: '密码不能为空' }).min(1, '密码不能为空'),
 });
 
-// 小程序登录：免图形验证码（v6）
+// 小程序登录：免图形验证码
 const loginMiniappSchema = z.object({
   student_id: z.string({ required_error: '学号不能为空' }).trim().min(1, '学号不能为空'),
   password: z.string({ required_error: '密码不能为空' }).min(1, '密码不能为空'),
@@ -131,7 +131,7 @@ const bindEmailSchema = z.object({
 
 router.post('/register', registerLimiter, validate(registerSchema), authController.register);
 router.post('/login', loginLimiter, validate(loginSchema), authController.login);
-// 小程序登录（v6）：免图形验证码，仍限流防暴力破解
+// 小程序登录：免图形验证码，仍限流防暴力破解
 router.post('/login-miniapp', loginLimiter, validate(loginMiniappSchema), authController.loginMiniapp);
 // 发送邮箱验证码：register/reset_password 免登录；bind_email 需登录（optionalAuth 挂载用户，控制器内校验）
 router.post(

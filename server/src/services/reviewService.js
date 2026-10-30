@@ -1,5 +1,5 @@
 /**
- * 活动评价服务（v4）：活动结束后、报名成功（approved）用户可评分 + 留言。
+ * 活动评价服务：活动结束后、报名成功（approved）用户可评分 + 留言。
  * 规则：一活动一人一评（重复提交覆盖旧评）；评分 1~5 整数；内容 ≤500 字纯文本。
  */
 const reviewModel = require('../models/reviewModel');

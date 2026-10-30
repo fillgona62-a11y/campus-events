@@ -1,5 +1,5 @@
 /**
- * 管理后台 - 数据概览：用户数 / 活动数 / 报名数 + 全站近 30 天报名趋势图（F8）。
+ * 管理后台 - 数据概览：用户数 / 活动数 / 报名数 + 全站近 30 天报名趋势图。
  *
  * 活动口径（已上架 approved 为前提，均不含 下架/待审/拒绝/取消/已结束）：
  *   活动总数 = 现存活动（已上架且未结束）
@@ -45,7 +45,7 @@ export default function Dashboard() {
     overviewTrend({ days: 30 })
       .then((d) => setTrend(d))
       .catch(() => {});
-    // 数据大屏聚合（v4）：分类分布 + 用户增长 + 论坛活跃
+    // 数据大屏聚合：分类分布 + 用户增长 + 论坛活跃
     analytics({ days: 30 })
       .then((d) => setAnalyticsData(d))
       .catch(() => {});
@@ -107,7 +107,7 @@ export default function Dashboard() {
         <TrendChart days={trend.days} title={`全站报名趋势（近 ${trend.days.length} 天）`} />
       </div>
 
-      {/* ── 数据大屏（v4）：分类分布 + 用户增长 + 论坛活跃 ────────── */}
+      {/* ── 数据大屏：分类分布 + 用户增长 + 论坛活跃 ────────── */}
       {analyticsData && (
         <div className="mt-4 space-y-4">
           {/* 用户增长趋势 */}

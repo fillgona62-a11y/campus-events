@@ -30,7 +30,7 @@ router.put(
   validate(reviewSchema),
   registrationController.review
 );
-// 候补手动提升 / 移出（F5，发布者/管理员；权限在服务层校验）
+// 候补手动提升 / 移出（发布者/管理员；权限在服务层校验）
 router.put(
   '/registrations/:id/waitlist/promote',
   requireAuth,

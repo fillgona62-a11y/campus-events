@@ -41,7 +41,7 @@ export default function Home() {
     listCategories()
       .then((d) => setCategories(d.list))
       .catch(() => {});
-    // 热门活动（v4）：仅首页首屏拉取一次
+    // 热门活动：仅首页首屏拉取一次
     listHotEvents({ limit: 6 })
       .then((d) => setHot(d.list))
       .catch(() => {});
@@ -121,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 热门推荐（v4）────────────────────────────────────── */}
+      {/* ── 热门推荐────────────────────────────────────── */}
       {hot.length > 0 && (
         <section className="mb-5">
           <div className="mb-2 flex items-center gap-2">

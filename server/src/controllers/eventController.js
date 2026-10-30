@@ -53,7 +53,7 @@ function listPublic(req, res, next) {
   }
 }
 
-/** GET /events/hot 热门活动（v4：按报名数降序，首页推荐位） */
+/** GET /events/hot 热门活动（按报名数降序，首页推荐位） */
 function listHot(req, res, next) {
   try {
     let limit = parseInt(req.query.limit, 10);
@@ -167,7 +167,7 @@ function listRegistrations(req, res, next) {
 }
 
 /**
- * GET /events/:id/registrations/trend 单活动报名趋势（F8，发布者/管理员）。
+ * GET /events/:id/registrations/trend 单活动报名趋势（发布者/管理员）。
  * Query：days?（默认 30，1~90）；口径同全站趋势（有效报名，UTC+8 归日期）。
  */
 function registrationsTrend(req, res, next) {

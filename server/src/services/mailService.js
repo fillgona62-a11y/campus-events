@@ -75,7 +75,7 @@ async function sendCodeMail(email, code, purpose, expireMinutes) {
 }
 
 /**
- * 发送提醒邮件（v4：活动开始/报名截止提醒）。
+ * 发送提醒邮件（活动开始/报名截止提醒）。
  * 与验证码邮件共用 transport；DEV_ECHO 或未配置 SMTP 时仅日志、不抛错。
  * @param {string} email 收件邮箱
  * @param {string} subject 主题

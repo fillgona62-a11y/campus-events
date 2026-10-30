@@ -1,6 +1,6 @@
 /**
  * 单活动报名名单管理：状态筛选 + 审核（通过/拒绝）+ 候补提升/移出 + 核销状态筛选
- * + 核销台入口 + CSV 导出（F4/F5）。
+ * + 核销台入口 + CSV 导出。
  * 注：报名趋势图在 T04 由 TrendChart 嵌入（见 registrationsTrend 数据源）。
  *
  * 视觉：撞色标题 + 撞色卡片包裹表格区域。
@@ -58,7 +58,7 @@ export default function EventRegistrations() {
       .catch((err) => showToast(err.message, 'error'));
   }, [id]);
 
-  // 单活动报名趋势（F8，默认近 30 天）
+  // 单活动报名趋势（默认近 30 天）
   useEffect(() => {
     registrationsTrend(id, { days: 30 })
       .then((d) => setTrend(d))

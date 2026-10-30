@@ -1,7 +1,7 @@
 /**
  * 用户模型：users 表 SQL 封装。所有查询参数化，防 SQL 注入。
- * v2 扩展：email / email_verified / failed_login_count / locked_until 读写，
- * 按邮箱查人、登录失败计数与锁定（F12）、改密/重置时清零锁定态。
+ * 扩展：email / email_verified / failed_login_count / locked_until 读写，
+ * 按邮箱查人、登录失败计数与锁定、改密/重置时清零锁定态。
  */
 const db = require('../db/connection');
 
@@ -28,14 +28,14 @@ function findById(id) {
   return db.prepare('SELECT * FROM users WHERE id = ?').get(id);
 }
 
-/** 按绑定邮箱查人（F2 找回密码 / F3 邮箱唯一性） */
+/** 按绑定邮箱查人（找回密码 / F3 邮箱唯一性） */
 function findByEmail(email) {
   if (!email) return null;
   return db.prepare('SELECT * FROM users WHERE email = ?').get(email);
 }
 
 /**
- * 创建用户（v2：支持注册时直接带 email，email_verified=1）
+ * 创建用户（支持注册时直接带 email，email_verified=1）
  * @param {{student_id:string,name:string,phone:string|null,password_hash:string,role?:string,email?:string|null}} data
  */
 function create(data) {
@@ -73,13 +73,13 @@ function setStatus(id, status) {
   db.prepare('UPDATE users SET status = ? WHERE id = ?').run(status, id);
 }
 
-/** 绑定/更换邮箱（F3 联动，需登录） */
+/** 绑定/更换邮箱（联动，需登录） */
 function updateEmail(id, email) {
   db.prepare('UPDATE users SET email = ?, email_verified = 1 WHERE id = ?').run(email, id);
   return findById(id);
 }
 
-/** 更新密码哈希，并清零登录失败计数与锁定态（F1/F2/F12 联动） */
+/** 更新密码哈希，并清零登录失败计数与锁定态（联动） */
 function updatePasswordHash(id, passwordHash) {
   db.prepare(
     'UPDATE users SET password_hash = ?, failed_login_count = 0, locked_until = NULL WHERE id = ?'
@@ -131,7 +131,7 @@ function count() {
 }
 
 /**
- * 按日注册用户趋势（v4 数据大屏用）：近 N 天每天新增用户数（UTC+8 归日期）。
+ * 按日注册用户趋势：近 N 天每天新增用户数（UTC+8 归日期）。
  * @param {number} days 1~90
  */
 function trendByDay(days) {

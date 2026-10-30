@@ -18,7 +18,7 @@ function findById(id) {
 
 /**
  * 公开活动列表：仅 status='approved' 且未结束（end_time > 当前），按开始时间升序。
- * v2：支持 start_from/start_to（ISO 时间，日历页拉整月活动；不传时行为与 v1 一致）。
+ * 支持 start_from/start_to（ISO 时间，日历页拉整月活动；不传时返回全部）。
  * @param {{keyword?:string, category_id?:number, start_from?:string, start_to?:string, page:number, page_size:number}} filters
  */
 function listPublic({ keyword, category_id, start_from, start_to, page, page_size }) {
@@ -225,13 +225,13 @@ function countPending() {
   return db.prepare("SELECT COUNT(*) AS c FROM events WHERE status = 'pending'").get().c;
 }
 
-/** 读取活动核销口令（F4，null 表示未生成） */
+/** 读取活动核销口令（null 表示未生成） */
 function getCheckinCode(id) {
   const row = db.prepare('SELECT checkin_code FROM events WHERE id = ?').get(id);
   return row ? row.checkin_code : null;
 }
 
-/** 写入/覆盖核销口令（F4：重复调用覆盖旧值，旧口令立即失效） */
+/** 写入/覆盖核销口令（重复调用即覆盖，仅当前口令有效） */
 function setCheckinCode(id, code) {
   const now = new Date().toISOString();
   db.prepare('UPDATE events SET checkin_code = ?, updated_at = ? WHERE id = ?').run(code, now, id);
@@ -249,7 +249,7 @@ function setPinned(id, pinned) {
 }
 
 /**
- * 热门活动（v4）：已上架且未结束，按 approved_count 降序取前 N 个。
+ * 热门活动：已上架且未结束，按 approved_count 降序取前 N 个。
  * 供首页「热门推荐」位使用。
  * @param {number} limit 返回条数（默认 6）
  */
@@ -264,7 +264,7 @@ function listHot(limit = 6) {
 }
 
 /**
- * 即将开始的活动（v4，提醒任务用）：已上架、开始时间落在 [now, now+windowMinutes] 区间。
+ * 即将开始的活动：已上架、开始时间落在 [now, now+windowMinutes] 区间。
  * @param {number} windowMinutes 时间窗（分钟）
  */
 function listStartingSoon(windowMinutes) {
@@ -278,7 +278,7 @@ function listStartingSoon(windowMinutes) {
 }
 
 /**
- * 报名即将截止的活动（v4，提醒任务用）：已上架、报名截止时间落在 [now, now+windowMinutes]。
+ * 报名即将截止的活动：已上架、报名截止时间落在 [now, now+windowMinutes]。
  */
 function listDeadlineSoon(windowMinutes) {
   const now = new Date().toISOString();

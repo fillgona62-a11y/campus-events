@@ -1,7 +1,7 @@
 /**
  * 报名模型：registrations 表 SQL 封装。
  * UNIQUE(event_id, user_id) 防重复；upsert 支持“取消后重新报名”（状态重置、核销态重置）。
- * v2 扩展：候补顺位计算（SQL 子查询）、核销字段读写、报名趋势统计（UTC+8 归日期）。
+ * 扩展：候补顺位计算（SQL 子查询）、核销字段读写、报名趋势统计（UTC+8 归日期）。
  */
 const db = require('../db/connection');
 const { REG_STATUS } = require('../utils/constants');
@@ -42,7 +42,7 @@ function updateStatus(id, status) {
   );
 }
 
-/** 标记已核销（F4，checked_in=1 + 核销时间） */
+/** 标记已核销（checked_in=1 + 核销时间） */
 function markCheckedIn(id, checkedInAt) {
   db.prepare('UPDATE registrations SET checked_in = 1, checked_in_at = ? WHERE id = ?').run(
     checkedInAt,
@@ -79,7 +79,7 @@ const WAITLIST_POSITION_SQL = `CASE WHEN r.status = '${REG_STATUS.WAITLISTED}'
 
 /**
  * 单活动报名名单（含用户信息），按报名时间升序。
- * v2：支持 checked_in 核销状态筛选；行含 checked_in / checked_in_at；
+ * 支持 checked_in 核销状态筛选；行含 checked_in / checked_in_at；
  * waitlisted 行附 waitlist_position 顺位。
  */
 function listByEvent(eventId, { status, checked_in, page, page_size }) {
@@ -162,7 +162,7 @@ function listUserIdsByEventAndStatus(eventId, status) {
 }
 
 /**
- * 某活动报名成功用户列表（含邮箱，v4 提醒任务用）。
+ * 某活动报名成功用户列表（含邮箱，提醒任务用）。
  * 仅返回 approved 且用户有绑定邮箱的记录。
  * @returns {Array<{user_id:number, email:string, name:string}>}
  */
@@ -177,7 +177,7 @@ function listApprovedWithEmail(eventId) {
 }
 
 /**
- * 各分类报名人数分布（v4 数据大屏用）：按活动分类聚合已成功报名数。
+ * 各分类报名人数分布：按活动分类聚合已成功报名数。
  * @returns {Array<{category_name:string, count:number}>}
  */
 function countByCategory() {
@@ -238,7 +238,7 @@ function count() {
 }
 
 /**
- * 单活动近 N 天报名趋势（F8）：当日创建且 status ∈ pending/approved/waitlisted 计为有效报名，
+ * 单活动近 N 天报名趋势：当日创建且 status ∈ pending/approved/waitlisted 计为有效报名，
  * 按北京时间（UTC+8）归日期，无数据日补 0。
  * @param {number} eventId
  * @param {number} days 1~90
@@ -259,7 +259,7 @@ function trendByEvent(eventId, days) {
 }
 
 /**
- * 全站近 N 天报名趋势（F8）：口径同 trendByEvent。
+ * 全站近 N 天报名趋势：口径同 trendByEvent。
  * @param {number} days 1~90
  * @returns {{days:Array<{date:string,count:number}>, total:number}}
  */

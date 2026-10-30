@@ -115,7 +115,7 @@ function cancel(organizerId, eventId) {
 
 /**
  * 管理员审核活动：仅 pending 状态可审。
- * approve → approved；reject → rejected（必填理由）。结果站内信通知发布者，并写审计日志（F6）。
+ * approve → approved；reject → rejected（必填理由）。结果站内信通知发布者，并写审计日志。
  */
 function review(adminId, eventId, action, reason) {
   const event = eventModel.findById(eventId);
@@ -147,7 +147,7 @@ function review(adminId, eventId, action, reason) {
 }
 
 /**
- * 管理员下架活动：仅 approved 状态可下架；下架后对公众不可见，站内信通知发布者，并写审计日志（F6）。
+ * 管理员下架活动：仅 approved 状态可下架；下架后对公众不可见，站内信通知发布者，并写审计日志。
  */
 function offline(adminId, eventId) {
   const event = eventModel.findById(eventId);

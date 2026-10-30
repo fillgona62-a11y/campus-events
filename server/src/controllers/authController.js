@@ -31,7 +31,7 @@ function assertCaptcha(req) {
 }
 
 /**
- * POST /auth/email-code/send 发送/重发邮箱验证码（F3/F2/F3 联动）。
+ * POST /auth/email-code/send 发送/重发邮箱验证码（联动）。
  * - register：只需 email；邮箱已被注册/绑定 → 40906。
  * - reset_password：需 student_id + email；学号不存在或邮箱不匹配时**不发码**，
  *   统一中性响应（防枚举）。
@@ -73,7 +73,7 @@ async function sendEmailCode(req, res, next) {
 }
 
 /**
- * POST /auth/register 注册（v2 改造 + 线上 captcha 双保险）：
+ * POST /auth/register 注册：
  * 图形验证码校验 → 学号查重（40901）→ 邮箱查重（40906）→ 验证码校验（40907）
  * → 建用户（email_verified=1）→ 签发 token。
  */
@@ -105,7 +105,7 @@ async function register(req, res, next) {
 }
 
 /**
- * POST /auth/login 登录（v2：账号级锁定 F12 + 线上 captcha 双保险）。
+ * POST /auth/login 登录（账号级锁定 F12 + 线上 captcha 双保险）。
  * 流程：图形验证码 → locked_until 未到期 → 423/40302；密码错误 → 计数+1，满 5 锁定 15 分钟；
  * 密码正确 → 清零失败计数与锁定态并签发 token。
  */
@@ -170,7 +170,7 @@ function getCaptcha(req, res, next) {
 }
 
 /**
- * POST /auth/login-miniapp 小程序登录（v6）：免图形验证码，但保留账号锁定与密码校验。
+ * POST /auth/login-miniapp 小程序登录：免图形验证码，但保留账号锁定与密码校验。
  * 小程序环境自带微信账号体系，可信度高于裸网页，且登录限流已防暴力破解，
  * 故不再要求图形验证码（小程序无法便捷显示 SVG 验证码）。
  */
@@ -242,7 +242,7 @@ function updateMe(req, res, next) {
 }
 
 /**
- * POST /auth/password 自助修改密码（F1，需登录）。
+ * POST /auth/password 自助修改密码（需登录）。
  * 旧密码 bcrypt 比对（失败 40002）→ 写新哈希 + 清零锁定 → 站内信通知本人。
  * 当前登录态保持（JWT 不涉及密码，不踢自己下线）。
  */
@@ -272,7 +272,7 @@ function changePassword(req, res, next) {
 }
 
 /**
- * POST /auth/password/reset 忘记密码重置（F2，免登录）。
+ * POST /auth/password/reset 忘记密码重置（免登录）。
  * 学号+邮箱匹配校验（不匹配 40001）→ 验证码校验（40907）→ 写新哈希 + 清零锁定 → 站内信通知。
  */
 function resetPassword(req, res, next) {
@@ -302,7 +302,7 @@ function resetPassword(req, res, next) {
 }
 
 /**
- * PUT /users/me/email 绑定/更换邮箱（F3 联动，需登录）。
+ * PUT /users/me/email 绑定/更换邮箱（联动，需登录）。
  * 验证码校验（40907）→ 邮箱唯一性（他人已绑 40906）→ 更新 email + email_verified=1。
  */
 function bindEmail(req, res, next) {

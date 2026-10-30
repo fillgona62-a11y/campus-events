@@ -29,7 +29,7 @@ export function updateMe(data) {
 }
 
 /**
- * 发送邮箱验证码（F3/F2/F3 联动）。
+ * 发送邮箱验证码（联动）。
  * @param {{email:string, purpose:'register'|'reset_password'|'bind_email', student_id?:string}} data
  * → {expires_in, dev_code?}
  */

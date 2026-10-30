@@ -11,10 +11,10 @@ CREATE TABLE IF NOT EXISTS users (
   role          TEXT    NOT NULL DEFAULT 'user',  -- user / admin
   status        TEXT    NOT NULL DEFAULT 'active',-- active / disabled
   created_at    TEXT    NOT NULL,
-  -- ===== 增量 v2（老用户为空，不影响；存量库升级走 migrate.js 幂等补齐）=====
+  -- ===== 增量（老用户为空，不影响；存量库升级走 migrate.js 幂等补齐）=====
   email             TEXT,                             -- 绑定邮箱（可空，唯一索引见 migrate.js）
   email_verified    INTEGER NOT NULL DEFAULT 0,       -- 邮箱是否已验证
-  failed_login_count INTEGER NOT NULL DEFAULT 0,      -- 登录失败计数（F12 锁定）
+  failed_login_count INTEGER NOT NULL DEFAULT 0,      -- 登录失败计数（锁定）
   locked_until      TEXT                               -- 锁定到期时间（ISO UTC，NULL=未锁定）
 );
 
@@ -44,16 +44,16 @@ CREATE TABLE IF NOT EXISTS events (
   reject_reason   TEXT,                              -- 审核拒绝理由
   created_at      TEXT    NOT NULL,
   updated_at      TEXT    NOT NULL,
-  -- ===== 增量 v2（存量库升级走 migrate.js 幂等补齐）=====
+  -- ===== 增量（存量库升级走 migrate.js 幂等补齐）=====
   checkin_code    TEXT,                             -- 核销口令（可空，一活动一口令，F4）
-  -- ===== 增量 v3：活动置顶（老活动 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  -- ===== 增量 活动置顶（老活动 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
   is_pinned       INTEGER NOT NULL DEFAULT 0,       -- 是否置顶（1=置顶，公开列表排最前）
   pinned_at       TEXT,                             -- 置顶时间（ISO UTC，NULL=未置顶）
-  -- ===== 增量 v5：定位签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  -- ===== 增量 定位签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
   lat             REAL,                              -- 活动地点纬度（-90~90，NULL=未设置定位）
   lng             REAL,                              -- 活动地点经度（-180~180，NULL=未设置定位）
   checkin_radius  REAL    NOT NULL DEFAULT 0.2,      -- 签到允许半径（公里，默认 0.2=200 米；0=不限制）
-  -- ===== 增量 v6：蓝牙信标签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  -- ===== 增量 蓝牙信标签到（老活动为 NULL 不影响；存量库升级走 migrate.js 幂等补齐）=====
   beacon_uuid     TEXT                               -- 蓝牙信标 UUID（大写 36 位；NULL=未启用信标签到）
 );
 
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS registrations (
   status     TEXT    NOT NULL,                       -- pending/approved/rejected/cancelled/waitlisted
   created_at TEXT    NOT NULL,
   updated_at TEXT    NOT NULL,
-  -- ===== 增量 v2（存量库升级走 migrate.js 幂等补齐）=====
-  checked_in    INTEGER NOT NULL DEFAULT 0,          -- 是否已核销（F4）
+  -- ===== 增量（存量库升级走 migrate.js 幂等补齐）=====
+  checked_in    INTEGER NOT NULL DEFAULT 0,          -- 是否已核销
   checked_in_at TEXT                                 -- 核销时间（ISO UTC）
 );
 
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS posts (
   status        TEXT    NOT NULL DEFAULT 'active', -- active / deleted
   created_at    TEXT    NOT NULL,
   updated_at    TEXT    NOT NULL,
-  -- ===== 增量 v3：论坛置顶（老帖 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
+  -- ===== 增量 论坛置顶（老帖 is_pinned=0 不影响；存量库升级走 migrate.js 幂等补齐）=====
   is_pinned     INTEGER NOT NULL DEFAULT 0,       -- 是否置顶（1=置顶，信息流排最前）
   pinned_at     TEXT                              -- 置顶时间（ISO UTC，NULL=未置顶）
 );
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS captchas (
 );
 CREATE INDEX IF NOT EXISTS idx_captchas_expires ON captchas(expires_at);
 
--- 邮箱验证码表（F3/F2/F3 联动共用，purpose 区分用途）
+-- 邮箱验证码表（联动共用，purpose 区分用途）
 CREATE TABLE IF NOT EXISTS email_codes (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   email      TEXT    NOT NULL,                    -- 接收邮箱
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS email_codes (
 -- （code_hash / used），此时建索引会因缺少 consumed 列而启动崩溃。
 -- 该索引统一由 db/migrate.js 在"旧表改名归档 + 建新表"之后创建。
 
--- 管理员操作日志表（F6，只读）
+-- 管理员操作日志表（只读）
 CREATE TABLE IF NOT EXISTS audit_logs (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   admin_id    INTEGER NOT NULL REFERENCES users(id),
@@ -200,12 +200,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_reg_event_user ON registrations(event_id, 
 CREATE INDEX IF NOT EXISTS idx_reg_user ON registrations(user_id, status);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
 
--- 增量索引（v2）：候补递补取首位候补（created_at ASC, id ASC）。
+-- 增量索引：候补递补取首位候补（created_at ASC, id ASC）。
 -- 注意：idx_users_email（users.email 唯一索引）不放在本文件——存量库在此处
 -- 尚无 email 列，须由 migrate.js 补齐列后再创建（幂等，见 db/migrate.js）。
 CREATE INDEX IF NOT EXISTS idx_reg_waitlist ON registrations(event_id, status, created_at);
 
--- ===== v4：活动评价（活动结束后，报名成功用户可打分 + 留言）=====
+-- ===== 活动评价（活动结束后，报名成功用户可打分 + 留言）=====
 CREATE TABLE IF NOT EXISTS event_reviews (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   event_id   INTEGER NOT NULL REFERENCES events(id),
@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS event_reviews (
 );
 CREATE INDEX IF NOT EXISTS idx_reviews_event ON event_reviews(event_id, created_at);
 
--- ===== v4：提醒发送记录（防重复发送：活动提醒/报名截止提醒）=====
+-- ===== 提醒发送记录（防重复发送：活动提醒/报名截止提醒）=====
 CREATE TABLE IF NOT EXISTS reminder_logs (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   event_id   INTEGER NOT NULL REFERENCES events(id),

@@ -14,7 +14,7 @@ app.listen(config.port, () => {
   console.log(`[server] API 前缀：http://localhost:${config.port}/api/v1`);
 });
 
-// 活动提醒定时任务（v4）：每 5 分钟扫描一次即将开始/即将截止的活动。
+// 活动提醒定时任务：每 5 分钟扫描一次即将开始/即将截止的活动。
 // 幂等（reminder_logs 防重复），提醒窗口默认 60 分钟，可用环境变量调整。
 if (!process.env.DISABLE_REMINDER) {
   const reminderService = require('./services/reminderService');

@@ -50,11 +50,11 @@ const eventSchema = z
       .refine((s) => s.startsWith('/uploads/'), '封面图路径不合法')
       .optional()
       .nullable(),
-    // 定位签到（v5）：lat/lng 成对出现；checkin_radius 单位公里
+    // 定位签到：lat/lng 成对出现；checkin_radius 单位公里
     lat: z.number().min(-90, '纬度不合法').max(90, '纬度不合法').optional().nullable(),
     lng: z.number().min(-180, '经度不合法').max(180, '经度不合法').optional().nullable(),
     checkin_radius: z.number().min(0, '签到半径不能为负').max(50, '签到半径过大').optional().nullable(),
-    // 蓝牙信标（v6）：大写 36 位 UUID，可空
+    // 蓝牙信标：大写 36 位 UUID，可空
     beacon_uuid: z
       .string()
       .trim()
@@ -101,7 +101,7 @@ router.get('/events', eventController.listPublic);
 router.get('/events/hot', eventController.listHot);
 router.get('/events/:id', optionalAuth, eventController.detail);
 
-// 活动评价（v4）
+// 活动评价
 router.get('/events/:id/reviews', reviewController.list);
 router.get('/events/:id/my-review', requireAuth, reviewController.myReview);
 router.post(

@@ -1,5 +1,5 @@
 /**
- * 活动评价控制器（v4）：提交评价（报名成功用户，活动结束后）、查询评价列表。
+ * 活动评价控制器：提交评价（报名成功用户，活动结束后）、查询评价列表。
  */
 const reviewService = require('../services/reviewService');
 const { ApiError, ok } = require('../utils/response');

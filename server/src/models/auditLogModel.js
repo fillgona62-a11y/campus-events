@@ -1,5 +1,5 @@
 /**
- * 管理员操作日志模型：audit_logs 表 SQL 封装（F6，只读查询 + 内部写入）。
+ * 管理员操作日志模型：audit_logs 表 SQL 封装（只读查询 + 内部写入）。
  * 写入统一走 auditService.log()，本模块不被其他业务直接调用。
  */
 const db = require('../db/connection');

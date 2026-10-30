@@ -31,7 +31,7 @@ function overview(req, res, next) {
   }
 }
 
-/** GET /admin/overview/trend 全站近 N 天报名趋势（F8） */
+/** GET /admin/overview/trend 全站近 N 天报名趋势 */
 function overviewTrend(req, res, next) {
   try {
     let days = parseInt(req.query.days, 10);
@@ -44,7 +44,7 @@ function overviewTrend(req, res, next) {
 }
 
 /**
- * GET /admin/analytics 数据大屏聚合（v4）：
+ * GET /admin/analytics 数据大屏聚合：
  * 分类报名分布 + 用户增长趋势 + 论坛活跃度概览。
  */
 function analytics(req, res, next) {
@@ -130,7 +130,7 @@ function setUserStatus(req, res, next) {
     const target = userModel.findById(id);
     if (!target) throw ApiError.notFound('用户不存在');
     userModel.setStatus(id, req.body.status);
-    // 审计日志（F6）：detail 只记录状态迁移，不存敏感信息
+    // 审计日志：detail 只记录状态迁移，不存敏感信息
     auditService.log(req.user.id, req.body.status === 'disabled' ? AUDIT_ACTION.USER_DISABLE : AUDIT_ACTION.USER_ENABLE, 'user', id, {
       from: target.status,
       to: req.body.status,
@@ -142,7 +142,7 @@ function setUserStatus(req, res, next) {
 }
 
 /**
- * PUT /admin/users/:id/password/reset 管理员重置用户密码（F1）。
+ * PUT /admin/users/:id/password/reset 管理员重置用户密码。
  * 禁止重置自己（40301）；生成 12 位临时密码（去易混字符）→ bcrypt 写入 →
  * 清零失败计数与锁定 → 站内信通知用户 → 审计 user_password_reset（禁存临时密码本身）。
  * 出参 temp_password 仅一次性返回，刷新不重现。
@@ -175,7 +175,7 @@ function resetUserPassword(req, res, next) {
   }
 }
 
-/** GET /admin/audit-logs 审计日志查询（F6，只读） */
+/** GET /admin/audit-logs 审计日志查询（只读） */
 function listAuditLogs(req, res, next) {
   try {
     const data = auditService.list({

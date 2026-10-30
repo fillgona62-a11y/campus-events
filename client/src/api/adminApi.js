@@ -38,22 +38,22 @@ export function setUserStatus(id, status) {
   return client.put(`/admin/users/${id}/status`, { status });
 }
 
-/** 管理员重置用户密码（F1）→ {temp_password, user}（临时密码一次性展示） */
+/** 管理员重置用户密码→ {temp_password, user}（临时密码一次性展示） */
 export function resetUserPassword(id) {
   return client.put(`/admin/users/${id}/password/reset`);
 }
 
-/** 审计日志查询（F6，只读）：{action?, target_type?, start_date?, end_date?, page, page_size} */
+/** 审计日志查询（只读）：{action?, target_type?, start_date?, end_date?, page, page_size} */
 export function listAuditLogs(params) {
   return client.get('/admin/audit-logs', { params });
 }
 
-/** 全站报名趋势（F8）：{days?} → {days:[{date,count}], total} */
+/** 全站报名趋势：{days?} → {days:[{date,count}], total} */
 export function overviewTrend(params) {
   return client.get('/admin/overview/trend', { params });
 }
 
-/** 数据大屏聚合（v4）：{days?} → {category_distribution, user_trend, forum} */
+/** 数据大屏聚合：{days?} → {category_distribution, user_trend, forum} */
 export function analytics(params) {
   return client.get('/admin/analytics', { params });
 }

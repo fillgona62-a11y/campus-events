@@ -42,7 +42,7 @@ export default function MainLayout() {
   const location = useLocation();
   const { token, user, setUser, logout } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState(null);
-  // 上次未读数（v4 桌面通知：检测新增通知时弹出系统通知）
+  // 上次未读数
   const lastUnreadRef = useRef(null);
 
   // 活动详情页自带底部固定报名栏，隐藏全局底部 Tab 避免遮挡
@@ -57,7 +57,7 @@ export default function MainLayout() {
     }
   }, [token, setUser]);
 
-  // 桌面通知（v4）：登录后每 60 秒轮询未读数，有新增则弹系统通知
+  // 桌面通知：登录后每 60 秒轮询未读数，有新增则弹系统通知
   useEffect(() => {
     if (!token) {
       lastUnreadRef.current = null;
@@ -226,7 +226,7 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {/* 页脚：撞色细条 + 法务入口（F9） */}
+      {/* 页脚：撞色细条 + 法务入口 */}
       <footer className="bg-paper-card pb-28 pt-0 md:pb-4">
         <ClashStripe />
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-x-4 gap-y-1 px-3 py-4 text-xs text-ink-mute">

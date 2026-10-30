@@ -1,5 +1,5 @@
 /**
- * 幂等增量迁移（v2）：启动时执行，可重复执行不报错。
+ * 幂等增量迁移：启动时执行，可重复执行不报错。
  * 策略：PRAGMA table_info 查字段在否 → 不在才 ALTER TABLE ADD COLUMN（带默认值）；
  *       新表与索引一律 IF NOT EXISTS。不重建表、不删数据。
  * 由 connection.js 在 module.exports 赋值之后调用（避开循环依赖）。
@@ -20,27 +20,27 @@ function addColumn(table, column, ddl) {
 }
 
 function runMigrations() {
-  // users：邮箱与登录锁定（F3/F12）
+  // users：邮箱与登录锁定
   addColumn('users', 'email', 'TEXT');
   addColumn('users', 'email_verified', 'INTEGER NOT NULL DEFAULT 0');
   addColumn('users', 'failed_login_count', 'INTEGER NOT NULL DEFAULT 0');
   addColumn('users', 'locked_until', 'TEXT');
-  // registrations：核销字段（F4）
+  // registrations：核销字段
   addColumn('registrations', 'checked_in', 'INTEGER NOT NULL DEFAULT 0');
   addColumn('registrations', 'checked_in_at', 'TEXT');
-  // events：核销口令（F4）
+  // events：核销口令
   addColumn('events', 'checkin_code', 'TEXT');
-  // posts：论坛置顶（v3）
+  // posts：论坛置顶
   addColumn('posts', 'is_pinned', 'INTEGER NOT NULL DEFAULT 0');
   addColumn('posts', 'pinned_at', 'TEXT');
-  // events：活动置顶（v3）
+  // events：活动置顶
   addColumn('events', 'is_pinned', 'INTEGER NOT NULL DEFAULT 0');
   addColumn('events', 'pinned_at', 'TEXT');
-  // events：定位签到（v5）
+  // events：定位签到
   addColumn('events', 'lat', 'REAL');
   addColumn('events', 'lng', 'REAL');
   addColumn('events', 'checkin_radius', 'REAL NOT NULL DEFAULT 0.2');
-  // events：蓝牙信标签到（v6）
+  // events：蓝牙信标签到
   addColumn('events', 'beacon_uuid', 'TEXT');
 
   // 邮箱唯一索引：SQLite 唯一索引中 NULL 视为互异，多个老用户 email 为空不冲突
@@ -59,7 +59,7 @@ function runMigrations() {
   `);
 
   // 历史库兼容：早期版本的 email_codes 使用 code_hash / used 字段，
-  // 而 v2 使用 code / consumed。结构不符时先把旧表改名归档（数据不丢），
+  // 当前版本使用 code / consumed。结构不符时先把旧表改名归档（数据不丢），
   // 再按新结构建表，避免启动阶段建索引时因缺少 consumed 列崩溃。
   try {
     const cols = db.prepare('PRAGMA table_info(email_codes)').all();
@@ -79,7 +79,7 @@ function runMigrations() {
     console.warn('[migrate] email_codes 结构检查跳过：', err.message);
   }
 
-  // 新表：验证码（F3/F2）与审计日志（F6）
+  // 新表：验证码与审计日志
   db.exec(`
     CREATE TABLE IF NOT EXISTS email_codes (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -125,7 +125,7 @@ function runMigrations() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_calendar_notes_user_date ON calendar_notes(user_id, date);
   `);
 
-  // v4：活动评价 + 提醒发送记录（幂等，老库自动补齐）
+  // 活动评价 + 提醒发送记录（幂等，老库自动补齐）
   db.exec(`
     CREATE TABLE IF NOT EXISTS event_reviews (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,

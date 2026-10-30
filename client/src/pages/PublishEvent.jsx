@@ -108,7 +108,7 @@ export default function PublishEvent() {
     if (!file) return;
     setUploading(true);
     try {
-      // v4：超过 2MB 的图片前端自动压缩后上传，手机大图也能快速上传
+      // 超过 2MB 的图片前端自动压缩后上传，手机大图也能快速上传
       const data = await uploadCoverCompressed(file);
       update('cover_url', data.url);
       showToast('封面上传成功');

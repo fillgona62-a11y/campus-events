@@ -1,8 +1,8 @@
 /**
- * 签到核销服务（v5 定位签到 + v6 蓝牙信标）：
+ * 签到核销服务：
  * - 学生到场后提交自己的实时定位（lat/lng）与扫描到的蓝牙信标 UUID，
  *   服务端校验：时间窗 → 活动已设定位 → 已报名 → 未签到 → 信标匹配（若启用）→ 距离在半径内。
- * - 蓝牙信标（v6）：活动若设置了 beacon_uuid，则签到必须提供匹配的信标，作为「物理到场」硬证明。
+ * - 蓝牙信标：活动若设置了 beacon_uuid，则签到必须提供匹配的信标，作为「物理到场」硬证明。
  */
 const eventModel = require('../models/eventModel');
 const registrationModel = require('../models/registrationModel');
@@ -11,7 +11,7 @@ const { ApiError } = require('../utils/response');
 const { ERR, REG_STATUS, isAdminRole } = require('../utils/constants');
 const { distanceMeters } = require('../utils/geo');
 
-/** 校验蓝牙信标（v6）：活动设置了 beacon_uuid 则必须匹配，否则抛 409 */
+/** 校验蓝牙信标：活动设置了 beacon_uuid 则必须匹配，否则抛 409 */
 function assertBeaconMatch(event, beacon_uuid) {
   if (!event.beacon_uuid) return;
   const normalized = String(beacon_uuid || '').trim().toUpperCase();
@@ -25,7 +25,7 @@ function assertBeaconMatch(event, beacon_uuid) {
 }
 
 /**
- * 学生自助定位 + 信标签到（v6）：本人 token，提交实时定位与扫描到的信标。
+ * 学生自助定位 + 信标签到：本人 token，提交实时定位与扫描到的信标。
  * @param {object} user 当前登录用户（报名学生本人）
  * @param {number} eventId
  * @param {{lat:number, lng:number, beacon_uuid?:string}} payload
@@ -60,7 +60,7 @@ function selfCheckin(user, eventId, { lat, lng, beacon_uuid }) {
     throw new ApiError(ERR.ALREADY_CHECKED_IN, '您已签到，请勿重复操作', 409);
   }
 
-  // 5. 蓝牙信标校验（v6）
+  // 5. 蓝牙信标校验
   assertBeaconMatch(event, beacon_uuid);
 
   // 6. 定位校验
@@ -85,7 +85,7 @@ function selfCheckin(user, eventId, { lat, lng, beacon_uuid }) {
 }
 
 /**
- * 组织者/管理员代签（v6）：输入学号 + 实时定位 + 信标。
+ * 组织者/管理员代签：输入学号 + 实时定位 + 信标。
  * @param {object} operator 当前登录用户（限活动发布者或管理员）
  * @param {number} eventId
  * @param {{student_id:string, lat:number, lng:number, beacon_uuid?:string}} payload
@@ -123,7 +123,7 @@ function checkin(operator, eventId, { student_id, lat, lng, beacon_uuid }) {
     throw new ApiError(ERR.ALREADY_CHECKED_IN, '该同学已签到，请勿重复操作', 409);
   }
 
-  // 蓝牙信标校验（v6）
+  // 蓝牙信标校验
   assertBeaconMatch(event, beacon_uuid);
 
   // 定位校验

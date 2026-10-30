@@ -70,7 +70,7 @@ const config = {
       allowedMime: ['video/mp4', 'video/webm', 'video/quicktime'],
     },
   },
-  /** 邮件通道（F3/F2 验证码；DEV_ECHO=1 不发真邮件） */
+  /** 邮件通道（验证码；DEV_ECHO=1 不发真邮件） */
   smtp: {
     host: process.env.SMTP_HOST || 'smtp.qq.com',
     port: parseInt(process.env.SMTP_PORT, 10) || 465,
@@ -82,12 +82,12 @@ const config = {
     // =1 时不发真实邮件，验证码在响应 dev_code 与服务器日志回显（开发/演示用）
     devEcho: process.env.SMTP_DEV_ECHO === '1',
   },
-  /** 登录失败锁定（F12） */
+  /** 登录失败锁定 */
   loginLock: {
     maxAttempts: parseInt(process.env.LOGIN_LOCK_MAX_ATTEMPTS, 10) || 5,
     minutes: parseInt(process.env.LOGIN_LOCK_MINUTES, 10) || 15,
   },
-  /** 邮箱验证码规则（F3/F2） */
+  /** 邮箱验证码规则 */
   emailCode: {
     expireMinutes: parseInt(process.env.EMAIL_CODE_EXPIRE_MINUTES, 10) || 5,
     resendCooldownSec: parseInt(process.env.EMAIL_CODE_RESEND_COOLDOWN_SEC, 10) || 60,

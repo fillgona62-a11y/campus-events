@@ -11,7 +11,7 @@ export const EVENT_STATUS = {
   CANCELLED: 'cancelled',
 };
 
-/** 报名状态枚举（v2 新增候补中） */
+/** 报名状态枚举 */
 export const REG_STATUS = {
   PENDING: 'pending',
   APPROVED: 'approved',
@@ -29,7 +29,7 @@ export const EVENT_STATUS_MAP = {
   cancelled: { label: '已取消', color: 'default' },
 };
 
-/** 报名状态文案与颜色（v2 新增候补中） */
+/** 报名状态文案与颜色 */
 export const REG_STATUS_MAP = {
   pending: { label: '待审核', color: 'warning' },
   approved: { label: '已成功', color: 'success' },
@@ -38,7 +38,7 @@ export const REG_STATUS_MAP = {
   waitlisted: { label: '候补中', color: 'info' },
 };
 
-/** 审计操作类型中文映射（F6 操作日志页） */
+/** 审计操作类型中文映射（操作日志页） */
 export const AUDIT_ACTION_MAP = {
   event_review_approve: { label: '审核通过活动' },
   event_review_reject: { label: '审核拒绝活动' },
@@ -48,7 +48,7 @@ export const AUDIT_ACTION_MAP = {
   user_password_reset: { label: '重置用户密码' },
 };
 
-/** 核销状态文案（F4） */
+/** 核销状态文案 */
 export const CHECKED_IN_MAP = {
   1: { label: '已核销', color: 'success' },
   0: { label: '未核销', color: 'default' },
