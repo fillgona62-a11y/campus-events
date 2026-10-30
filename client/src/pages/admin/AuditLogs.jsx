@@ -82,7 +82,7 @@ export default function AuditLogs() {
     <div>
       <div className="mb-4 flex items-center gap-2">
         <ClashStar size={20} style={{ color: CLASH.haze }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">操作日志</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">操作日志</h1>
       </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-2">

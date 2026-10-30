@@ -39,7 +39,7 @@ export default function ForumLayout() {
       <div className="clash-card mb-4 p-3">
         <div className="flex flex-wrap items-center gap-2">
           <ClashStar size={20} style={{ color: CLASH.magenta }} />
-          <h1 className="text-lg font-extrabold tracking-tight text-ink">校园论坛</h1>
+          <h1 className="text-lg font-semibold tracking-tight text-ink">校园论坛</h1>
           <div className="flex-1" />
           <Button
             variant="contained"

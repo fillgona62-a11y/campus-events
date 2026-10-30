@@ -76,7 +76,7 @@ export default function Terms() {
       <div className="clash-card p-5 md:p-8">
         <div className="mb-1 flex items-center gap-2">
           <ClashStar size={20} style={{ color: CLASH.violet }} />
-          <h1 className="text-2xl font-extrabold tracking-tight text-ink">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
             <span className="clash-text-gradient">用户协议</span>
           </h1>
         </div>
@@ -85,7 +85,7 @@ export default function Terms() {
         <div className="space-y-5 text-sm leading-relaxed text-ink-soft">
           {SECTIONS.map((s) => (
             <section key={s.title}>
-              <h2 className="mb-1.5 flex items-center gap-1.5 font-extrabold text-ink">
+              <h2 className="mb-1.5 flex items-center gap-1.5 font-semibold text-ink">
                 <ClashStar size={12} style={{ color: CLASH.magenta }} />
                 {s.title}
               </h2>

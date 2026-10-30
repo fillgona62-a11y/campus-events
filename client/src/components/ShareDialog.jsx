@@ -135,11 +135,11 @@ export default function ShareDialog({ open, onClose, event }) {
           {loading ? (
             <div className="py-6">
               {/* 骨架屏：模拟海报比例，比纯转圈更有加载预期 */}
-              <div className="skeleton mx-auto h-64 w-44 rounded-2xl border-2 border-ink" />
+              <div className="skeleton mx-auto h-64 w-44 rounded-2xl border border-ink/10" />
               <p className="mt-4 text-sm font-semibold text-ink-mute">正在生成海报…</p>
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-paper-card p-4 shadow-block-ink">
+            <div className="relative overflow-hidden rounded-2xl border border-ink/10 bg-paper-card p-4 shadow-sm">
               {/* 纯色光斑装饰（不使用渐变） */}
               <span
                 aria-hidden="true"
@@ -159,7 +159,7 @@ export default function ShareDialog({ open, onClose, event }) {
                   <img
                     src={poster}
                     alt="活动海报预览"
-                    className="w-full max-w-[240px] rounded-xl border-2 border-ink object-contain"
+                    className="w-full max-w-[240px] rounded-xl border border-ink/10 object-contain"
                   />
                 ) : (
                   <p className="py-8 text-sm text-ink-mute">海报预览暂不可用</p>
@@ -167,7 +167,7 @@ export default function ShareDialog({ open, onClose, event }) {
 
                 {/* 二维码预览 */}
                 {qr && (
-                  <div className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-ink bg-paper-card px-3 py-2 shadow-block-ink-sm">
+                  <div className="flex flex-col items-center gap-1.5 rounded-xl border border-ink/10 bg-paper-card px-3 py-2 shadow-sm">
                     <img src={qr} alt="活动二维码预览" className="h-28 w-28" />
                     <span className="text-[11px] font-bold text-ink-mute">扫码报名</span>
                   </div>

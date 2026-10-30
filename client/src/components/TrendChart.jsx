@@ -36,10 +36,10 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
   // ── 空数据态：撞色空态卡 + 引导文案 ─────────────────────────────
   if (!dates.length || total === 0) {
     return (
-      <div className="rounded-2xl border-2 border-ink bg-paper-card p-5 shadow-block-ink">
-        <h2 className="mb-4 text-base font-extrabold text-ink">{title}</h2>
+      <div className="rounded-2xl border border-ink/10 bg-paper-card p-5 shadow-sm">
+        <h2 className="mb-4 text-base font-semibold text-ink">{title}</h2>
         <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
-          <span className="flex h-16 w-16 -rotate-6 items-center justify-center rounded-2xl border-2 border-ink bg-clash-lime shadow-block-ink">
+          <span className="flex h-16 w-16 -rotate-6 items-center justify-center rounded-2xl border border-ink/10 bg-clash-lime shadow-sm">
             <ClashStar size={30} style={{ color: CLASH.ink }} />
           </span>
           <p className="text-sm font-bold text-ink">暂无报名数据</p>
@@ -83,16 +83,16 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
   };
 
   return (
-    <div className="rounded-2xl border-2 border-ink bg-paper-card p-5 shadow-block-ink">
+    <div className="rounded-2xl border border-ink/10 bg-paper-card p-5 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-base font-extrabold text-ink">{title}</h2>
+        <h2 className="text-base font-semibold text-ink">{title}</h2>
         {/* 多序列图例 */}
         {list.length > 1 && (
           <div className="flex flex-wrap items-center gap-3">
             {list.map((s, i) => (
               <span key={s.name || i} className="flex items-center gap-1.5 text-xs font-semibold text-ink-soft">
                 <span
-                  className="inline-block h-3 w-3 rounded-sm border-2 border-ink"
+                  className="inline-block h-3 w-3 rounded-sm border border-ink/10"
                   style={{ backgroundColor: clashColorAt(i, CATEGORY_COLORS) }}
                 />
                 {s.name}
@@ -224,7 +224,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
         {/* Tooltip：跟随当前悬停 / 键盘选中的日期 */}
         {hoverDate && (
           <div
-            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-xl border-2 border-ink bg-paper-card px-3 py-2 shadow-block-ink"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-xl border border-ink/10 bg-paper-card px-3 py-2 shadow-sm"
             style={{
               // 左右夹紧，避免首尾数据点的 tooltip 溢出图表容器
               left: `${Math.min(88, Math.max(12, (x(activeIndex) / W) * 100))}%`,
@@ -232,7 +232,7 @@ export default function TrendChart({ days = [], title = '报名趋势', series =
               marginTop: '10px',
             }}
           >
-            <p className="mb-1 text-[11px] font-extrabold text-ink">{hoverDate}</p>
+            <p className="mb-1 text-[11px] font-semibold text-ink">{hoverDate}</p>
             {list.map((s, i) => (
               <p key={s.name || i} className="flex items-center gap-1.5 text-[11px] font-semibold text-ink-soft">
                 <span

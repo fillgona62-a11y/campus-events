@@ -83,7 +83,7 @@ export default function MyEvents() {
       <div className="mb-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <ClashStar size={20} style={{ color: CLASH.violet }} />
-          <h1 className="text-xl font-extrabold tracking-tight text-ink">我发布的活动</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-ink">我发布的活动</h1>
         </div>
         <Button variant="contained" component={Link} to="/publish">
           发布活动
@@ -111,7 +111,7 @@ export default function MyEvents() {
               <div key={event.id} className="clash-card flex gap-3 p-4">
                 {/* 左侧撞色条：状态一眼可辨 */}
                 <span
-                  className="w-1.5 flex-shrink-0 rounded-full border-2 border-ink"
+                  className="w-1.5 flex-shrink-0 rounded-full border border-ink/10"
                   style={{ backgroundColor: stripe }}
                   aria-hidden="true"
                 />
@@ -126,13 +126,13 @@ export default function MyEvents() {
                   <p className="mt-1 text-xs font-semibold text-ink-mute">
                     报名：{event.approved_count}/{event.capacity === 0 ? '不限' : event.capacity}
                     {event.pending_registrations > 0 && (
-                      <span className="ml-2 rounded-md border-2 border-ink bg-clash-lemon px-1.5 py-0.5 font-bold text-ink on-clash">
+                      <span className="ml-2 rounded-md border border-ink/10 bg-clash-lemon px-1.5 py-0.5 font-bold text-ink on-clash">
                         {event.pending_registrations} 条待审核报名
                       </span>
                     )}
                   </p>
                   {event.status === 'rejected' && event.reject_reason && (
-                    <p className="mt-2 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-xs font-bold text-ink on-clash">
+                    <p className="mt-2 rounded-xl border border-ink/10 bg-clash-magenta px-3 py-2 text-xs font-bold text-ink on-clash">
                       拒绝理由：{event.reject_reason}
                     </p>
                   )}

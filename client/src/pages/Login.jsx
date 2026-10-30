@@ -14,7 +14,6 @@ import { login, getCaptcha } from '../api/authApi';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { AuthShell } from './clashUi';
-import { CLASH } from '../theme';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -87,10 +86,10 @@ export default function Login() {
   };
 
   return (
-    <AuthShell accent={CLASH.lime}>
-      <div className="clash-card p-6 md:p-8">
-        <h2 className="text-center text-2xl font-extrabold tracking-tight text-ink">
-          登录<span className="clash-text-gradient">校园活动</span>
+    <AuthShell accent="#9c6b3f">
+      <div className="rounded-xl border border-ink/10 bg-paper-card p-6 shadow-sm md:p-8">
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-ink">
+          登录校园活动
         </h2>
         <p className="mb-5 mt-1 text-center text-sm text-ink-mute">登录后报名心仪的活动</p>
 
@@ -109,11 +108,11 @@ export default function Login() {
             autoComplete="username"
           />
 
-          {/* 图形验证码：撞色小卡（墨边 + 硬投影）+ 明确的刷新按钮 */}
-          <div className="rounded-2xl border-2 border-ink bg-clash-cyan p-3 shadow-block-ink-sm on-clash">
+          {/* 图形验证码 */}
+          <div className="rounded-xl border border-ink/10 bg-paper p-3">
             <div className="flex items-start gap-2">
               <div
-                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-paper-card"
+                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-ink/15 bg-white"
                 onClick={loadCaptcha}
                 title="点击图片刷新验证码"
                 dangerouslySetInnerHTML={{ __html: captcha.svg }}
@@ -160,16 +159,16 @@ export default function Login() {
           </Button>
         </form>
 
-        {/* 底部链接：主链接撞色、次级链接中性、兜底链接更弱 */}
+        {/* 底部链接 */}
         <div className="mt-6 space-y-1.5 text-center text-sm">
           <p className="text-ink-mute">
             没有账号？
-            <Link to="/register" className="ml-1 font-extrabold text-clash-royal no-underline hover:underline">
+            <Link to="/register" className="ml-1 font-medium no-underline hover:underline" style={{ color: '#9c6b3f' }}>
               立即注册
             </Link>
           </p>
           <p>
-            <Link to="/forgot-password" className="font-bold text-ink-soft no-underline hover:text-clash-violet">
+            <Link to="/forgot-password" className="text-ink-soft no-underline hover:text-ink">
               忘记密码？
             </Link>
           </p>

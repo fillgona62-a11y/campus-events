@@ -44,7 +44,7 @@ function FormSection({ title, accent, desc, children }) {
     <section className="clash-card p-4 md:p-6">
       <div className="mb-3 flex items-center gap-2">
         <ClashStar size={18} style={{ color: accent }} />
-        <h2 className="text-base font-extrabold tracking-tight text-ink">{title}</h2>
+        <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
       </div>
       <ClashStripe className="mb-4" />
       {desc && <p className="-mt-1 mb-3 text-xs text-ink-mute">{desc}</p>}
@@ -198,7 +198,7 @@ export default function PublishEvent() {
     <div className="mx-auto max-w-2xl">
       <div className="mb-4 flex items-center gap-2">
         <ClashStar size={22} style={{ color: CLASH.magenta }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">
           {isEdit ? '编辑活动' : '发布活动'}
         </h1>
       </div>
@@ -338,7 +338,7 @@ export default function PublishEvent() {
                   <img
                     src={form.cover_url}
                     alt="封面预览"
-                    className="h-16 w-24 rounded-xl border-2 border-ink object-cover"
+                    className="h-16 w-24 rounded-xl border border-ink/10 object-cover"
                   />
                   <Button size="small" color="error" onClick={() => update('cover_url', '')}>
                     移除
@@ -359,7 +359,7 @@ export default function PublishEvent() {
         </FormSection>
 
         {/* 提交区：整行大按钮 + 硬投影 */}
-        <div className="rounded-2xl border-2 border-ink bg-paper-card p-4">
+        <div className="rounded-2xl border border-ink/10 bg-paper-card p-4">
           <Button
             fullWidth
             variant="contained"

@@ -71,9 +71,9 @@ export default function Notifications() {
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <ClashStar size={20} style={{ color: CLASH.magenta }} />
-          <h1 className="text-xl font-extrabold tracking-tight text-ink">站内通知</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-ink">站内通知</h1>
           {data.unread_count > 0 && (
-            <span className="rounded-md border-2 border-ink bg-clash-magenta px-2 py-0.5 text-xs font-extrabold text-ink on-clash">
+            <span className="rounded-md border border-ink/10 bg-clash-magenta px-2 py-0.5 text-xs font-semibold text-ink on-clash">
               {data.unread_count} 条未读
             </span>
           )}
@@ -117,7 +117,7 @@ export default function Notifications() {
                     aria-label="未读"
                   />
                 )}
-                <h3 className={`text-sm ${item.is_read ? 'font-bold text-ink-soft' : 'font-extrabold text-ink'}`}>
+                <h3 className={`text-sm ${item.is_read ? 'font-bold text-ink-soft' : 'font-semibold text-ink'}`}>
                   {item.title}
                 </h3>
               </div>

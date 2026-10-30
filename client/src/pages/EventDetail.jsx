@@ -42,7 +42,7 @@ function DetailSkeleton() {
   return (
     <div className="space-y-4">
       <div className="skeleton h-52 w-full rounded-2xl md:h-72" />
-      <div className="space-y-3 rounded-2xl border-2 border-ink bg-paper-card p-4">
+      <div className="space-y-3 rounded-2xl border border-ink/10 bg-paper-card p-4">
         <div className="skeleton h-6 w-3/4 rounded" />
         <div className="skeleton h-4 w-1/2 rounded" />
         <div className="skeleton h-4 w-2/3 rounded" />
@@ -239,15 +239,15 @@ export default function EventDetail() {
         <img
           src={event.cover_url}
           alt={event.title}
-          className="h-52 w-full rounded-2xl border-2 border-ink object-cover md:h-72"
+          className="h-52 w-full rounded-2xl border border-ink/10 object-cover md:h-72"
         />
       ) : (
         // 纯撞色块 + 大字占位（不用渐变）
         <div
-          className="flex h-52 w-full items-center justify-center rounded-2xl border-2 border-ink md:h-72"
+          className="flex h-52 w-full items-center justify-center rounded-2xl border border-ink/10 md:h-72"
           style={{ backgroundColor: coverColor }}
         >
-          <span className="text-6xl font-extrabold md:text-7xl" style={{ color: coverText }}>
+          <span className="text-6xl font-semibold md:text-7xl" style={{ color: coverText }}>
             {event.title?.slice(0, 1) || '活'}
           </span>
         </div>
@@ -269,11 +269,11 @@ export default function EventDetail() {
           )}
         </div>
 
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">{event.title}</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">{event.title}</h1>
 
         {/* 关键信息：色块标签 + 图标 */}
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-lemon px-3 py-2 on-clash">
+          <div className="flex items-center gap-2 rounded-xl border border-ink/10 bg-clash-lemon px-3 py-2 on-clash">
             <ScheduleIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">活动时间</p>
@@ -282,21 +282,21 @@ export default function EventDetail() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-mint px-3 py-2 on-clash">
+          <div className="flex items-center gap-2 rounded-xl border border-ink/10 bg-clash-mint px-3 py-2 on-clash">
             <PlaceIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">活动地点</p>
               <p className="truncate text-sm font-bold text-ink">{event.location}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-haze px-3 py-2 on-clash">
+          <div className="flex items-center gap-2 rounded-xl border border-ink/10 bg-clash-haze px-3 py-2 on-clash">
             <EventBusyIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">报名截止</p>
               <p className="truncate text-sm font-bold text-ink">{formatDateTime(event.signup_deadline)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border-2 border-ink bg-clash-cyan px-3 py-2 on-clash">
+          <div className="flex items-center gap-2 rounded-xl border border-ink/10 bg-clash-cyan px-3 py-2 on-clash">
             <PersonIcon sx={{ fontSize: 20 }} />
             <div className="min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-wide text-ink-soft">发布者</p>
@@ -309,7 +309,7 @@ export default function EventDetail() {
         <div className="mt-4">
           <div className="mb-1.5 flex items-baseline justify-between">
             <span className="text-xs font-bold text-ink-mute">报名进度</span>
-            <span className="text-lg font-extrabold text-ink">
+            <span className="text-lg font-semibold text-ink">
               {Math.round(progress)}
               <span className="text-xs font-bold text-ink-mute">%</span>
               <span className="ml-2 text-xs font-bold text-ink-mute">{remainingText(event)}</span>
@@ -324,7 +324,7 @@ export default function EventDetail() {
         </div>
 
         {event.status === 'rejected' && event.reject_reason && isOwnerOrAdmin && (
-          <p className="mt-3 rounded-xl border-2 border-ink bg-clash-magenta px-3 py-2 text-sm font-bold text-ink on-clash">
+          <p className="mt-3 rounded-xl border border-ink/10 bg-clash-magenta px-3 py-2 text-sm font-bold text-ink on-clash">
             审核拒绝理由：{event.reject_reason}
           </p>
         )}
@@ -334,7 +334,7 @@ export default function EventDetail() {
       <div className="clash-card mt-4 p-4">
         <div className="mb-2 flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.magenta }} />
-          <h2 className="text-base font-extrabold text-ink">活动简介</h2>
+          <h2 className="text-base font-semibold text-ink">活动简介</h2>
         </div>
         <ClashStripe className="mb-3" />
         {/* 服务端已做白名单过滤，可安全渲染 */}

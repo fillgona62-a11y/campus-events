@@ -81,15 +81,15 @@ function NavList({ onNavigate }) {
 /** 侧边栏顶部品牌区：撞色方块 + 四角星 */
 function Brand() {
   return (
-    <div className="flex h-14 items-center justify-center gap-2 border-b-2 border-ink">
+    <div className="flex h-14 items-center justify-center gap-2 border-b border-ink/10">
       <span
-        className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-ink"
+        className="flex h-8 w-8 items-center justify-center rounded-lg border border-ink/10"
         style={{ backgroundColor: CLASH.cyan }}
         aria-hidden="true"
       >
         <ClashStar size={15} style={{ color: CLASH.ink }} />
       </span>
-      <span className="font-extrabold text-ink">管理后台</span>
+      <span className="font-semibold text-ink">管理后台</span>
     </div>
   );
 }
@@ -137,13 +137,13 @@ export default function AdminLayout() {
               <MenuIcon />
             </IconButton>
             <span
-              className="flex h-7 w-7 items-center justify-center rounded-lg border-2 border-ink"
+              className="flex h-7 w-7 items-center justify-center rounded-lg border border-ink/10"
               style={{ backgroundColor: CLASH.lime }}
               aria-hidden="true"
             >
               <ClashStar size={13} style={{ color: CLASH.ink }} />
             </span>
-            <span className="font-extrabold text-ink">校园活动 · 管理后台</span>
+            <span className="font-semibold text-ink">校园活动 · 管理后台</span>
             <div className="flex-1" />
             <ThemeToggle />
             <IconButton component={Link} to="/" aria-label="返回前台" sx={{ minWidth: 44, minHeight: 44 }}>

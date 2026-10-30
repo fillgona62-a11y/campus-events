@@ -68,7 +68,7 @@ export function ClashBlob({
 export function ClashTitle({ children, subtitle, align = 'left', star = true }) {
   return (
     <div className={align === 'center' ? 'text-center' : ''}>
-      <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight md:text-3xl">
+      <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight md:text-3xl">
         <span className="clash-text-gradient">{children}</span>
         {star && <ClashStar size={20} style={{ color: CLASH.magenta }} />}
       </h1>

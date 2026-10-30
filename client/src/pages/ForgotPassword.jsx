@@ -142,7 +142,7 @@ export default function ForgotPassword() {
   return (
     <AuthShell accent={CLASH.cyan} slogan="通过绑定邮箱自助找回密码，两步即可重置">
       <div className="clash-card p-6 md:p-8">
-        <h2 className="text-center text-2xl font-extrabold tracking-tight text-ink">
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-ink">
           找回<span className="clash-text-gradient">密码</span>
         </h2>
         <p className="mb-4 mt-1 text-center text-sm text-ink-mute">通过绑定邮箱重置账号密码</p>
@@ -186,10 +186,10 @@ export default function ForgotPassword() {
             />
 
             {/* 图形验证码：撞色小卡 */}
-            <div className="rounded-2xl border-2 border-ink bg-clash-mint p-3 shadow-block-ink-sm on-clash">
+            <div className="rounded-2xl border border-ink/10 bg-clash-mint p-3 shadow-sm on-clash">
               <div className="flex items-start gap-2">
                 <div
-                  className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-paper-card"
+                  className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-ink/10 bg-paper-card"
                   onClick={loadCaptcha}
                   title="点击图片刷新验证码"
                   dangerouslySetInnerHTML={{ __html: captcha.svg }}
@@ -273,7 +273,7 @@ export default function ForgotPassword() {
         <div className="mt-6 space-y-1.5 text-center text-sm">
           <p className="text-ink-mute">
             想起来了？
-            <Link to="/login" className="ml-1 font-extrabold text-clash-royal no-underline hover:underline">
+            <Link to="/login" className="ml-1 font-semibold text-clash-royal no-underline hover:underline">
               返回登录
             </Link>
           </p>

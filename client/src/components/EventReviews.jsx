@@ -65,12 +65,12 @@ export default function EventReviews({ event }) {
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.magenta }} />
-          <h2 className="text-base font-extrabold text-ink">活动评价</h2>
+          <h2 className="text-base font-semibold text-ink">活动评价</h2>
         </div>
         {summary.count > 0 && (
           <div className="flex items-center gap-1.5">
             <Rating value={summary.avg} precision={0.1} readOnly size="small" />
-            <span className="text-sm font-extrabold text-ink">{summary.avg}</span>
+            <span className="text-sm font-semibold text-ink">{summary.avg}</span>
             <span className="text-xs text-ink-mute">（{summary.count} 条）</span>
           </div>
         )}

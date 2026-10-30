@@ -53,7 +53,7 @@ function DetailSkeleton() {
   return (
     <div className="space-y-4">
       <div className="skeleton h-10 w-28 rounded" />
-      <div className="space-y-3 rounded-2xl border-2 border-ink bg-paper-card p-4">
+      <div className="space-y-3 rounded-2xl border border-ink/10 bg-paper-card p-4">
         <div className="skeleton h-6 w-2/3 rounded" />
         <div className="skeleton h-4 w-1/3 rounded" />
         <div className="skeleton h-24 w-full rounded-xl" />
@@ -286,10 +286,10 @@ export default function ForumPostDetail() {
         className={depth === 0 ? '' : 'mt-2'}
         style={depth > 0 ? { marginLeft: 12, borderLeft: '2px solid var(--ink-line)', paddingLeft: 10 } : undefined}
       >
-        <div className="rounded-xl border-2 border-ink bg-paper-card p-3">
+        <div className="rounded-xl border border-ink/10 bg-paper-card p-3">
           <div className="flex items-center gap-2">
             <CommentAvatar name={comment.user_name} />
-            <span className="text-xs font-extrabold text-ink">{comment.user_name || '匿名同学'}</span>
+            <span className="text-xs font-semibold text-ink">{comment.user_name || '匿名同学'}</span>
             {comment.user_student_id && (
               <span className="text-[11px] text-ink-mute">{comment.user_student_id}</span>
             )}
@@ -377,7 +377,7 @@ export default function ForumPostDetail() {
           {post.author_name?.slice(0, 1) || '友'}
         </Avatar>
         <div className="min-w-0">
-          <p className="text-sm font-extrabold text-ink">{post.author_name || '匿名同学'}</p>
+          <p className="text-sm font-semibold text-ink">{post.author_name || '匿名同学'}</p>
           <p className="text-xs text-ink-mute">
             {post.author_student_id ? `${post.author_student_id} · ` : ''}
             {formatDateTime(post.created_at)}
@@ -430,7 +430,7 @@ export default function ForumPostDetail() {
         <div className="mb-2 flex flex-wrap items-center gap-2">
           {/* 置顶徽标：所有人可见 */}
           {post.is_pinned && (
-            <span className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-clash-magenta px-1.5 py-0.5 text-[11px] font-extrabold on-clash">
+            <span className="inline-flex items-center gap-1 rounded-md border border-ink/10 bg-clash-magenta px-1.5 py-0.5 text-[11px] font-semibold on-clash">
               <PushPinOutlinedIcon sx={{ fontSize: 13 }} />
               置顶
             </span>
@@ -451,7 +451,7 @@ export default function ForumPostDetail() {
             />
           ))}
         </div>
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">{post.title}</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">{post.title}</h1>
         <ClashStripe className="my-3" />
         {/* 服务端已白名单净化，可安全渲染 */}
         <div
@@ -465,7 +465,7 @@ export default function ForumPostDetail() {
         <div className="clash-card mt-4 space-y-3 p-4">
           <div className="flex items-center gap-2">
             <ClashStar size={16} style={{ color: CLASH.violet }} />
-            <h2 className="text-base font-extrabold text-ink">视频</h2>
+            <h2 className="text-base font-semibold text-ink">视频</h2>
           </div>
           {videos.map((v, i) => (
             <VideoEmbed key={`${v.type}-${i}`} type={v.type} url={v.url} />
@@ -517,7 +517,7 @@ export default function ForumPostDetail() {
       <div className="mt-4">
         <div className="mb-2 flex items-center gap-2">
           <ChatBubbleOutlineIcon sx={{ fontSize: 18, color: CLASH.violet }} />
-          <h2 className="text-base font-extrabold text-ink">评论（{post.comment_count || 0}）</h2>
+          <h2 className="text-base font-semibold text-ink">评论（{post.comment_count || 0}）</h2>
         </div>
 
         {/* 评论输入：未登录引导登录 */}

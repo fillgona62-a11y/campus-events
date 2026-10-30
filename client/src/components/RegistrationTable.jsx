@@ -101,7 +101,7 @@ export default function RegistrationTable({
         </Button>
       </div>
 
-      <TableContainer className="overflow-x-auto rounded-2xl border-2 border-ink bg-paper-card shadow-block-ink">
+      <TableContainer className="overflow-x-auto rounded-2xl border border-ink/10 bg-paper-card shadow-sm">
         <Table size="small" sx={{ minWidth: 860 }}>
           <TableHead>
             <TableRow>
@@ -120,7 +120,7 @@ export default function RegistrationTable({
               <TableRow>
                 <TableCell colSpan={hasActions ? 8 : 7} sx={{ border: 0, py: 6 }}>
                   <div className="flex flex-col items-center justify-center gap-3 text-center">
-                    <span className="flex h-14 w-14 -rotate-6 items-center justify-center rounded-2xl border-2 border-ink bg-clash-cyan shadow-block-ink-sm on-clash">
+                    <span className="flex h-14 w-14 -rotate-6 items-center justify-center rounded-2xl border border-ink/10 bg-clash-cyan shadow-sm on-clash">
                       <ClashStar size={26} style={{ color: CLASH.ink }} />
                     </span>
                     <p className="text-sm font-bold text-ink">还没有报名记录</p>
@@ -147,7 +147,7 @@ export default function RegistrationTable({
                       <StatusBadge type="reg" status={row.status} />
                       {row.status === 'waitlisted' && row.waitlist_position && (
                         <span
-                          className="inline-flex shrink-0 items-center rounded-lg border-2 border-ink px-1.5 py-0.5 text-xs font-bold"
+                          className="inline-flex shrink-0 items-center rounded-lg border border-ink/10 px-1.5 py-0.5 text-xs font-bold"
                           style={{ backgroundColor: CLASH.cyan, color: readableText(CLASH.cyan) }}
                         >
                           第 {row.waitlist_position} 位

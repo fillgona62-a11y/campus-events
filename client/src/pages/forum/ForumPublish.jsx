@@ -209,7 +209,7 @@ export default function ForumPublish() {
     <div className="mx-auto max-w-2xl">
       <div className="mb-4 flex items-center gap-2">
         <ClashStar size={22} style={{ color: CLASH.magenta }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">
           {isEdit ? '编辑帖子' : '发布帖子'}
         </h1>
       </div>
@@ -232,7 +232,7 @@ export default function ForumPublish() {
         <div className="clash-card p-4">
           <div className="mb-3 flex items-center gap-2">
             <ClashStar size={16} style={{ color: CLASH.violet }} />
-            <h2 className="text-base font-extrabold text-ink">正文</h2>
+            <h2 className="text-base font-semibold text-ink">正文</h2>
           </div>
           <ClashStripe className="mb-3" />
 
@@ -284,7 +284,7 @@ export default function ForumPublish() {
         <div className="clash-card p-4">
           <div className="mb-3 flex items-center gap-2">
             <ClashStar size={16} style={{ color: CLASH.cyan }} />
-            <h2 className="text-base font-extrabold text-ink">视频</h2>
+            <h2 className="text-base font-semibold text-ink">视频</h2>
             <span className="text-xs text-ink-mute">上传 ≤50MB，或贴 B站/YouTube 链接，最多 5 个</span>
           </div>
           <ClashStripe className="mb-3" />
@@ -320,9 +320,9 @@ export default function ForumPublish() {
           {videos.length > 0 && (
             <div className="space-y-2">
               {videos.map((v, i) => (
-                <div key={i} className="rounded-2xl border-2 border-ink bg-paper-card p-2">
+                <div key={i} className="rounded-2xl border border-ink/10 bg-paper-card p-2">
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
+                    <span className="rounded-md border border-ink/10 bg-clash-mint px-2 py-0.5 text-[11px] font-semibold text-ink on-clash">
                       {v.type === 'upload' ? '上传视频' : '链接嵌入'}
                     </span>
                     <Button size="small" color="error" variant="outlined" onClick={() => removeVideo(i)}>
@@ -340,7 +340,7 @@ export default function ForumPublish() {
         <div className="clash-card p-4">
           <div className="mb-3 flex items-center gap-2">
             <ClashStar size={16} style={{ color: CLASH.cyan }} />
-            <h2 className="text-base font-extrabold text-ink">话题标签</h2>
+            <h2 className="text-base font-semibold text-ink">话题标签</h2>
             <span className="text-xs text-ink-mute">回车添加，最多 {MAX_TOPICS} 个</span>
           </div>
           <TextField
@@ -377,7 +377,7 @@ export default function ForumPublish() {
         </div>
 
         {/* 提交区 */}
-        <div className="rounded-2xl border-2 border-ink bg-paper-card p-4">
+        <div className="rounded-2xl border border-ink/10 bg-paper-card p-4">
           <Button
             fullWidth
             variant="contained"

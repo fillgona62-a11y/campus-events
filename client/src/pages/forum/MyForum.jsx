@@ -53,7 +53,7 @@ function PostRow({ item, onOpen }) {
         {topics.slice(0, 3).map((t, i) => (
           <span
             key={t}
-            className="rounded-md border-2 border-ink px-1.5 py-0.5 text-[11px] font-extrabold on-clash"
+            className="rounded-md border border-ink/10 px-1.5 py-0.5 text-[11px] font-semibold on-clash"
             style={{ backgroundColor: clashColorAt(i) }}
           >
             {t}
@@ -62,7 +62,7 @@ function PostRow({ item, onOpen }) {
         <div className="flex-1" />
         <span className="text-[11px] text-ink-faint">{formatDateTime(item.created_at)}</span>
       </div>
-      <h3 className="mt-1.5 line-clamp-1 text-sm font-extrabold text-ink">{item.title}</h3>
+      <h3 className="mt-1.5 line-clamp-1 text-sm font-semibold text-ink">{item.title}</h3>
       <p className="mt-1 text-xs text-ink-mute">
         {item.author_name || '匿名同学'}
         {item.author_student_id ? ` · ${item.author_student_id}` : ''}

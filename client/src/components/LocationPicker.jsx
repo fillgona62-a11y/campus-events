@@ -138,7 +138,7 @@ export default function LocationPicker({ lat, lng, onPick }) {
       {AMAP_KEY && (
         <div
           ref={mapRef}
-          className="h-56 w-full overflow-hidden rounded-xl border-2 border-ink"
+          className="h-56 w-full overflow-hidden rounded-xl border border-ink/10"
           style={{ display: useMap ? 'block' : 'none' }}
         />
       )}

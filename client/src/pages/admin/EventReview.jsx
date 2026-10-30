@@ -87,7 +87,7 @@ export default function EventReview() {
     <div>
       <div className="mb-4 flex items-center gap-2">
         <ClashStar size={20} style={{ color: CLASH.lemon }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">活动审核</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">活动审核</h1>
       </div>
 
       {loading ? (
@@ -157,7 +157,7 @@ export default function EventReview() {
         <DialogTitle>{detailTarget?.title}</DialogTitle>
         <DialogContent>
           {detailTarget?.cover_url && (
-            <img src={detailTarget.cover_url} alt="封面" className="mb-3 max-h-48 rounded-xl border-2 border-ink object-cover" />
+            <img src={detailTarget.cover_url} alt="封面" className="mb-3 max-h-48 rounded-xl border border-ink/10 object-cover" />
           )}
           <div
             className="rich-text text-sm text-ink-soft"

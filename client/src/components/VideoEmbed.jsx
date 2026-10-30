@@ -26,7 +26,7 @@ function parseYouTubeId(url) {
 function EmbedFrame({ src, title }) {
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl border-2 border-ink bg-black"
+      className="relative w-full overflow-hidden rounded-xl border border-ink/10 bg-black"
       style={{ paddingBottom: '56.25%' }}
     >
       <iframe
@@ -79,7 +79,7 @@ export default function VideoEmbed({ type, url }) {
       href={url || '#'}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-xl border-2 border-ink bg-paper-card px-3 py-2 text-sm font-bold text-ink no-underline"
+      className="inline-flex items-center gap-1.5 rounded-xl border border-ink/10 bg-paper-card px-3 py-2 text-sm font-bold text-ink no-underline"
     >
       打开视频链接 ↗
     </a>

@@ -110,7 +110,7 @@ export default function CheckIn() {
       <section className="clash-card mb-4 p-4">
         <div className="mb-2 flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.lime }} />
-          <h2 className="text-base font-extrabold text-ink">签到地点</h2>
+          <h2 className="text-base font-semibold text-ink">签到地点</h2>
         </div>
         <ClashStripe className="mb-3" />
         {event.lat != null && event.lng != null ? (
@@ -126,15 +126,15 @@ export default function CheckIn() {
       {stats && (
         <div className="mb-4 grid grid-cols-3 gap-2 text-center">
           <div className="clash-card p-3">
-            <p className="text-2xl font-extrabold text-ink">{stats.approved_count}</p>
+            <p className="text-2xl font-semibold text-ink">{stats.approved_count}</p>
             <p className="mt-1 text-xs font-bold text-ink-mute">报名成功</p>
           </div>
           <div className="clash-card p-3">
-            <p className="text-2xl font-extrabold text-ink">{stats.checked_in_count}</p>
+            <p className="text-2xl font-semibold text-ink">{stats.checked_in_count}</p>
             <p className="mt-1 text-xs font-bold text-ink-mute">已签到</p>
           </div>
           <div className="clash-card p-3">
-            <p className="text-2xl font-extrabold text-ink">{stats.unchecked_count}</p>
+            <p className="text-2xl font-semibold text-ink">{stats.unchecked_count}</p>
             <p className="mt-1 text-xs font-bold text-ink-mute">未签到</p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function CheckIn() {
       <form onSubmit={handleCheckin} className="clash-card space-y-4 p-4">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.cyan }} />
-          <h2 className="text-base font-extrabold text-ink">现场定位签到</h2>
+          <h2 className="text-base font-semibold text-ink">现场定位签到</h2>
         </div>
         <ClashStripe />
         <TextField

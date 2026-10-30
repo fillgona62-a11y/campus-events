@@ -93,7 +93,7 @@ export default function MyRegistrations() {
     <div>
       <div className="mb-3 flex items-center gap-2">
         <ClashStar size={20} style={{ color: CLASH.magenta }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">我的报名</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">我的报名</h1>
       </div>
 
       <Tabs
@@ -136,11 +136,11 @@ export default function MyRegistrations() {
                     src={item.cover_url}
                     alt={item.title}
                     loading="lazy"
-                    className="h-20 w-28 flex-shrink-0 rounded-xl border-2 border-ink object-cover"
+                    className="h-20 w-28 flex-shrink-0 rounded-xl border border-ink/10 object-cover"
                   />
                 ) : (
                   <div
-                    className="flex h-20 w-28 flex-shrink-0 items-center justify-center rounded-xl border-2 border-ink text-2xl font-extrabold"
+                    className="flex h-20 w-28 flex-shrink-0 items-center justify-center rounded-xl border border-ink/10 text-2xl font-semibold"
                     style={{ backgroundColor: coverColor, color: coverText }}
                   >
                     {item.title?.slice(0, 1)}
@@ -167,14 +167,14 @@ export default function MyRegistrations() {
                   {/* 定位签到：已报名成功，活动进行中可定位签到 */}
                   {item.status === 'approved' && (
                     item.checked_in === 1 ? (
-                      <p className="mt-1 rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-xs font-bold text-ink on-clash">
+                      <p className="mt-1 rounded-lg border border-ink/10 bg-clash-cyan px-2 py-1 text-xs font-bold text-ink on-clash">
                         已签到 ✓
                       </p>
                     ) : (
                       <button
                         onClick={() => handleSelfCheckin(item)}
                         disabled={checkingInId === item.id}
-                        className="mt-1 w-full rounded-lg border-2 border-ink bg-clash-cyan px-2 py-1 text-left text-xs font-bold text-ink transition-transform on-clash hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="mt-1 w-full rounded-lg border border-ink/10 bg-clash-cyan px-2 py-1 text-left text-xs font-bold text-ink transition-transform on-clash hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {checkingInId === item.id ? '定位签到中…' : '📍 定位签到'}
                       </button>

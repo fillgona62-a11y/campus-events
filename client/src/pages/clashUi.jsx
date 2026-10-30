@@ -1,36 +1,25 @@
 /**
- * clashUi.jsx — 页面层撞色（Clash）共享片段
+ * clashUi.jsx — 页面层共享片段（清爽风格）
  *
- * 仅服务于 pages/ 目录下的页面拼装，避免每个页面各写一套撞色样式。
- * components/ 目录由组件同事维护，这里不重复造轮子，只做页面级复用。
- *
- * 提供的片段：
- *   SkeletonCard   骨架屏占位卡（加载态，网格布局）
- *   SkeletonList   列表骨架屏（加载态，纵向列表）
- *   ErrorState     错误态（可重试）
- *   AuthShell      认证页左右分栏外壳（品牌区 + 表单卡）
- *   PAGINATION_SX  分页选中色（撞色荧光绿 + 硬投影）
- *   CLASH_HEAD_SX  表格表头撞色底（后台用）
+ * 提供：SkeletonCard / SkeletonList / ErrorState / AuthShell / PAGINATION_SX / CLASH_HEAD_SX
  */
 import Button from '@mui/material/Button';
 import { CLASH } from '../theme';
-import { ClashStar, ClashBlob } from '../components/ClashDecor';
 
 /**
  * 骨架屏占位卡：封面 + 文本行 + 按钮位，用于活动卡片网格。
- * @param {{count?: number}} props
  */
 export function SkeletonCard({ count = 6 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="overflow-hidden rounded-2xl border-2 border-ink bg-paper-card">
-          <div className="skeleton h-40 w-full" />
+        <div key={i} className="overflow-hidden rounded-xl border border-ink/10 bg-paper-card">
+          <div className="skeleton h-36 w-full" />
           <div className="space-y-2.5 p-4">
             <div className="skeleton h-5 w-3/4 rounded" />
             <div className="skeleton h-3 w-1/2 rounded" />
             <div className="skeleton h-3 w-2/3 rounded" />
-            <div className="skeleton h-10 w-full rounded-xl" />
+            <div className="skeleton h-9 w-full rounded-lg" />
           </div>
         </div>
       ))}
@@ -39,15 +28,14 @@ export function SkeletonCard({ count = 6 }) {
 }
 
 /**
- * 列表骨架屏：用于「我的报名 / 我的活动 / 通知」等纵向列表。
- * @param {{count?: number}} props
+ * 列表骨架屏：纵向列表。
  */
 export function SkeletonList({ count = 4 }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex gap-3 rounded-2xl border-2 border-ink bg-paper-card p-3">
-          <div className="skeleton h-20 w-28 flex-shrink-0 rounded-xl" />
+        <div key={i} className="flex gap-3 rounded-xl border border-ink/10 bg-paper-card p-3">
+          <div className="skeleton h-20 w-28 flex-shrink-0 rounded-lg" />
           <div className="flex-1 space-y-2 py-1">
             <div className="skeleton h-4 w-2/3 rounded" />
             <div className="skeleton h-3 w-1/2 rounded" />
@@ -60,14 +48,12 @@ export function SkeletonList({ count = 4 }) {
 }
 
 /**
- * 错误态：撞色描边卡 + 说明 + 重试按钮。
- * @param {{text?: string, onRetry?: () => void}} props
+ * 错误态：柔和卡片 + 说明 + 重试按钮。
  */
 export function ErrorState({ text = '加载失败，请稍后重试', onRetry }) {
   return (
-    <div className="clash-card flex flex-col items-center justify-center gap-3 px-6 py-10 text-center">
-      <ClashStar size={30} style={{ color: CLASH.magenta }} />
-      <p className="text-sm font-semibold text-ink-soft">{text}</p>
+    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-ink/10 bg-paper-card px-6 py-10 text-center">
+      <p className="text-sm text-ink-soft">{text}</p>
       {onRetry && (
         <Button variant="contained" onClick={onRetry} sx={{ mt: 0.5 }}>
           重试
@@ -78,39 +64,35 @@ export function ErrorState({ text = '加载失败，请稍后重试', onRetry })
 }
 
 /**
- * 认证页外壳：左侧纯撞色品牌区 + 右侧白色表单卡；移动端品牌区压缩为横幅。
- * @param {{accent?: string, brandTitle?: string, slogan?: string, children: React.ReactNode}} props
+ * 认证页外壳：左侧柔和渐变品牌区 + 右侧表单卡；移动端品牌区压缩为横幅。
  */
 export function AuthShell({
-  accent = CLASH.lime,
+  accent = '#9c6b3f',
   brandTitle = '校园活动',
   slogan = '发现 · 报名 · 参与校园里的每一种可能',
   children,
 }) {
   return (
     <div className="min-h-screen bg-paper md:flex">
-      {/* 品牌区：桌面端占左半屏，移动端压缩为顶部撞色横幅 */}
       <aside
-        className="relative overflow-hidden border-b-2 border-ink px-6 py-6 md:flex md:w-[46%] md:flex-col md:justify-between md:border-b-0 md:border-r-2 md:px-10 md:py-14"
-        style={{ backgroundColor: accent }}
+        className="relative overflow-hidden px-6 py-8 md:flex md:w-[46%] md:flex-col md:justify-between md:px-12 md:py-16"
+        style={{ background: 'linear-gradient(160deg, #f5f1e8 0%, #eef2ea 55%, #e8eef0 100%)' }}
       >
-        <ClashBlob color={CLASH.magenta} top={-70} right={-50} size={220} opacity={0.5} />
-        <ClashBlob color={CLASH.cyan} bottom={-80} left={-60} size={200} opacity={0.5} />
-        <ClashStar size={26} className="absolute right-10 top-16 animate-float" style={{ color: CLASH.ink }} />
-        <ClashStar size={16} className="absolute bottom-24 right-24" style={{ color: CLASH.ink }} />
         <div className="relative">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink bg-paper-card shadow-block-ink-sm">
-            <ClashStar size={24} style={{ color: CLASH.royal }} />
+          <div
+            className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl text-white"
+            style={{ backgroundColor: accent }}
+          >
+            <span className="text-xl font-semibold">校</span>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-ink md:text-4xl">{brandTitle}</h1>
-          <p className="mt-2 max-w-xs text-sm font-bold text-ink-soft md:text-base">{slogan}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink md:text-4xl">{brandTitle}</h1>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-mute md:text-base">{slogan}</p>
         </div>
-        <p className="relative mt-6 hidden text-xs font-bold uppercase tracking-widest text-ink-soft md:block">
-          Clash · Campus Events
+        <p className="relative mt-8 hidden text-xs tracking-widest text-ink-faint md:block">
+          校园活动报名系统
         </p>
       </aside>
 
-      {/* 表单区 */}
       <main className="flex flex-1 items-start justify-center px-4 py-8 md:items-center md:px-8">
         <div className="w-full max-w-md">{children}</div>
       </main>
@@ -118,27 +100,25 @@ export function AuthShell({
   );
 }
 
-/** 分页：选中项换成撞色荧光绿 + 硬投影 */
+/** 分页：选中项用主题色 */
 export const PAGINATION_SX = {
   '& .MuiPaginationItem-root': {
-    borderRadius: 12,
-    fontWeight: 700,
-    color: CLASH.ink,
-    minWidth: 44,
-    minHeight: 44,
+    borderRadius: 8,
+    fontWeight: 500,
+    color: 'var(--ink-soft)',
+    minWidth: 40,
+    minHeight: 40,
   },
   '& .Mui-selected': {
-    backgroundColor: CLASH.lime,
-    color: CLASH.ink,
-    fontWeight: 800,
-    boxShadow: '3px 3px 0 0 var(--ink-line)',
-    '&:hover': { backgroundColor: CLASH.lime },
+    backgroundColor: '#9c6b3f',
+    color: '#fff',
+    '&:hover': { backgroundColor: '#7a5230' },
   },
 };
 
-/** 表格表头撞色底（后台克制风格，用薄荷绿） */
+/** 表格表头底色 */
 export const CLASH_HEAD_SX = {
-  backgroundColor: CLASH.mint,
-  fontWeight: 800,
+  backgroundColor: 'rgba(156,107,63,0.06)',
+  fontWeight: 600,
   whiteSpace: 'nowrap',
 };

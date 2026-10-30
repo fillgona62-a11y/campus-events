@@ -91,7 +91,7 @@ export default function UserManage() {
     <div>
       <div className="mb-4 flex items-center gap-2">
         <ClashStar size={20} style={{ color: CLASH.magenta }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">用户管理</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">用户管理</h1>
       </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
@@ -205,7 +205,7 @@ export default function UserManage() {
                 已为用户「{resetTarget?.name}（{resetTarget?.student_id}）」生成临时密码：
               </p>
               <p
-                className="rounded-xl border-2 border-ink p-3 text-center text-xl font-extrabold tracking-widest text-ink"
+                className="rounded-xl border border-ink/10 p-3 text-center text-xl font-semibold tracking-widest text-ink"
                 style={{ backgroundColor: CLASH.lemon }}
               >
                 {tempPassword}

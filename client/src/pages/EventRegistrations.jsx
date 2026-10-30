@@ -135,7 +135,7 @@ export default function EventRegistrations() {
           <ArrowBackIcon />
         </IconButton>
         <ClashStar size={18} style={{ color: CLASH.violet }} />
-        <h1 className="text-lg font-extrabold tracking-tight text-ink">
+        <h1 className="text-lg font-semibold tracking-tight text-ink">
           报名名单{event ? ` · ${event.title}` : ''}
         </h1>
         <div className="flex-1" />

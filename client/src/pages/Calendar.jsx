@@ -201,7 +201,7 @@ export default function Calendar() {
         </IconButton>
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.magenta }} />
-          <span className="text-lg font-extrabold tracking-tight text-ink">
+          <span className="text-lg font-semibold tracking-tight text-ink">
             {month.format('YYYY 年 M 月')}
           </span>
         </div>
@@ -254,12 +254,12 @@ export default function Calendar() {
                   aria-pressed={isSelected}
                   className={`flex min-h-[56px] flex-col items-center rounded-xl border-2 py-1 text-xs transition-transform active:translate-y-[2px] ${
                     isSelected
-                      ? 'border-ink bg-clash-lime font-extrabold shadow-block-ink-sm on-clash'
+                      ? 'border-ink bg-clash-lime font-semibold shadow-sm on-clash'
                       : 'border-transparent hover:border-ink/30'
                   } ${inMonth ? 'text-ink' : 'text-ink-faint'}`}
                 >
                   <span
-                    className={isToday ? 'font-extrabold underline decoration-2' : ''}
+                    className={isToday ? 'font-semibold underline decoration-2' : ''}
                     style={rest && inMonth && !isSelected ? { color: REST_RED } : isToday ? { color: CLASH.royal } : undefined}
                   >
                     {day.date()}
@@ -295,10 +295,10 @@ export default function Calendar() {
           </div>
 
           {/* 选中日活动列表 */}
-          <h2 className="mb-2 mt-4 flex items-center gap-2 text-base font-extrabold text-ink">
+          <h2 className="mb-2 mt-4 flex items-center gap-2 text-base font-semibold text-ink">
             <ClashStar size={16} style={{ color: CLASH.violet }} />
             {selected} 的活动
-            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-xs font-extrabold text-ink on-clash">
+            <span className="rounded-md border border-ink/10 bg-clash-cyan px-2 py-0.5 text-xs font-semibold text-ink on-clash">
               {selectedEvents.length}
             </span>
           </h2>
@@ -320,7 +320,7 @@ export default function Calendar() {
                   onKeyDown={(ev) => ev.key === 'Enter' && navigate(`/events/${e.id}`)}
                 >
                   <i
-                    className="block h-10 w-1.5 flex-shrink-0 rounded-full border-2 border-ink"
+                    className="block h-10 w-1.5 flex-shrink-0 rounded-full border border-ink/10"
                     style={{ backgroundColor: colorOf(e.category_id) }}
                   />
                   <div className="min-w-0 flex-1">
@@ -331,7 +331,7 @@ export default function Calendar() {
                     <p className="text-xs font-semibold text-ink-mute">{e.location}</p>
                   </div>
                   {e.category_name && (
-                    <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
+                    <span className="rounded-md border border-ink/10 bg-clash-mint px-2 py-0.5 text-[11px] font-semibold text-ink on-clash">
                       {e.category_name}
                     </span>
                   )}
@@ -342,11 +342,11 @@ export default function Calendar() {
 
           {/* 我的备注（登录后可添加/编辑/删除） */}
           <div className="mt-4">
-            <h2 className="mb-2 flex items-center gap-2 text-base font-extrabold text-ink">
+            <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-ink">
               <ClashStar size={16} style={{ color: CLASH.magenta }} />
               我的备注
               {selectedNote && (
-                <span className="rounded-md border-2 border-ink bg-clash-magenta px-2 py-0.5 text-xs font-extrabold text-ink on-clash">
+                <span className="rounded-md border border-ink/10 bg-clash-magenta px-2 py-0.5 text-xs font-semibold text-ink on-clash">
                   已记
                 </span>
               )}

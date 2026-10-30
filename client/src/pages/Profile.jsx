@@ -183,22 +183,22 @@ export default function Profile() {
       {/* ── 撞色头像区 ─────────────────────────────────────────── */}
       <section className="clash-card flex items-center gap-4 p-4">
         <div
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-ink text-2xl font-extrabold text-ink shadow-block-ink-sm"
+          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border border-ink/10 text-2xl font-semibold text-ink shadow-sm"
           style={{ backgroundColor: CLASH.lime }}
           aria-hidden="true"
         >
           {user?.name?.slice(0, 1) || '我'}
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-lg font-extrabold tracking-tight text-ink">
+          <h1 className="truncate text-lg font-semibold tracking-tight text-ink">
             {user?.name || '未设置姓名'}
           </h1>
           <p className="mt-0.5 text-xs font-bold text-ink-mute">学号 {user?.student_id || '-'}</p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            <span className="rounded-md border-2 border-ink bg-clash-cyan px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
+            <span className="rounded-md border border-ink/10 bg-clash-cyan px-2 py-0.5 text-[11px] font-semibold text-ink on-clash">
               {ROLE_LABEL[user?.role] || '普通用户'}
             </span>
-            <span className="rounded-md border-2 border-ink bg-clash-mint px-2 py-0.5 text-[11px] font-extrabold text-ink on-clash">
+            <span className="rounded-md border border-ink/10 bg-clash-mint px-2 py-0.5 text-[11px] font-semibold text-ink on-clash">
               {user?.email ? '已绑定邮箱' : '未绑定邮箱'}
             </span>
           </div>
@@ -210,7 +210,7 @@ export default function Profile() {
       <section className="clash-card space-y-4 p-4 md:p-6">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.violet }} />
-          <h2 className="text-base font-extrabold text-ink">基本资料</h2>
+          <h2 className="text-base font-semibold text-ink">基本资料</h2>
         </div>
         <ClashStripe />
         <TextField fullWidth label="学号" value={user?.student_id || ''} disabled helperText="学号为登录账号，不可修改" />
@@ -256,7 +256,7 @@ export default function Profile() {
       <section className="clash-card space-y-4 p-4 md:p-6">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.lemon }} />
-          <h2 className="text-base font-extrabold text-ink">修改密码</h2>
+          <h2 className="text-base font-semibold text-ink">修改密码</h2>
         </div>
         <ClashStripe />
         <TextField
@@ -299,7 +299,7 @@ export default function Profile() {
       <section className="clash-card space-y-4 p-4 md:p-6">
         <div className="flex items-center gap-2">
           <ClashStar size={16} style={{ color: CLASH.cyan }} />
-          <h2 className="text-base font-extrabold text-ink">绑定邮箱</h2>
+          <h2 className="text-base font-semibold text-ink">绑定邮箱</h2>
         </div>
         <ClashStripe />
         <p className="text-sm text-ink-soft">
@@ -314,10 +314,10 @@ export default function Profile() {
           onChange={(e) => setEmailForm((f) => ({ ...f, email: e.target.value }))}
         />
         {/* 图形验证码：撞色小卡 */}
-        <div className="rounded-2xl border-2 border-ink bg-clash-lemon p-3 shadow-block-ink-sm on-clash">
+        <div className="rounded-2xl border border-ink/10 bg-clash-lemon p-3 shadow-sm on-clash">
           <div className="flex items-start gap-2">
             <div
-              className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-paper-card"
+              className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-ink/10 bg-paper-card"
               onClick={loadCaptcha}
               title="点击图片刷新验证码"
               dangerouslySetInnerHTML={{ __html: captcha.svg }}

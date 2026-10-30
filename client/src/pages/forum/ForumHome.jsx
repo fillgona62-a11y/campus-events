@@ -48,7 +48,7 @@ function toSummary(html, max = 110) {
 function TopicChip({ topic, index }) {
   return (
     <span
-      className="rounded-md border-2 border-ink px-1.5 py-0.5 text-[11px] font-extrabold on-clash"
+      className="rounded-md border border-ink/10 px-1.5 py-0.5 text-[11px] font-semibold on-clash"
       style={{ backgroundColor: clashColorAt(index) }}
     >
       {topic}
@@ -130,7 +130,7 @@ export default function ForumHome() {
       <div className="clash-card mb-4 space-y-3 p-3">
         <div className="flex flex-wrap items-center gap-2">
           {/* 排序切换：最新 / 最热 */}
-          <div className="flex overflow-hidden rounded-xl border-2 border-ink">
+          <div className="flex overflow-hidden rounded-xl border border-ink/10">
             {SORTS.map((s) => {
               const active = sort === s.value;
               return (
@@ -274,10 +274,10 @@ export default function ForumHome() {
 
                 {/* 标题 + 正文摘要 */}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <h3 className="text-base font-extrabold text-ink">{p.title}</h3>
+                  <h3 className="text-base font-semibold text-ink">{p.title}</h3>
                   {/* 置顶徽标：所有人可见 */}
                   {p.is_pinned && (
-                    <span className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-clash-magenta px-1.5 py-0.5 text-[11px] font-extrabold on-clash">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-ink/10 bg-clash-magenta px-1.5 py-0.5 text-[11px] font-semibold on-clash">
                       置顶
                     </span>
                   )}

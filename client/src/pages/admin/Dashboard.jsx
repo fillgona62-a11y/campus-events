@@ -68,7 +68,7 @@ export default function Dashboard() {
     <div>
       <div className="mb-4 flex items-center gap-2">
         <ClashStar size={20} style={{ color: CLASH.violet }} />
-        <h1 className="text-xl font-extrabold tracking-tight text-ink">数据概览</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">数据概览</h1>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -80,7 +80,7 @@ export default function Dashboard() {
               style={{ backgroundColor: card.color }}
               aria-hidden="true"
             />
-            <p className="text-3xl font-extrabold text-ink">{stats[card.key]}</p>
+            <p className="text-3xl font-semibold text-ink">{stats[card.key]}</p>
             <p className="mt-1 text-sm font-bold text-ink-mute">{card.label}</p>
           </div>
         ))}
@@ -118,10 +118,10 @@ export default function Dashboard() {
 
           {/* 分类报名分布（横向条形图） */}
           {analyticsData.category_distribution.length > 0 && (
-            <div className="rounded-2xl border-2 border-ink bg-paper-card p-5 shadow-block-ink">
+            <div className="rounded-2xl border border-ink/10 bg-paper-card p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
                 <ClashStar size={16} style={{ color: CLASH.magenta }} />
-                <h2 className="text-base font-extrabold text-ink">分类报名分布</h2>
+                <h2 className="text-base font-semibold text-ink">分类报名分布</h2>
               </div>
               <div className="space-y-2">
                 {(() => {
@@ -133,7 +133,7 @@ export default function Dashboard() {
                       </span>
                       <div className="flex-1 overflow-hidden rounded-lg" style={{ backgroundColor: 'rgba(var(--ink-rgb),0.08)' }}>
                         <div
-                          className="flex h-6 items-center justify-end rounded-lg border-2 border-ink px-2 text-[11px] font-extrabold text-ink"
+                          className="flex h-6 items-center justify-end rounded-lg border border-ink/10 px-2 text-[11px] font-semibold text-ink"
                           style={{
                             width: `${Math.max(8, (c.count / max) * 100)}%`,
                             backgroundColor: clashColorAt(i, CATEGORY_COLORS),
@@ -160,7 +160,7 @@ export default function Dashboard() {
               ].map((f) => (
                 <div key={f.label} className="clash-card relative overflow-hidden p-4 text-center">
                   <span className="absolute left-0 right-0 top-0 h-1.5" style={{ backgroundColor: f.color }} aria-hidden="true" />
-                  <p className="text-2xl font-extrabold text-ink">{f.value}</p>
+                  <p className="text-2xl font-semibold text-ink">{f.value}</p>
                   <p className="mt-1 text-xs font-bold text-ink-mute">{f.label}</p>
                 </div>
               ))}

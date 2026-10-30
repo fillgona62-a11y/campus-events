@@ -14,7 +14,6 @@ import { register, sendEmailCode, getCaptcha } from '../api/authApi';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { AuthShell } from './clashUi';
-import { CLASH } from '../theme';
 
 const RESEND_COOLDOWN = 60; // 秒，与后端 EMAIL_CODE_RESEND_COOLDOWN_SEC 对齐
 
@@ -167,10 +166,10 @@ export default function Register() {
   };
 
   return (
-    <AuthShell accent={CLASH.magenta} slogan="注册账号，发布与报名校园里的每一场活动">
-      <div className="clash-card p-6 md:p-8">
-        <h2 className="text-center text-2xl font-extrabold tracking-tight text-ink">
-          注册<span className="clash-text-gradient">新账号</span>
+    <AuthShell accent="#9c6b3f" slogan="注册账号，发布与报名校园里的每一场活动">
+      <div className="rounded-xl border border-ink/10 bg-paper-card p-6 shadow-sm md:p-8">
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-ink">
+          注册新账号
         </h2>
         <p className="mb-5 mt-1 text-center text-sm text-ink-mute">注册后即可发布与报名活动</p>
 
@@ -205,11 +204,11 @@ export default function Register() {
             helperText="用于接收验证码与找回密码"
           />
 
-          {/* 图形验证码：撞色小卡 */}
-          <div className="rounded-2xl border-2 border-ink bg-clash-lemon p-3 shadow-block-ink-sm">
+          {/* 图形验证码 */}
+          <div className="rounded-xl border border-ink/10 bg-paper p-3">
             <div className="flex items-start gap-2">
               <div
-                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-ink bg-paper-card"
+                className="flex h-14 w-32 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-ink/15 bg-white"
                 onClick={loadCaptcha}
                 title="点击图片刷新验证码"
                 dangerouslySetInnerHTML={{ __html: captcha.svg }}
@@ -300,7 +299,7 @@ export default function Register() {
         <div className="mt-6 space-y-1.5 text-center text-sm">
           <p className="text-ink-mute">
             已有账号？
-            <Link to="/login" className="ml-1 font-extrabold text-clash-royal no-underline hover:underline">
+            <Link to="/login" className="ml-1 font-medium no-underline hover:underline" style={{ color: '#9c6b3f' }}>
               去登录
             </Link>
           </p>
