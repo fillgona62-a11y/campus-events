@@ -55,8 +55,8 @@ export default function EventCard({ event }) {
         }
       }}
     >
-      {/* 封面：真实图优先，无图用分类色渐变 */}
-      <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br" style={{ background: `linear-gradient(135deg, ${accent}22, ${accent}0d)` }}>
+      {/* 封面：真实图优先，无图用分类色渐变 + 分类名 */}
+      <div className="relative h-36 w-full overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}26 0%, ${accent}0d 60%, #f5f1e8 100%)` }}>
         {event.cover_url && !coverFailed ? (
           <img
             src={event.cover_url}
@@ -66,8 +66,8 @@ export default function EventCard({ event }) {
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center" style={{ color: accent }}>
-            <span className="text-3xl font-semibold opacity-40">{event.title?.slice(0, 1) || '活'}</span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1" style={{ color: accent }}>
+            <span className="text-xl font-semibold opacity-50">{event.category_name || '活动'}</span>
           </div>
         )}
         {/* 置顶标记：左上角淡色胶囊 */}
@@ -114,7 +114,7 @@ export default function EventCard({ event }) {
         <div className="mt-2 pt-1">
           <Button
             fullWidth
-            variant="contained"
+            variant="outlined"
             size="small"
             onClick={(e) => {
               e.stopPropagation();
@@ -122,13 +122,14 @@ export default function EventCard({ event }) {
             }}
             disabled={disabled}
             sx={{
-              minHeight: 36,
-              fontWeight: 600,
+              minHeight: 34,
+              fontWeight: 500,
               borderRadius: '8px',
               textTransform: 'none',
-              boxShadow: 'none',
+              color: 'var(--ink-soft)',
+              borderColor: 'rgba(var(--ink-rgb), 0.18)',
               ...(disabled
-                ? { backgroundColor: '#e5e3dd', color: '#9a9aab', '&:hover': { backgroundColor: '#e5e3dd' } }
+                ? { color: '#b0aca3', borderColor: 'rgba(var(--ink-rgb), 0.10)' }
                 : {}),
             }}
           >
